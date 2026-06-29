@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="no" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Pris App by Mr. Intl</title>
+    <style>
+        * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        body { background-color: #f5f7fb; margin: 0; padding: 10px; color: #2c3e50; }
+        .app-container { width: 100%; max-width: 480px; margin: auto; background: white; padding: 20px 15px; border-radius: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); }
+        
+        h1 { font-size: 26px; font-weight: 800; margin: 0; text-align: center; color: #1e272e; }
+        .subtitle { font-size: 12px; font-weight: 700; color: #27ae60; text-transform: uppercase; letter-spacing: 2px; text-align: center; margin-bottom: 20px; }
+        
+        .section-title { font-size: 16px; font-weight: 700; border-bottom: 2px solid #ecf0f1; padding-bottom: 5px; margin: 20px 0 10px 0; color: #34495e; text-align: left; }
+        
+        .form-group { background: #f8fafc; padding: 12px; border-radius: 12px; margin-bottom: 10px; border: 1px solid #e2e8f0; text-align: left; }
+        label { font-size: 12px; font-weight: bold; color: #7f8c8d; display: block; margin-bottom: 5px; }
+        input, select { width: 100%; padding: 10px; border: 2px solid #e1e8ed; border-radius: 8px; font-size: 15px; background: white; }
+        input:focus, select:focus { border-color: #27ae60; outline: none; }
+        
+        .row { display: flex; gap: 10px; margin-bottom: 10px; }
+        .col { flex: 1; text-align: left; }
+        
+        /* حاسبة الأسعار الفورية */
+        .calc-box { background: #e8f8f5; border: 2px dashed #27ae60; border-radius: 12px; padding: 15px; margin-top: 10px; text-align: left; }
+        .calc-result { font-size: 14px; font-weight: bold; margin-bottom: 5px; display: flex; justify-content: space-between; }
+        .final-price { font-size: 22px; color: #27ae60; font-weight: 800; }
+        .profit-amount { font-size: 18px; color: #e74c3c; font-weight: 800; }
+        
+        .btn { width: 100%; background: #27ae60; color: white; padding: 14px; border: none; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 10px; box-shadow: 0 4px 12px rgba(39, 174, 96, 0.2); }
+        .btn:active { transform: scale(0.98); }
+        
+        .search-box { width: 100%; padding: 12px; margin: 15px 0; border: 2px solid #27ae60; border-radius: 10px; font-size: 15px; }
+        
+        /* قائمة الطلبيات والموردين */
+        .product-card { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 14px; padding: 12px; margin-bottom: 12px; display: flex; gap: 12px; align-items: center; position: relative; text-align: left; }
+        .product-img { width: 70px; height: 70px; border-radius: 8px; object-fit: cover; background: #e2e8f0; }
+        .product-details { flex: 1; min-width: 0; }
+        .p-name { font-weight: 700; font-size: 15px; color: #2c3e50; margin: 0; }
+        .p-supplier { font-size: 11px; color: #7f8c8d; font-weight: bold; margin-top: 2px; }
+        .p-meta { font-size: 12px; margin-top: 4px; color: #34495e; }
+        .p-link { font-size: 11px; color: #2980b9; text-decoration: none; display: inline-block; margin-top: 4px; }
+        .p-prices { text-align: right; min-width: 90px; }
+        .p-sales-price { font-size: 16px; font-weight: 800; color: #27ae60; }
+        .p-cost { font-size: 11px; color: #7f8c8d; }
+        .delete-btn { background: #ff7675; color: white; border: none; padding: 4px 8px; border-radius: 5px; font-size: 11px; cursor: pointer; margin-top: 5px; }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <h1>Pris App</h1>
+    <div class="subtitle">by Mr. Intl (Kalkulator & Bestilling)</div>
+    
+    <!-- قسم حاسبة الأسعار وإدخال المنتجات -->
+    <div class="section-title">1. Legg til Produkt & Beregn Pris</div>
+    
+    <div class="form-group">
+        <label>Produktnavn (اسم المنتج)</label>
+        <input type="text" id="prodName" placeholder="F.eks. Sweet Potato">
+    </div>
+    
+    <div class="row">
+        <div class="col" style="flex: 1.5;">
+            <div class="form-group">
+                <label>Innkjøpspris (سعر الشراء للكمية)</label>
+                <input type="number" id="costPrice" placeholder="0.00" oninput="calculatePricing()">
+            </div>
+        </div>
+        <div class="col">
+            <div class="form-group">
+                <label>Antall (الكمية)</label>
+                <input type="number" id="quantity" value="1" oninput="calculatePricing()">
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col">
+            <div class="form-group">
+                <label>Margin / Fandemultiplikator (نسبة الفائدة)</label>
+                <select id="marginSelect" onchange="calculatePricing()">
+                    <option value="1.3">1.3</option>
+                    <option value="1.4">1.4</option>
+                    <option value="1.5" selected>1.5</option>
+                    <option value="1.6">1.6</option>
+                    <option value="1.7">1.7</option>
+                    <option value="1.8">1.8</option>
+                    <option value="1.9">1.9</option>
+                    <option value="2.0">2.0</option>
+                </select>
+            </div>
+        </div>
+        <div class="col">
+            <div class="form-group">
+                <label>MVA / ضريبة القيمة المضافة</label>
+                <select id="vvaSelect" onchange="calculatePricing()">
+                    <option value="0.25">25% (Standard)</option>
+                    <option value="0.15" selected>15% (Matvarer)</option>
+                    <option value="0">0% (Ingen)</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <!-- حقول المورد والصور لإنشاء مجموعات الطلبيات -->
+    <div class="row">
+        <div class="col">
+            <div class="form-group">
+                <label>Leverandør (المورد)</label>
+                <input type="text" id="supplierName" placeholder="F.eks. Afro kjøp">
+            </div>
+        </div>
+        <div class="col">
+            <div class="form-group">
+                <label>Bilde-URL (رابط صورة المنتج)</label>
+                <input type="text" id="imgUrl" placeholder="https://...">
+            </div>
+        </div>
+    </div>
+    <div class="form-group">
+        <label>Leverandør Link (صفحة المنتج لدى المورد)</label>
+        <input type="text" id="supplierLink" placeholder="https://leverandor.no/produkt...">
+    </div>
+
+    <!-- صندوق المخرجات التلقائي والربح الموضح -->
+    <div class="calc-box">
+        <div class="calc-result">Utpris eks. MVA (سعر البيع بدون ضريبة): <span id="resExMva">0.00 kr</span></div>
+        <div class="calc-result">MVA beløp (قيمة الضريبة): <span id="resMvaAmount">0.00 kr</span></div>
+        <div class="calc-result" style="margin-top: 10px;">
+            <div>Veiledende Utsalgspris (سعر البيع النهائي):</div>
+            <div class="final-price" id="resFinalPrice">0.00 kr</div>
+        </div>
+        <div class="calc-result" style="border-top: 1px solid #27ae60; padding-top: 8px; margin-top: 5px;">
+            <div>Netto Fortjeneste (صافي الربح الموضح):</div>
+            <div class="profit-amount" id="resProfit">0.00 kr</div>
+        </div>
+    </div>
+
+    <button class="btn" onclick="saveToOrderList()">Lagre i ordreliste (حفظ في قائمة الطلبيات)</button>
+
+    <!-- قسم البحث وإدارة الطلبيات والموردين -->
+    <div class="section-title">2. Ordreliste & Leverandørgrupper</div>
+    <input type="text" id="searchBar" class="search-box" placeholder="Søk i lagrede produkter..." oninput="renderOrders()">
+
+    <div id="ordersContainer">
+        <!-- كروت المنتجات والطلبيات المجهزة ستظهر هنا -->
+    </div>
+</div>
+
+<script>
+    let savedOrders = JSON.parse(localStorage.getItem('mr_intl_orders')) || [];
+
+    // دالة حساب الأسعار والضريبة والربح الفوري تماشياً مع معايير المتجر
+    function calculatePricing() {
+        const costPrice = parseFloat(document.getElementById('costPrice').value) || 0;
+        const qty = parseFloat(document.getElementById('quantity').value) || 1;
+        const margin = parseFloat(document.getElementById('marginSelect').value);
+        const mvaRate = parseFloat(document.getElementById('vvaSelect').value);
+
+        if (costPrice === 0) return;
+
+        // الحسابات الهندسية للمنتج بناءً على سعر الكمية الكلي
+        const priceExMva = costPrice * margin;
+        const mvaAmount = priceExMva * mvaRate;
+        const finalPrice = priceExMva + mvaAmount;
+        const netProfit = priceExMva - costPrice; // الربح الصافي قبل الضريبة للمتجر
+
+        // عرض النتائج الفورية في الحاسبة
+        document.getElementById('resExMva').innerText = (priceExMva / qty).toFixed(2) + " kr (stk)";
+        document.getElementById('resMvaAmount').innerText = mvaAmount.toFixed(2) + " kr";
+        document.getElementById('resFinalPrice').innerText = finalPrice.toFixed(2) + " kr";
+        document.getElementById('resProfit').innerText = netProfit.toFixed(2) + " kr";
+        
+        return { priceExMva, finalPrice, netProfit };
+    }
+
+    // حفظ المنتج المحسوب مع صورته ومورده داخل الهاتف
+    function saveToOrderList() {
+        const name = document.getElementById('prodName').value.trim();
+        const cost = parseFloat(document.getElementById('costPrice').value) || 0;
+        
+        if (!name || cost === 0) {
+            alert("Vennligst fyll ut produktnavn og innkjøpspris!");
+            return;
+        }
+
+        const calc = calculatePricing();
+        const fallbackImg = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 24 24' fill='none' stroke='%23b2bec3' stroke-width='1' stroke-linecap='round' stroke-linejoin='round'><rect x='3' y='3' width='18' height='18' rx='2' ry='2'/><circle cx='8.5' cy='8.5' r='1.5'/><polyline points='21 15 16 10 5 21'/></svg>";
+
+        const product = {
+            id: Date.now(),
+            name: name,
+            cost: cost,
+            qty: document.getElementById('quantity').value,
+            margin: document.getElementById('marginSelect').value,
+            mva: document.getElementById('vvaSelect').value,
+            supplier: document.getElementById('supplierName').value.trim() || "Ukjent Leverandør",
+            img: document.getElementById('imgUrl').value.trim() || fallbackImg,
+            link: document.getElementById('supplierLink').value.trim() || "#",
+            finalPrice: calc.finalPrice.toFixed(2),
+            profit: calc.netProfit.toFixed(2)
+        };
+
+        savedOrders.unshift(product);
+        localStorage.setItem('mr_intl_orders', JSON.stringify(savedOrders));
+
+        // تفريغ الحقول لإدخال منتج آخر سريعاً
+        document.getElementById('prodName').value = '';
+        document.getElementById('costPrice').value = '';
+        document.getElementById('imgUrl').value = '';
+        document.getElementById('supplierLink').value = '';
+
+        renderOrders();
+    }
+
+    function deleteOrder(id) {
+        if (confirm("Vil du slette dette produktet fra listen?")) {
+            savedOrders = savedOrders.filter(p => p.id !== id);
+            localStorage.setItem('mr_intl_orders', JSON.stringify(savedOrders));
+            renderOrders();
+        }
+    }
+
+    // عرض المنتجات وتجميعها حسب المورد والبحث الفوري بدون إنترنت
+    function renderOrders() {
+        const container = document.getElementById('ordersContainer');
+        const query = document.getElementById('searchBar').value.toLowerCase();
+        container.innerHTML = '';
+
+        const filtered = savedOrders.filter(p => p.name.toLowerCase().includes(query) || p.supplier.toLowerCase().includes(query));
+
+        if (filtered.length === 0) {
+            container.innerHTML = '<div style="color:#7f8c8d; text-align:center; font-size:14px; margin-top:15px;">Ingen produkter i ordrelisten.</div>';
+            return;
+        }
+
+        filtered.forEach(p => {
+            container.innerHTML += `
+                <div class="product-card">
+                    <img src="${p.img}" class="product-img" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\\'http://www.w3.org/2000/svg\\' width=\\'100\\' height=\\'100\\' viewBox=\\'0 0 24 24\\' fill=\\'none\\' stroke=\\'%23b2bec3\\' stroke-width=\\'1\\'><rect x=\\'3\\' y=\\'3\\' width=\\'18\\' height=\\'18\\' rx=\\'2\\'/></svg>'">
+                    <div class="product-details">
+                        <p class="p-name">${p.name}</p>
+                        <span class="p-supplier">Leverandør: ${p.supplier}</span>
+                        <div class="p-meta">Antall: <b>${p.qty}</b> | Margin: <b>${p.margin}</b></div>
+                        <a href="${p.link}" target="_blank" class="p-link">Se hos leverandør ↗</a>
+                    </div>
+                    <div class="p-prices">
+                        <div class="p-sales-price">${p.finalPrice} kr</div>
+                        <div class="p-cost">Kost: ${p.cost} kr</div>
+                        <div class="p-cost" style="color:#e74c3c;">Profit: +${p.profit} kr</div>
+                        <button class="delete-btn" onclick="deleteOrder(${p.id})">Slett</button>
+                    </div>
+                </div>
+            `;
+        });
+    }
+
+    // تشغيل القائمة فوراً عند فتح التطبيق
+    renderOrders();
+</script>
+
+</body>
+</html>
