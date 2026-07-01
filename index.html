@@ -118,7 +118,7 @@
     </div>
     
     <div class="row">
-        <div class="col" style="flex: 1.2;">
+        <div class="col" style="flex: 1.5;">
             <div class="form-group">
                 <label id="lblCostPrice">Innkjøpspris (سعر الشراء الإجمالي)</label>
                 <input type="number" id="costPrice" placeholder="0.00" oninput="calculatePricing()">
@@ -127,33 +127,7 @@
         <div class="col">
             <div class="form-group">
                 <label id="lblQty">Antall (الكمية)</label>
-                <input type="number" id="quantity" value="1" oninput="calculatePricing()">
-            </div>
-        </div>
-        <div class="col">
-            <div class="form-group">
-                <label id="lblUnitType">Enhet (الوحدة)</label>
-                <select id="unitTypeSelect" onchange="calculatePricing()">
-                    <option value="" selected>--</option>
-                    <option value="stk">Stk (قطعة)</option>
-                    <option value="bunt">Bunt (ضمة)</option>
-                    <option value="kg">Kg (وزن)</option>
-                </select>
-            </div>
-        </div>
-    </div>
-
-    <div class="row">
-        <div class="col">
-            <div class="form-group">
-                <label id="lblPackDetails">Innhold per eske (محتوى الصندوق داخلياً)</label>
-                <input type="text" id="packDetails" placeholder="F.eks. 12 stk x 1L">
-            </div>
-        </div>
-        <div class="col">
-            <div class="form-group">
-                <label id="lblOrderEsker">Antall esker å bestille (كمية الصناديق المطلوبة)</label>
-                <input type="number" id="orderEsker" value="1" oninput="updateEskerInState(this)">
+                <input type="number" id="quantity" placeholder="" oninput="calculatePricing()">
             </div>
         </div>
     </div>
@@ -240,7 +214,7 @@
     const i18n = {
         no: {
             sub: "by Mr. Intl (Kalkulator & Ordre)", sec1: "1. Beregn Pris & Legg til", sec2: "2. Leverandørbestillinger (سجل الطلبيات)",
-            prodName: "Produktnavn", cost: "Innkjøpspris (Total)", qty: "Antall", unitType: "Enhet (الوحدة)", packDetails: "Innhold per eske", orderEsker: "Antall esker å bestille", margin: "Margin", mva: "MVA", supplier: "Leverandør",
+            prodName: "Produktnavn", cost: "Innkjøpspris (Total)", qty: "Antall", margin: "Margin", mva: "MVA", supplier: "Leverandør",
             img: "Bilde-URL", link: "Leverandør Link", uCost: "Innkjøpspris per enhet", exMva: "Utsalgspris eks. MVA", fPrice: "Utsalgspris:",
             profit: "Netto Fortjeneste:", save: "Lagre i ordreliste", update: "Oppdater Produkt", search: "Søk efter produkt...",
             selected: "valgt", reorderBtn: "Send valgte produkter (Mورد)", edit: "Endre", del: "Slett", openPage: "Åpne Leverandørsiden ↗",
@@ -248,7 +222,7 @@
         },
         ar: {
             sub: "بواسطة مستر إنترناشونال (الحاسبة والطلبيات)", sec1: "1. حساب الأسعار وإضافة منتج", sec2: "2. سجل طلبيات الموردين الحاليين",
-            prodName: "اسم المنتج", cost: "سعر الشراء الإجمالي للكمية", qty: "الكمية/العدد", unitType: "نوع الوحدة", packDetails: "محتوى وتعبئة الصندوق الداخلي", orderEsker: "عدد الصناديق المطلوبة للطلب", margin: "نسبة الفائدة", mva: "الضريبة", supplier: "المورد الحالي",
+            prodName: "اسم المنتج", cost: "سعر الشراء الإجمالي للكمية", qty: "الكمية/العدد", margin: "نسبة الفائدة", mva: "الضريبة", supplier: "المورد الحالي",
             img: "رابط الصورة", link: "رابط صفحة المورد", uCost: "تكلفة الوحدة الواحدة", exMva: "البيع بدون ضريبة", fPrice: "سعر البيع البارز للوحدة:",
             profit: "صافي ربح الوحدة الواحدة:", save: "حفظ وتثبيت في القائمة", update: "تعديل وحفظ الحالي", search: "بحث سريع...",
             selected: "منتج محدد", reorderBtn: "إرسال طلب مجمع للمورد 🛒", edit: "تعديل", del: "حذف", openPage: "رابط المورد ↗",
@@ -266,9 +240,6 @@
         document.getElementById('lblProdName').innerText = i18n[lang].prodName;
         document.getElementById('lblCostPrice').innerText = i18n[lang].cost;
         document.getElementById('lblQty').innerText = i18n[lang].qty;
-        document.getElementById('lblUnitType').innerText = i18n[lang].unitType;
-        document.getElementById('lblPackDetails').innerText = i18n[lang].packDetails;
-        document.getElementById('lblOrderEsker').innerText = i18n[lang].orderEsker;
         document.getElementById('lblMargin').innerText = i18n[lang].margin;
         document.getElementById('lblMva').innerText = i18n[lang].mva;
         document.getElementById('lblSupplier').innerText = i18n[lang].supplier;
@@ -300,22 +271,20 @@
         const qty = parseFloat(document.getElementById('quantity').value) || 1;
         const margin = parseFloat(document.getElementById('marginSelect').value);
         const mvaRate = parseFloat(document.getElementById('vvaSelect').value);
-        const unitType = document.getElementById('unitTypeSelect').value;
-        const unitSuffix = unitType ? "/" + unitType : "";
 
-        if (costPrice === 0) return { unitCost:0, unitFinalPrice:0, unitProfit:0, unitType };
+        if (costPrice === 0) return { unitCost:0, unitFinalPrice:0, unitProfit:0 };
 
         const unitCost = costPrice / qty;
         const unitPriceExMva = unitCost * margin;
         const unitFinalPrice = unitPriceExMva * (1 + mvaRate);
         const unitProfit = unitPriceExMva - unitCost;
 
-        document.getElementById('resUnitCost').innerText = unitCost.toFixed(2) + " kr" + unitSuffix;
+        document.getElementById('resUnitCost').innerText = unitCost.toFixed(2) + " kr";
         document.getElementById('resExMva').innerText = unitPriceExMva.toFixed(2) + " kr";
         document.getElementById('resFinalUnitPrice').innerText = unitFinalPrice.toFixed(2) + " kr";
         document.getElementById('resUnitProfit').innerText = "+" + unitProfit.toFixed(2) + " kr";
         
-        return { unitCost, unitFinalPrice, unitProfit, unitType };
+        return { unitCost, unitFinalPrice, unitProfit };
     }
 
     function saveToOrderList() {
@@ -334,10 +303,8 @@
             id: editId ? parseInt(editId) : Date.now(),
             name: name,
             cost: cost,
-            qty: document.getElementById('quantity').value,
-            unitType: calc.unitType,
-            packDetails: document.getElementById('packDetails').value.trim() || "",
-            orderEsker: document.getElementById('orderEsker').value || "1",
+            qty: document.getElementById('quantity').value || "1",
+            orderEsker: "1", // القيمة الافتراضية للطلب
             margin: document.getElementById('marginSelect').value,
             mva: document.getElementById('vvaSelect').value,
             supplier: document.getElementById('supplierName').value.trim() || (currentLang === 'ar' ? "مورد غير معروف" : "Ukjent Leverandør"),
@@ -348,6 +315,10 @@
         };
 
         if (editId) {
+            // المحافظة على كمية الطلب السابقة عند التعديل
+            const oldP = savedOrders.find(item => item.id === productData.id);
+            if(oldP) productData.orderEsker = oldP.orderEsker;
+
             savedOrders = savedOrders.map(p => p.id === productData.id ? productData : p);
             document.getElementById('editId').value = "";
         } else {
@@ -358,8 +329,7 @@
 
         document.getElementById('prodName').value = '';
         document.getElementById('costPrice').value = '';
-        document.getElementById('packDetails').value = '';
-        document.getElementById('orderEsker').value = '1';
+        document.getElementById('quantity').value = '';
         document.getElementById('imgUrl').value = '';
         document.getElementById('supplierLink').value = '';
         
@@ -373,10 +343,7 @@
         document.getElementById('editId').value = p.id;
         document.getElementById('prodName').value = p.name;
         document.getElementById('costPrice').value = p.cost;
-        document.getElementById('quantity').value = p.qty;
-        document.getElementById('unitTypeSelect').value = p.unitType || '';
-        document.getElementById('packDetails').value = p.packDetails || '';
-        document.getElementById('orderEsker').value = p.orderEsker || '1';
+        document.getElementById('quantity').value = p.qty === "1" ? "" : p.qty;
         document.getElementById('marginSelect').value = p.margin;
         document.getElementById('vvaSelect').value = p.mva;
         document.getElementById('supplierName').value = p.supplier;
@@ -409,7 +376,6 @@
         document.getElementById('txtSelectedCount').innerText = `${checked} ${i18n[currentLang].selected}`;
     }
 
-    // 1. طلب جماعي للمورد بدون أي تفاصيل حاسبة أو أسعار
     function bulkReorder() {
         const checkboxes = document.querySelectorAll('.select-box:checked');
         if(checkboxes.length === 0) {
@@ -422,35 +388,29 @@
             const pId = parseInt(cb.getAttribute('data-id'));
             const p = savedOrders.find(item => item.id === pId);
             if(p) {
-                const packInfo = p.packDetails ? ` (${p.packDetails})` : '';
-                msg += `${idx + 1}. *${p.name}* -> Antall: *${p.orderEsker} esker* ${packInfo}\n`;
+                msg += `${idx + 1}. *${p.name}* -> Antall: *${p.orderEsker}*\n`;
             }
         });
         
         window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`, '_blank');
     }
 
-    // 2. إرسال للمورد فقط (بدون أسعار وحاسبة) لكتلة مورد محدد
     function sendWhatsAppSupplierOnly(supplierName) {
         const supplierProducts = savedOrders.filter(p => p.supplier === supplierName);
         let text = currentLang === 'ar' ? `طلب شراء من: *${supplierName}*:\n\n` : `Bestilling til *${supplierName}*:\n\n`;
         supplierProducts.forEach((p, idx) => {
-            const packInfo = p.packDetails ? ` (${p.packDetails})` : '';
-            text += `${idx + 1}. *${p.name}* -> Antall esker: *${p.orderEsker}* ${packInfo}\n`;
+            text += `${idx + 1}. *${p.name}* -> Antall: *${p.orderEsker}*\n`;
         });
         window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
     }
 
-    // 3. مشاركة بكامل تفاصيل الحاسبة والأرباح والأسعار (خاصة بك)
     function sendWhatsAppMyDetails(supplierName) {
         const supplierProducts = savedOrders.filter(p => p.supplier === supplierName);
         let text = `📋 *تقرير الأسعار والحسابات الخاص بي [${supplierName}]:*\n\n`;
         supplierProducts.forEach((p, idx) => {
-            const uType = p.unitType ? p.unitType.toUpperCase() : "Enhet";
             text += `${idx + 1}. *${p.name}*\n`;
-            text += `   - عدد الصناديق المطلوبة: ${p.orderEsker}\n`;
-            if(p.packDetails) text += `   - التعبئة: ${p.packDetails}\n`;
-            text += `   - سعر البيع النهائي: ${p.unitFinalPrice} kr per ${uType}\n`;
+            text += `   - العدد المطلوب للطلب: ${p.orderEsker}\n`;
+            text += `   - سعر البيع النهائي: ${p.unitFinalPrice} kr\n`;
             text += `   - التكلفة الإجمالية: ${p.cost} kr (${p.qty} وحدة)\n`;
             text += `   - صافي ربح الوحدة: +${p.unitProfit} kr (فائدة: ${p.margin})\n\n`;
         });
@@ -536,10 +496,6 @@
             `;
 
             grouped[supplier].forEach(p => {
-                const uType = p.unitType || '';
-                const uDisplay = uType ? uType.toUpperCase() : '--';
-                const packDisplay = p.packDetails ? `<div style="font-size:11px; color:#1e3a8a; font-weight:600;">Pakking: ${p.packDetails}</div>` : '';
-                
                 blockHtml += `
                     <div class="product-card">
                         <div class="select-box-container">
@@ -548,11 +504,10 @@
                         <img src="${p.img}" class="product-img" onerror="handleImageError(this)">
                         <div class="product-details">
                             <p class="p-name">${p.name}</p>
-                            <div class="p-meta" style="margin-bottom: 5px;">
-                                Esker: <input type="number" value="${p.orderEsker}" style="width:55px; padding:2px 5px; display:inline-block; font-size:13px;" oninput="updateCardEsker(${p.id}, this.value)">
+                            <div class="p-meta" style="margin-top: 5px; margin-bottom: 5px;">
+                                Antall: <input type="number" value="${p.orderEsker}" style="width:60px; padding:2px 5px; display:inline-block; font-size:13px;" oninput="updateCardEsker(${p.id}, this.value)">
                             </div>
-                            ${packDisplay}
-                            <div class="p-meta">Innhold: <b>${p.qty} ${uType}</b> | Margin: <b>${p.margin}</b></div>
+                            <div class="p-meta">Innhold: <b>${p.qty}</b> | Margin: <b>${p.margin}</b></div>
                             <a href="${p.link}" target="_blank" class="p-link">${i18n[currentLang].openPage}</a>
                             <div class="actions-row">
                                 <button class="action-btn edit-btn" onclick="editProduct(${p.id})">${i18n[currentLang].edit}</button>
@@ -561,7 +516,6 @@
                         </div>
                         <div class="p-prices">
                             <div class="p-sales-price">${p.unitFinalPrice} kr</div>
-                            <span style="font-size:10px; color:#64748b; font-weight:bold;">${uType ? 'per ' + uDisplay : ''}</span>
                             <div class="p-cost">Total kost: ${p.cost} kr</div>
                             <div class="p-profit">Profit: ${p.unitProfit} kr</div>
                         </div>
