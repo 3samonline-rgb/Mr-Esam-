@@ -9,9 +9,14 @@
         body { background-color: #f1f5f9; margin: 0; padding: 10px; color: #1e293b; }
         .app-container { width: 100%; max-width: 480px; margin: auto; background: white; padding: 20px 15px; border-radius: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
         
-        .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .lang-btn { background: #3b82f6; color: white; border: none; padding: 6px 12px; border-radius: 8px; font-size: 12px; font-weight: bold; cursor: pointer; }
-        .print-main-btn { background: #64748b; color: white; border: none; padding: 6px 12px; border-radius: 8px; font-size: 12px; font-weight: bold; cursor: pointer; }
+        .top-bar { display: flex; flex-wrap: wrap; gap: 5px; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid #e2e8f0; padding-bottom: 10px; }
+        .top-bar-left, .top-bar-right { display: flex; gap: 5px; }
+        
+        .lang-btn { background: #3b82f6; color: white; border: none; padding: 6px 10px; border-radius: 8px; font-size: 11px; font-weight: bold; cursor: pointer; }
+        .print-main-btn { background: #64748b; color: white; border: none; padding: 6px 10px; border-radius: 8px; font-size: 11px; font-weight: bold; cursor: pointer; }
+        .export-btn { background: #059669; color: white; border: none; padding: 6px 10px; border-radius: 8px; font-size: 11px; font-weight: bold; cursor: pointer; }
+        .import-btn { background: #d97706; color: white; border: none; padding: 6px 10px; border-radius: 8px; font-size: 11px; font-weight: bold; cursor: pointer; position: relative; overflow: hidden; }
+        .import-btn input[type="file"] { position: absolute; left: 0; top: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
 
         h1 { font-size: 26px; font-weight: 800; margin: 0; text-align: center; color: #0f172a; }
         .subtitle { font-size: 12px; font-weight: 700; color: #10b981; text-transform: uppercase; letter-spacing: 2px; text-align: center; margin-bottom: 20px; }
@@ -41,9 +46,13 @@
         
         .supplier-block { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 16px; padding: 15px; margin-bottom: 20px; text-align: left; }
         html[dir="rtl"] .supplier-block { text-align: right; }
-        .supplier-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #cbd5e1; padding-bottom: 8px; margin-bottom: 12px; }
+        .supplier-header { display: flex; flex-direction: column; gap: 5px; border-bottom: 2px solid #cbd5e1; padding-bottom: 8px; margin-bottom: 12px; }
+        .supplier-header-top { display: flex; justify-content: space-between; align-items: center; }
         .supplier-title { font-size: 16px; font-weight: 800; color: #1e293b; }
-        .whatsapp-btn { background: #25d366; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: bold; cursor: pointer; }
+        .supplier-actions { display: flex; gap: 5px; width: 100%; justify-content: flex-start; margin-top: 5px; }
+        
+        .whatsapp-btn { background: #25d366; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-size: 11px; font-weight: bold; cursor: pointer; }
+        .share-me-btn { background: #3b82f6; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-size: 11px; font-weight: bold; cursor: pointer; }
         
         .product-card { background: white; border: 1px solid #f1f5f9; border-radius: 12px; padding: 12px; margin-bottom: 10px; display: flex; gap: 12px; align-items: center; box-shadow: 0 2px 8px rgba(0,0,0,0.02); position: relative; }
         .select-box-container { display: flex; align-items: center; justify-content: center; padding: 0 2px; }
@@ -69,10 +78,9 @@
         .edit-btn { background: #f59e0b; }
         .del-btn { background: #ef4444; }
 
-        /* تعديل كود الطباعة لإظهار النص بوضوح تام على ورق A4 */
         @media print {
             body { background: white !important; color: black !important; padding: 0; }
-            .top-bar, .section-title:first-of-type, .form-group, .row, .calc-box, #saveBtn, .search-box, .whatsapp-btn, .actions-row, .reorder-bar, .select-box-container { display: none !important; }
+            .top-bar, .section-title:first-of-type, .form-group, .row, .calc-box, #saveBtn, .search-box, .supplier-actions, .actions-row, .reorder-bar, .select-box-container { display: none !important; }
             .app-container { box-shadow: none !important; max-width: 100% !important; padding: 0 !important; background: white !important; }
             .supplier-block { background: white !important; border: 1px solid #ccc !important; padding: 15px !important; margin-bottom: 20px !important; page-break-inside: avoid; display: block !important; }
             .product-card { border-bottom: 1px solid #ccc !important; border-radius: 0 !important; box-shadow: none !important; background: white !important; page-break-inside: avoid; display: flex !important; }
@@ -85,8 +93,16 @@
 
 <div class="app-container">
     <div class="top-bar">
-        <button class="lang-btn" onclick="toggleLanguage()">Language: NO / AR</button>
-        <button class="print-main-btn" onclick="window.print()">Print A4 🖨️</button>
+        <div class="top-bar-left">
+            <button class="lang-btn" onclick="toggleLanguage()">Language: NO / AR</button>
+            <button class="print-main-btn" onclick="window.print()">Print 🖨️</button>
+        </div>
+        <div class="top-bar-right">
+            <button class="export-btn" onclick="exportData()" id="btnExport">Export 📤</button>
+            <button class="import-btn" id="btnImport">Import 📥
+                <input type="file" accept=".json" onchange="importData(this)">
+            </button>
+        </div>
     </div>
 
     <h1>Pris App</h1>
@@ -118,7 +134,8 @@
             <div class="form-group">
                 <label id="lblUnitType">Enhet (الوحدة)</label>
                 <select id="unitTypeSelect" onchange="calculatePricing()">
-                    <option value="stk" selected>Stk (قطعة)</option>
+                    <option value="" selected>--</option>
+                    <option value="stk">Stk (قطعة)</option>
                     <option value="bunt">Bunt (ضمة)</option>
                     <option value="kg">Kg (وزن)</option>
                 </select>
@@ -126,7 +143,6 @@
         </div>
     </div>
 
-    <!-- ميزة تفاصيل التعبئة وسعة المنتج -->
     <div class="row">
         <div class="col">
             <div class="form-group">
@@ -137,7 +153,7 @@
         <div class="col">
             <div class="form-group">
                 <label id="lblOrderEsker">Antall esker å bestille (كمية الصناديق المطلوبة)</label>
-                <input type="number" id="orderEsker" value="1">
+                <input type="number" id="orderEsker" value="1" oninput="updateEskerInState(this)">
             </div>
         </div>
     </div>
@@ -227,14 +243,16 @@
             prodName: "Produktnavn", cost: "Innkjøpspris (Total)", qty: "Antall", unitType: "Enhet (الوحدة)", packDetails: "Innhold per eske", orderEsker: "Antall esker å bestille", margin: "Margin", mva: "MVA", supplier: "Leverandør",
             img: "Bilde-URL", link: "Leverandør Link", uCost: "Innkjøpspris per enhet", exMva: "Utsalgspris eks. MVA", fPrice: "Utsalgspris:",
             profit: "Netto Fortjeneste:", save: "Lagre i ordreliste", update: "Oppdater Produkt", search: "Søk efter produkt...",
-            selected: "valgt", reorderBtn: "Send valgte produkter", edit: "Endre", del: "Slett", openPage: "Åpne Leverandørsiden ↗"
+            selected: "valgt", reorderBtn: "Send valgte produkter (Mورد)", edit: "Endre", del: "Slett", openPage: "Åpne Leverandørsiden ↗",
+            export: "Eksporter 📤", import: "Importer 📥"
         },
         ar: {
             sub: "بواسطة مستر إنترناشونال (الحاسبة والطلبيات)", sec1: "1. حساب الأسعار وإضافة منتج", sec2: "2. سجل طلبيات الموردين الحاليين",
             prodName: "اسم المنتج", cost: "سعر الشراء الإجمالي للكمية", qty: "الكمية/العدد", unitType: "نوع الوحدة", packDetails: "محتوى وتعبئة الصندوق الداخلي", orderEsker: "عدد الصناديق المطلوبة للطلب", margin: "نسبة الفائدة", mva: "الضريبة", supplier: "المورد الحالي",
             img: "رابط الصورة", link: "رابط صفحة المورد", uCost: "تكلفة الوحدة الواحدة", exMva: "البيع بدون ضريبة", fPrice: "سعر البيع البارز للوحدة:",
             profit: "صافي ربح الوحدة الواحدة:", save: "حفظ وتثبيت في القائمة", update: "تعديل وحفظ الحالي", search: "بحث سريع...",
-            selected: "منتج محدد", reorderBtn: "إرسال طلب مجمع للمحدد", edit: "تعديل", del: "حذف", openPage: "رابط المورد ↗"
+            selected: "منتج محدد", reorderBtn: "إرسال طلب مجمع للمورد 🛒", edit: "تعديل", del: "حذف", openPage: "رابط المورد ↗",
+            export: "تصدير البيانات 📤", import: "استيراد البيانات 📥"
         }
     };
 
@@ -262,6 +280,7 @@
         document.getElementById('txtProfit').innerText = i18n[lang].profit;
         document.getElementById('searchBar').placeholder = i18n[lang].search;
         document.getElementById('btnReorder').innerText = i18n[lang].reorderBtn;
+        document.getElementById('btnExport').innerText = i18n[lang].export;
         
         const saveBtn = document.getElementById('saveBtn');
         saveBtn.innerText = document.getElementById('editId').value ? i18n[lang].update : i18n[lang].save;
@@ -282,15 +301,16 @@
         const margin = parseFloat(document.getElementById('marginSelect').value);
         const mvaRate = parseFloat(document.getElementById('vvaSelect').value);
         const unitType = document.getElementById('unitTypeSelect').value;
+        const unitSuffix = unitType ? "/" + unitType : "";
 
-        if (costPrice === 0) return;
+        if (costPrice === 0) return { unitCost:0, unitFinalPrice:0, unitProfit:0, unitType };
 
         const unitCost = costPrice / qty;
         const unitPriceExMva = unitCost * margin;
         const unitFinalPrice = unitPriceExMva * (1 + mvaRate);
         const unitProfit = unitPriceExMva - unitCost;
 
-        document.getElementById('resUnitCost').innerText = unitCost.toFixed(2) + " kr/" + unitType;
+        document.getElementById('resUnitCost').innerText = unitCost.toFixed(2) + " kr" + unitSuffix;
         document.getElementById('resExMva').innerText = unitPriceExMva.toFixed(2) + " kr";
         document.getElementById('resFinalUnitPrice').innerText = unitFinalPrice.toFixed(2) + " kr";
         document.getElementById('resUnitProfit').innerText = "+" + unitProfit.toFixed(2) + " kr";
@@ -354,7 +374,7 @@
         document.getElementById('prodName').value = p.name;
         document.getElementById('costPrice').value = p.cost;
         document.getElementById('quantity').value = p.qty;
-        document.getElementById('unitTypeSelect').value = p.unitType || 'stk';
+        document.getElementById('unitTypeSelect').value = p.unitType || '';
         document.getElementById('packDetails').value = p.packDetails || '';
         document.getElementById('orderEsker').value = p.orderEsker || '1';
         document.getElementById('marginSelect').value = p.margin;
@@ -376,11 +396,20 @@
         }
     }
 
+    function updateCardEsker(id, val) {
+        const p = savedOrders.find(item => item.id === id);
+        if (p) {
+            p.orderEsker = val || "1";
+            localStorage.setItem('mr_intl_orders', JSON.stringify(savedOrders));
+        }
+    }
+
     function updateSelectedCount() {
         const checked = document.querySelectorAll('.select-box:checked').length;
         document.getElementById('txtSelectedCount').innerText = `${checked} ${i18n[currentLang].selected}`;
     }
 
+    // 1. طلب جماعي للمورد بدون أي تفاصيل حاسبة أو أسعار
     function bulkReorder() {
         const checkboxes = document.querySelectorAll('.select-box:checked');
         if(checkboxes.length === 0) {
@@ -388,27 +417,86 @@
             return;
         }
         
-        let msg = currentLang === 'ar' ? "*طلب جماعي مجمع من القائمة:*\n\n" : "*Bulkbestilling liste:*\n\n";
+        let msg = currentLang === 'ar' ? "*طلب جماعي للمورد:*\n\n" : "*Innkjøpsliste til Leverandør:*\n\n";
         checkboxes.forEach((cb, idx) => {
             const pId = parseInt(cb.getAttribute('data-id'));
             const p = savedOrders.find(item => item.id === pId);
             if(p) {
                 const packInfo = p.packDetails ? ` (${p.packDetails})` : '';
-                msg += `${idx + 1}. *${p.name}* -> لطلب: *${p.orderEsker} صناديق/كرتونة* ${packInfo} [${p.supplier}]\n`;
+                msg += `${idx + 1}. *${p.name}* -> Antall: *${p.orderEsker} esker* ${packInfo}\n`;
             }
         });
         
         window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`, '_blank');
     }
 
-    function sendWhatsAppOrder(supplierName) {
+    // 2. إرسال للمورد فقط (بدون أسعار وحاسبة) لكتلة مورد محدد
+    function sendWhatsAppSupplierOnly(supplierName) {
         const supplierProducts = savedOrders.filter(p => p.supplier === supplierName);
-        let text = `Bestilling til *${supplierName}*:\n\n`;
+        let text = currentLang === 'ar' ? `طلب شراء من: *${supplierName}*:\n\n` : `Bestilling til *${supplierName}*:\n\n`;
         supplierProducts.forEach((p, idx) => {
             const packInfo = p.packDetails ? ` (${p.packDetails})` : '';
             text += `${idx + 1}. *${p.name}* -> Antall esker: *${p.orderEsker}* ${packInfo}\n`;
         });
         window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
+    }
+
+    // 3. مشاركة بكامل تفاصيل الحاسبة والأرباح والأسعار (خاصة بك)
+    function sendWhatsAppMyDetails(supplierName) {
+        const supplierProducts = savedOrders.filter(p => p.supplier === supplierName);
+        let text = `📋 *تقرير الأسعار والحسابات الخاص بي [${supplierName}]:*\n\n`;
+        supplierProducts.forEach((p, idx) => {
+            const uType = p.unitType ? p.unitType.toUpperCase() : "Enhet";
+            text += `${idx + 1}. *${p.name}*\n`;
+            text += `   - عدد الصناديق المطلوبة: ${p.orderEsker}\n`;
+            if(p.packDetails) text += `   - التعبئة: ${p.packDetails}\n`;
+            text += `   - سعر البيع النهائي: ${p.unitFinalPrice} kr per ${uType}\n`;
+            text += `   - التكلفة الإجمالية: ${p.cost} kr (${p.qty} وحدة)\n`;
+            text += `   - صافي ربح الوحدة: +${p.unitProfit} kr (فائدة: ${p.margin})\n\n`;
+        });
+        window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
+    }
+
+    function exportData() {
+        if(savedOrders.length === 0) {
+            alert(currentLang === 'ar' ? "لا توجد بيانات لتصديرها!" : "Ingen data å eksportere!");
+            return;
+        }
+        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(savedOrders));
+        const downloadAnchor = document.createElement('a');
+        downloadAnchor.setAttribute("href", dataStr);
+        downloadAnchor.setAttribute("download", "mr_intl_pris_backup.json");
+        document.body.appendChild(downloadAnchor);
+        downloadAnchor.click();
+        downloadAnchor.remove();
+    }
+
+    function importData(input) {
+        const file = input.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const imported = JSON.parse(e.target.result);
+                if (Array.isArray(imported)) {
+                    if(confirm(currentLang === 'ar' ? "هل أنت متأكد من استيراد البيانات؟ هذا سيقوم بدمج المنتجات الجديدة." : "Er du sikker på at du vil importere? Dette vil legge til produktene.")){
+                        savedOrders = [...imported, ...savedOrders];
+                        const uniqueOrders = Array.from(new Set(savedOrders.map(a => a.id)))
+                                            .map(id => savedOrders.find(a => a.id === id));
+                        savedOrders = uniqueOrders;
+                        localStorage.setItem('mr_intl_orders', JSON.stringify(savedOrders));
+                        applyLanguage();
+                        alert(currentLang === 'ar' ? "تم استيراد البيانات بنجاح!" : "Data importert med suksess!");
+                    }
+                } else {
+                    alert(currentLang === 'ar' ? "ملف غير صالح!" : "Ugyldig filformat!");
+                }
+            } catch (err) {
+                alert(currentLang === 'ar' ? "حدث خطأ أثناء قراءة الملف!" : "Feil ved lesing av filen!");
+            }
+        };
+        reader.readAsText(file);
     }
 
     function handleImageError(img) {
@@ -437,13 +525,19 @@
             let blockHtml = `
                 <div class="supplier-block">
                     <div class="supplier-header">
-                        <span class="supplier-title">${supplier}</span>
-                        <button class="whatsapp-btn" onclick="sendWhatsAppOrder('${supplier}')">Send Bestilling 💬</button>
+                        <div class="supplier-header-top">
+                            <span class="supplier-title">${supplier}</span>
+                        </div>
+                        <div class="supplier-actions">
+                            <button class="whatsapp-btn" onclick="sendWhatsAppSupplierOnly('${supplier}')">طلب للمورد 💬</button>
+                            <button class="share-me-btn" onclick="sendWhatsAppMyDetails('${supplier}')">مشاركة تفاصيلي 📝</button>
+                        </div>
                     </div>
             `;
 
             grouped[supplier].forEach(p => {
-                const uType = p.unitType || 'stk';
+                const uType = p.unitType || '';
+                const uDisplay = uType ? uType.toUpperCase() : '--';
                 const packDisplay = p.packDetails ? `<div style="font-size:11px; color:#1e3a8a; font-weight:600;">Pakking: ${p.packDetails}</div>` : '';
                 
                 blockHtml += `
@@ -454,7 +548,9 @@
                         <img src="${p.img}" class="product-img" onerror="handleImageError(this)">
                         <div class="product-details">
                             <p class="p-name">${p.name}</p>
-                            <div class="p-meta">Esker til bestilling: <b style="color:#d97706; font-size:14px;">${p.orderEsker}</b></div>
+                            <div class="p-meta" style="margin-bottom: 5px;">
+                                Esker: <input type="number" value="${p.orderEsker}" style="width:55px; padding:2px 5px; display:inline-block; font-size:13px;" oninput="updateCardEsker(${p.id}, this.value)">
+                            </div>
                             ${packDisplay}
                             <div class="p-meta">Innhold: <b>${p.qty} ${uType}</b> | Margin: <b>${p.margin}</b></div>
                             <a href="${p.link}" target="_blank" class="p-link">${i18n[currentLang].openPage}</a>
@@ -465,9 +561,9 @@
                         </div>
                         <div class="p-prices">
                             <div class="p-sales-price">${p.unitFinalPrice} kr</div>
-                            <span style="font-size:10px; color:#64748b; font-weight:bold;">per ${uType.toUpperCase()}</span>
+                            <span style="font-size:10px; color:#64748b; font-weight:bold;">${uType ? 'per ' + uDisplay : ''}</span>
                             <div class="p-cost">Total kost: ${p.cost} kr</div>
-                            <div class="p-profit">Profit/${uType}: ${p.unitProfit} kr</div>
+                            <div class="p-profit">Profit: ${p.unitProfit} kr</div>
                         </div>
                     </div>
                 `;
