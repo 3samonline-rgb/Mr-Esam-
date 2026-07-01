@@ -3,130 +3,134 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Pris App by Mr. Intl</title>
+    <title>Pris App - Bestilling</title>
     <style>
         * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-        body { background-color: #f1f5f9; margin: 0; padding: 10px; color: #1e293b; }
-        .app-container { width: 100%; max-width: 480px; margin: auto; background: white; padding: 20px 15px; border-radius: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+        body { background-color: #f1f5f9; margin: 0; padding: 10px; color: #1e293b; -webkit-tap-highlight-color: transparent; }
+        .app-container { width: 100%; max-width: 480px; margin: auto; background: white; padding: 15px 12px; border-radius: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
         
-        .top-bar { display: flex; flex-wrap: wrap; gap: 5px; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid #e2e8f0; padding-bottom: 10px; }
-        .top-bar-left, .top-bar-right { display: flex; gap: 5px; }
+        /* صف الأزرار العلوي - صف واحد مدمج للهاتف */
+        .top-bar { display: flex; gap: 4px; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px; }
+        .top-bar button { flex: 1; min-width: 0; padding: 8px 4px; border: none; border-radius: 6px; font-size: 11px; font-weight: bold; cursor: pointer; color: white; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }
         
-        .lang-btn { background: #3b82f6; color: white; border: none; padding: 6px 10px; border-radius: 8px; font-size: 11px; font-weight: bold; cursor: pointer; }
-        .print-main-btn { background: #64748b; color: white; border: none; padding: 6px 10px; border-radius: 8px; font-size: 11px; font-weight: bold; cursor: pointer; }
-        .export-btn { background: #059669; color: white; border: none; padding: 6px 10px; border-radius: 8px; font-size: 11px; font-weight: bold; cursor: pointer; }
-        .import-btn { background: #d97706; color: white; border: none; padding: 6px 10px; border-radius: 8px; font-size: 11px; font-weight: bold; cursor: pointer; position: relative; overflow: hidden; }
+        .print-main-btn { background: #475569; }
+        .print-staff-btn { background: #0284c7; }
+        .export-btn { background: #059669; }
+        .import-btn { background: #d97706; position: relative; overflow: hidden; }
         .import-btn input[type="file"] { position: absolute; left: 0; top: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
 
-        h1 { font-size: 26px; font-weight: 800; margin: 0; text-align: center; color: #0f172a; }
-        .subtitle { font-size: 12px; font-weight: 700; color: #10b981; text-transform: uppercase; letter-spacing: 2px; text-align: center; margin-bottom: 20px; }
+        h1 { font-size: 24px; font-weight: 800; margin: 0; text-align: center; color: #0f172a; }
+        .subtitle { font-size: 11px; font-weight: 700; color: #10b981; text-transform: uppercase; letter-spacing: 1px; text-align: center; margin-bottom: 15px; }
         
-        .section-title { font-size: 16px; font-weight: 700; border-bottom: 2px solid #e2e8f0; padding-bottom: 5px; margin: 25px 0 12px 0; color: #334155; }
+        .section-title { font-size: 15px; font-weight: 700; border-bottom: 2px solid #e2e8f0; padding-bottom: 4px; margin: 20px 0 10px 0; color: #334155; }
         
-        .form-group { background: #f8fafc; padding: 12px; border-radius: 12px; margin-bottom: 10px; border: 1px solid #e2e8f0; text-align: left; }
-        html[dir="rtl"] .form-group { text-align: right; }
-        
-        label { font-size: 11px; font-weight: bold; color: #64748b; display: block; margin-bottom: 5px; }
-        input, select { width: 100%; padding: 10px; border: 2px solid #cbd5e1; border-radius: 8px; font-size: 15px; background: white; color: #0f172a; }
+        .form-group { background: #f8fafc; padding: 10px; border-radius: 10px; margin-bottom: 8px; border: 1px solid #e2e8f0; text-align: left; }
+        label { font-size: 11px; font-weight: bold; color: #64748b; display: block; margin-bottom: 4px; }
+        input, select { width: 100%; padding: 8px 10px; border: 2px solid #cbd5e1; border-radius: 6px; font-size: 14px; background: white; color: #0f172a; }
         input:focus, select:focus { border-color: #10b981; outline: none; }
         
-        .row { display: flex; gap: 10px; margin-bottom: 10px; }
+        .row { display: flex; gap: 8px; margin-bottom: 4px; }
         .col { flex: 1; }
         
-        .calc-box { background: #ecfdf5; border: 2px dashed #10b981; border-radius: 12px; padding: 15px; margin-top: 10px; text-align: left; }
-        html[dir="rtl"] .calc-box { text-align: right; }
-        .calc-result { font-size: 13px; font-weight: 600; color: #475569; margin-bottom: 6px; display: flex; justify-content: space-between; }
-        .final-unit-price { font-size: 24px; color: #059669; font-weight: 900; }
-        .profit-unit-amount { font-size: 18px; color: #dc2626; font-weight: 800; }
+        .calc-box { background: #ecfdf5; border: 2px dashed #10b981; border-radius: 10px; padding: 12px; margin-top: 8px; text-align: left; }
+        .calc-result { font-size: 12px; font-weight: 600; color: #475569; margin-bottom: 4px; display: flex; justify-content: space-between; }
+        .final-unit-price { font-size: 22px; color: #059669; font-weight: 900; }
+        .profit-unit-amount { font-size: 16px; color: #dc2626; font-weight: 800; }
         
-        .btn { width: 100%; background: #10b981; color: white; padding: 14px; border: none; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 10px; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2); }
-        .btn:active { transform: scale(0.98); }
+        .btn { width: 100%; background: #10b981; color: white; padding: 12px; border: none; border-radius: 8px; font-size: 15px; font-weight: bold; cursor: pointer; margin-top: 8px; box-shadow: 0 4px 10px rgba(16, 185, 129, 0.15); }
+        .btn:active { transform: scale(0.97); }
         
-        .search-box { width: 100%; padding: 12px; margin: 15px 0; border: 2px solid #10b981; border-radius: 10px; font-size: 15px; }
+        .search-box { width: 100%; padding: 10px; margin: 12px 0; border: 2px solid #10b981; border-radius: 8px; font-size: 14px; }
         
-        .supplier-block { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 16px; padding: 15px; margin-bottom: 20px; text-align: left; }
-        html[dir="rtl"] .supplier-block { text-align: right; }
-        .supplier-header { display: flex; flex-direction: column; gap: 5px; border-bottom: 2px solid #cbd5e1; padding-bottom: 8px; margin-bottom: 12px; }
+        .supplier-block { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 14px; padding: 12px; margin-bottom: 15px; text-align: left; }
+        .supplier-header { display: flex; flex-direction: column; gap: 4px; border-bottom: 2px solid #cbd5e1; padding-bottom: 6px; margin-bottom: 10px; }
         .supplier-header-top { display: flex; justify-content: space-between; align-items: center; }
-        .supplier-title { font-size: 16px; font-weight: 800; color: #1e293b; }
-        .supplier-actions { display: flex; gap: 5px; width: 100%; justify-content: flex-start; margin-top: 5px; }
+        .supplier-title { font-size: 15px; font-weight: 800; color: #1e293b; }
+        .supplier-actions { display: flex; gap: 4px; width: 100%; justify-content: flex-start; }
         
-        .whatsapp-btn { background: #25d366; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-size: 11px; font-weight: bold; cursor: pointer; }
-        .share-me-btn { background: #3b82f6; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-size: 11px; font-weight: bold; cursor: pointer; }
+        .whatsapp-btn { background: #25d366; color: white; border: none; padding: 5px 10px; border-radius: 5px; font-size: 11px; font-weight: bold; cursor: pointer; }
+        .share-me-btn { background: #3b82f6; color: white; border: none; padding: 5px 10px; border-radius: 5px; font-size: 11px; font-weight: bold; cursor: pointer; }
         
-        .product-card { background: white; border: 1px solid #f1f5f9; border-radius: 12px; padding: 12px; margin-bottom: 10px; display: flex; gap: 12px; align-items: center; box-shadow: 0 2px 8px rgba(0,0,0,0.02); position: relative; }
-        .select-box-container { display: flex; align-items: center; justify-content: center; padding: 0 2px; }
+        .product-card { background: white; border: 1px solid #f1f5f9; border-radius: 10px; padding: 10px; margin-bottom: 8px; display: flex; gap: 10px; align-items: center; box-shadow: 0 2px 6px rgba(0,0,0,0.01); position: relative; }
+        .select-box-container { display: flex; align-items: center; justify-content: center; }
         .select-box { width: 18px; height: 18px; cursor: pointer; }
         
-        .product-img { width: 75px; height: 75px; border-radius: 8px; object-fit: cover; background: #f1f5f9; border: 1px solid #e2e8f0; }
+        .product-img { width: 65px; height: 65px; border-radius: 6px; object-fit: cover; background: #f1f5f9; border: 1px solid #e2e8f0; }
         .product-details { flex: 1; min-width: 0; text-align: left; }
-        html[dir="rtl"] .product-details { text-align: right; }
-        .p-name { font-weight: 700; font-size: 15px; color: #0f172a; margin: 0; }
-        .p-meta { font-size: 12px; margin-top: 3px; color: #64748b; }
-        .p-link { font-size: 11px; color: #3b82f6; text-decoration: none; display: inline-block; margin-top: 4px; font-weight: 600; }
+        .p-name { font-weight: 700; font-size: 14px; color: #0f172a; margin: 0; }
+        .p-meta { font-size: 11px; margin-top: 2px; color: #64748b; }
+        .p-link { font-size: 11px; color: #3b82f6; text-decoration: none; display: inline-block; margin-top: 2px; font-weight: 600; }
         
-        .p-prices { text-align: right; min-width: 100px; display: flex; flex-direction: column; align-items: flex-end; }
-        html[dir="rtl"] .p-prices { text-align: left; align-items: flex-start; }
-        .p-sales-price { font-size: 17px; font-weight: 800; color: #059669; }
+        .p-prices { text-align: right; min-width: 90px; display: flex; flex-direction: column; align-items: flex-end; }
+        .p-sales-price { font-size: 16px; font-weight: 800; color: #059669; }
         .p-cost { font-size: 11px; color: #64748b; margin-top: 1px; }
         .p-profit { font-size: 11px; color: #dc2626; font-weight: bold; }
 
-        .reorder-bar { background: #fffbeb; border: 1px solid #fef3c7; padding: 12px; border-radius: 12px; margin-top: 15px; display: flex; justify-content: space-between; align-items: center; }
-        .reorder-btn { background: #d97706; color: white; border: none; padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: bold; cursor: pointer; }
-        .actions-row { display: flex; gap: 5px; margin-top: 5px; }
-        .action-btn { border: none; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; cursor: pointer; color: white; }
+        .reorder-bar { background: #fffbeb; border: 1px solid #fef3c7; padding: 10px; border-radius: 10px; margin-top: 12px; display: flex; justify-content: space-between; align-items: center; }
+        .reorder-btn { background: #d97706; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: bold; cursor: pointer; }
+        .actions-row { display: flex; gap: 4px; margin-top: 4px; }
+        .action-btn { border: none; padding: 3px 6px; border-radius: 4px; font-size: 11px; font-weight: bold; cursor: pointer; color: white; }
         .edit-btn { background: #f59e0b; }
         .del-btn { background: #ef4444; }
 
+        /* منطقة تظهر فقط في الطباعة لعرض التاريخ */
+        .print-header { display: none; text-align: center; margin-bottom: 20px; font-size: 14px; font-weight: bold; border-bottom: 2px solid #000; padding-bottom: 10px; }
+
+        /* ستايل الطباعة الشامل لـ A4 */
         @media print {
             body { background: white !important; color: black !important; padding: 0; }
-            .top-bar, .section-title:first-of-type, .form-group, .row, .calc-box, #saveBtn, .search-box, .supplier-actions, .actions-row, .reorder-bar, .select-box-container { display: none !important; }
+            .top-bar, .section-title, .form-group, .row, .calc-box, #saveBtn, .search-box, .supplier-actions, .actions-row, .reorder-bar, .select-box-container, .p-link, h1, .subtitle { display: none !important; }
             .app-container { box-shadow: none !important; max-width: 100% !important; padding: 0 !important; background: white !important; }
-            .supplier-block { background: white !important; border: 1px solid #ccc !important; padding: 15px !important; margin-bottom: 20px !important; page-break-inside: avoid; display: block !important; }
-            .product-card { border-bottom: 1px solid #ccc !important; border-radius: 0 !important; box-shadow: none !important; background: white !important; page-break-inside: avoid; display: flex !important; }
-            .p-link { display: none !important; }
-            .p-sales-price { color: black !important; }
+            .print-header { display: block !important; }
+            .supplier-block { background: white !important; border: none !important; padding: 0 !important; margin-bottom: 15px !important; page-break-inside: avoid; }
+            .supplier-header { border-bottom: 1px dashed #000 !important; }
+            .product-card { border-bottom: 1px solid #eee !important; border-radius: 0 !important; box-shadow: none !important; background: white !important; page-break-inside: avoid; padding: 8px 0 !important; }
+            .p-sales-price { color: black !important; font-size: 18px !important; }
+            
+            /* إخفاء تفاصيل التكلفة تماماً في خيار طباعة الموظفين */
+            body.staff-print-mode .p-cost, 
+            body.staff-print-mode .p-profit, 
+            body.staff-print-mode .p-meta, 
+            body.staff-print-mode .product-img { display: none !important; }
+            body.staff-print-mode .supplier-title { font-size: 13px !important; font-weight: normal !important; }
         }
     </style>
 </head>
 <body>
 
 <div class="app-container">
+    <!-- أزرار علوية في صف واحد مدمج ومناسب للعمل بيد واحدة -->
     <div class="top-bar">
-        <div class="top-bar-left">
-            <button class="lang-btn" onclick="toggleLanguage()">Language: NO / AR</button>
-            <button class="print-main-btn" onclick="window.print()">Print 🖨️</button>
-        </div>
-        <div class="top-bar-right">
-            <button class="export-btn" onclick="exportData()" id="btnExport">Export 📤</button>
-            <button class="import-btn" id="btnImport">Import 📥
-                <input type="file" accept=".json" onchange="importData(this)">
-            </button>
-        </div>
+        <button class="print-main-btn" onclick="triggerPrint(false)">Eier Print 🖨️</button>
+        <button class="print-staff-btn" onclick="triggerPrint(true)">Ansatte Print 👤</button>
+        <button class="export-btn" onclick="exportData()">Export 📤</button>
+        <button class="import-btn">Import 📥
+            <input type="file" accept=".json" onchange="importData(this)">
+        </button>
     </div>
 
     <h1>Pris App</h1>
-    <div class="subtitle" id="subTitle">by Mr. Intl (Kalkulator & Ordre)</div>
+    <div class="subtitle">by Mr. Intl (Kalkulator & Ordre)</div>
     
-    <div class="section-title" id="tSection1">1. Beregn Pris & Legg til</div>
+    <div class="print-header" id="printHeaderView"></div>
     
     <input type="hidden" id="editId" value="">
     
     <div class="form-group">
-        <label id="lblProdName">Produktnavn (اسم المنتج)</label>
+        <label>Produktnavn</label>
         <input type="text" id="prodName" placeholder="F.eks. Nido Milk Powder 2.5kg">
     </div>
     
     <div class="row">
         <div class="col" style="flex: 1.5;">
             <div class="form-group">
-                <label id="lblCostPrice">Innkjøpspris (سعر الشراء الإجمالي)</label>
+                <label>Innkjøpspris (Total)</label>
                 <input type="number" id="costPrice" placeholder="0.00" oninput="calculatePricing()">
             </div>
         </div>
         <div class="col">
             <div class="form-group">
-                <label id="lblQty">Antall (الكمية)</label>
+                <label>Antall</label>
                 <input type="number" id="quantity" placeholder="" oninput="calculatePricing()">
             </div>
         </div>
@@ -135,7 +139,7 @@
     <div class="row">
         <div class="col">
             <div class="form-group">
-                <label id="lblMargin">Margin / الفائدة</label>
+                <label>Margin</label>
                 <select id="marginSelect" onchange="calculatePricing()">
                     <option value="1.3">1.3</option>
                     <option value="1.4">1.4</option>
@@ -150,7 +154,7 @@
         </div>
         <div class="col">
             <div class="form-group">
-                <label id="lblMva">MVA / الضريبة</label>
+                <label>MVA</label>
                 <select id="vvaSelect" onchange="calculatePricing()">
                     <option value="0.25">25% (Standard)</option>
                     <option value="0.15" selected>15% (Matvarer)</option>
@@ -163,108 +167,51 @@
     <div class="row">
         <div class="col">
             <div class="form-group">
-                <label id="lblSupplier">Leverandør (المورد)</label>
+                <label>Leverandør</label>
                 <input type="text" id="supplierName" placeholder="F.eks. Afro kjøp">
             </div>
         </div>
         <div class="col">
             <div class="form-group">
-                <label id="lblImg">Bilde-URL (رابط الصورة)</label>
+                <label>Bilde-URL</label>
                 <input type="text" id="imgUrl" placeholder="https://...">
             </div>
         </div>
     </div>
     <div class="form-group">
-        <label id="lblLink">Leverandør Link (صفحة المورد)</label>
+        <label>Leverandør Link</label>
         <input type="text" id="supplierLink" placeholder="https://...">
     </div>
 
     <div class="calc-box">
-        <div class="calc-result"><span id="txtUnitCost">Innkjøpspris per enhet</span>: <span id="resUnitCost">0.00 kr</span></div>
-        <div class="calc-result"><span id="txtExMva">Utsalgspris eks. MVA</span>: <span id="resExMva">0.00 kr</span></div>
+        <div class="calc-result"><span>Innkjøpspris per enhet</span>: <span id="resUnitCost">0.00 kr</span></div>
+        <div class="calc-result"><span>Utsalgspris eks. MVA</span>: <span id="resExMva">0.00 kr</span></div>
         <div class="calc-result" style="margin-top: 8px; border-top: 1px dashed #10b981; padding-top: 8px;">
-            <div id="txtFinalPrice">Utsalgspris (السعر البارز):</div>
+            <div>Utsalgspris:</div>
             <div class="final-unit-price" id="resFinalUnitPrice">0.00 kr</div>
         </div>
         <div class="calc-result">
-            <div id="txtProfit">Netto Fortjeneste:</div>
+            <div>Netto Fortjeneste:</div>
             <div class="profit-unit-amount" id="resUnitProfit">0.00 kr</div>
         </div>
     </div>
 
-    <button class="btn" id="saveBtn" onclick="saveToOrderList()">Lagre i ordreliste (حفظ في القائمة)</button>
+    <button class="btn" id="saveBtn" onclick="saveToOrderList()">Lagre i ordreliste</button>
 
-    <div class="section-title" id="tSection2">2. Leverandørbestillinger (سجل الطلبيات)</div>
-    <input type="text" id="searchBar" class="search-box" placeholder="Søk..." oninput="renderOrders()">
+    <div class="section-title">Leverandørbestillinger</div>
+    <input type="text" id="searchBar" class="search-box" placeholder="Søk efter produkt..." oninput="renderOrders()">
 
     <div id="ordersContainer"></div>
 
     <div class="reorder-bar">
         <span id="txtSelectedCount">0 valgt</span>
-        <button class="reorder-btn" onclick="bulkReorder()" id="btnReorder">Send reorder 🛒</button>
+        <button class="reorder-btn" onclick="bulkReorder()">Send reorder 🛒</button>
     </div>
 </div>
 
 <script>
     let savedOrders = JSON.parse(localStorage.getItem('mr_intl_orders')) || [];
-    let currentLang = localStorage.getItem('mr_intl_lang') || 'no';
-
     const fallbackImg = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='1.5'><path d='M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z'/><path d='m3.3 7 8.7 5 8.7-5'/><path d='M12 22V12'/></svg>";
-
-    const i18n = {
-        no: {
-            sub: "by Mr. Intl (Kalkulator & Ordre)", sec1: "1. Beregn Pris & Legg til", sec2: "2. Leverandørbestillinger (سجل الطلبيات)",
-            prodName: "Produktnavn", cost: "Innkjøpspris (Total)", qty: "Antall", margin: "Margin", mva: "MVA", supplier: "Leverandør",
-            img: "Bilde-URL", link: "Leverandør Link", uCost: "Innkjøpspris per enhet", exMva: "Utsalgspris eks. MVA", fPrice: "Utsalgspris:",
-            profit: "Netto Fortjeneste:", save: "Lagre i ordreliste", update: "Oppdater Produkt", search: "Søk efter produkt...",
-            selected: "valgt", reorderBtn: "Send valgte produkter (Mورد)", edit: "Endre", del: "Slett", openPage: "Åpne Leverandørsiden ↗",
-            export: "Eksporter 📤", import: "Importer 📥"
-        },
-        ar: {
-            sub: "بواسطة مستر إنترناشونال (الحاسبة والطلبيات)", sec1: "1. حساب الأسعار وإضافة منتج", sec2: "2. سجل طلبيات الموردين الحاليين",
-            prodName: "اسم المنتج", cost: "سعر الشراء الإجمالي للكمية", qty: "الكمية/العدد", margin: "نسبة الفائدة", mva: "الضريبة", supplier: "المورد الحالي",
-            img: "رابط الصورة", link: "رابط صفحة المورد", uCost: "تكلفة الوحدة الواحدة", exMva: "البيع بدون ضريبة", fPrice: "سعر البيع البارز للوحدة:",
-            profit: "صافي ربح الوحدة الواحدة:", save: "حفظ وتثبيت في القائمة", update: "تعديل وحفظ الحالي", search: "بحث سريع...",
-            selected: "منتج محدد", reorderBtn: "إرسال طلب مجمع للمورد 🛒", edit: "تعديل", del: "حذف", openPage: "رابط المورد ↗",
-            export: "تصدير البيانات 📤", import: "استيراد البيانات 📥"
-        }
-    };
-
-    function applyLanguage() {
-        const lang = currentLang;
-        document.getElementById('appHtml').setAttribute('dir', lang === 'ar' ? 'rtl' : 'ltr');
-        
-        document.getElementById('subTitle').innerText = i18n[lang].sub;
-        document.getElementById('tSection1').innerText = i18n[lang].sec1;
-        document.getElementById('tSection2').innerText = i18n[lang].sec2;
-        document.getElementById('lblProdName').innerText = i18n[lang].prodName;
-        document.getElementById('lblCostPrice').innerText = i18n[lang].cost;
-        document.getElementById('lblQty').innerText = i18n[lang].qty;
-        document.getElementById('lblMargin').innerText = i18n[lang].margin;
-        document.getElementById('lblMva').innerText = i18n[lang].mva;
-        document.getElementById('lblSupplier').innerText = i18n[lang].supplier;
-        document.getElementById('lblImg').innerText = i18n[lang].img;
-        document.getElementById('lblLink').innerText = i18n[lang].link;
-        document.getElementById('txtUnitCost').innerText = i18n[lang].uCost;
-        document.getElementById('txtExMva').innerText = i18n[lang].exMva;
-        document.getElementById('txtFinalPrice').innerText = i18n[lang].fPrice;
-        document.getElementById('txtProfit').innerText = i18n[lang].profit;
-        document.getElementById('searchBar').placeholder = i18n[lang].search;
-        document.getElementById('btnReorder').innerText = i18n[lang].reorderBtn;
-        document.getElementById('btnExport').innerText = i18n[lang].export;
-        
-        const saveBtn = document.getElementById('saveBtn');
-        saveBtn.innerText = document.getElementById('editId').value ? i18n[lang].update : i18n[lang].save;
-        
-        updateSelectedCount();
-        renderOrders();
-    }
-
-    function toggleLanguage() {
-        currentLang = currentLang === 'no' ? 'ar' : 'no';
-        localStorage.setItem('mr_intl_lang', currentLang);
-        applyLanguage();
-    }
 
     function calculatePricing() {
         const costPrice = parseFloat(document.getElementById('costPrice').value) || 0;
@@ -293,7 +240,7 @@
         const editId = document.getElementById('editId').value;
         
         if (!name || cost === 0) {
-            alert(currentLang === 'ar' ? "الرجاء إدخال اسم المنتج وسعر الشراء!" : "Vennligst fyll ut produktnavn og innkjøpspris!");
+            alert("Vennligst fyll ut produktnavn og innkjøpspris!");
             return;
         }
 
@@ -304,10 +251,10 @@
             name: name,
             cost: cost,
             qty: document.getElementById('quantity').value || "1",
-            orderEsker: "1", // القيمة الافتراضية للطلب
+            orderEsker: "1",
             margin: document.getElementById('marginSelect').value,
             mva: document.getElementById('vvaSelect').value,
-            supplier: document.getElementById('supplierName').value.trim() || (currentLang === 'ar' ? "مورد غير معروف" : "Ukjent Leverandør"),
+            supplier: document.getElementById('supplierName').value.trim() || "Ukjent Leverandør",
             img: document.getElementById('imgUrl').value.trim() || fallbackImg,
             link: document.getElementById('supplierLink').value.trim() || "#",
             unitFinalPrice: calc.unitFinalPrice.toFixed(2),
@@ -315,10 +262,8 @@
         };
 
         if (editId) {
-            // المحافظة على كمية الطلب السابقة عند التعديل
             const oldP = savedOrders.find(item => item.id === productData.id);
             if(oldP) productData.orderEsker = oldP.orderEsker;
-
             savedOrders = savedOrders.map(p => p.id === productData.id ? productData : p);
             document.getElementById('editId').value = "";
         } else {
@@ -332,8 +277,9 @@
         document.getElementById('quantity').value = '';
         document.getElementById('imgUrl').value = '';
         document.getElementById('supplierLink').value = '';
+        document.getElementById('saveBtn').innerText = "Lagre i ordreliste";
         
-        applyLanguage();
+        renderOrders();
     }
 
     function editProduct(id) {
@@ -350,13 +296,13 @@
         document.getElementById('imgUrl').value = p.img.startsWith('data:') ? '' : p.img;
         document.getElementById('supplierLink').value = p.link === '#' ? '' : p.link;
 
-        document.getElementById('saveBtn').innerText = i18n[currentLang].update;
+        document.getElementById('saveBtn').innerText = "Oppdater Produkt";
         window.scrollTo({ top: 0, behavior: 'smooth' });
         calculatePricing();
     }
 
     function deleteOrder(id) {
-        if (confirm(currentLang === 'ar' ? "هل تريد حذف هذا المنتج؟" : "Vil du slette dette produktet?")) {
+        if (confirm("Vil du slette dette produktet?")) {
             savedOrders = savedOrders.filter(p => p.id !== id);
             localStorage.setItem('mr_intl_orders', JSON.stringify(savedOrders));
             renderOrders();
@@ -373,31 +319,27 @@
 
     function updateSelectedCount() {
         const checked = document.querySelectorAll('.select-box:checked').length;
-        document.getElementById('txtSelectedCount').innerText = `${checked} ${i18n[currentLang].selected}`;
+        document.getElementById('txtSelectedCount').innerText = `${checked} valgt`;
     }
 
     function bulkReorder() {
         const checkboxes = document.querySelectorAll('.select-box:checked');
         if(checkboxes.length === 0) {
-            alert(currentLang === 'ar' ? "الرجاء تحديد منتجات أولاً!" : "Velg produkter først!");
+            alert("Velg produkter først!");
             return;
         }
-        
-        let msg = currentLang === 'ar' ? "*طلب جماعي للمورد:*\n\n" : "*Innkjøpsliste til Leverandør:*\n\n";
+        let msg = "*Innkjøpsliste til Leverandør:*\n\n";
         checkboxes.forEach((cb, idx) => {
             const pId = parseInt(cb.getAttribute('data-id'));
             const p = savedOrders.find(item => item.id === pId);
-            if(p) {
-                msg += `${idx + 1}. *${p.name}* -> Antall: *${p.orderEsker}*\n`;
-            }
+            if(p) msg += `${idx + 1}. *${p.name}* -> Antall: *${p.orderEsker}*\n`;
         });
-        
         window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`, '_blank');
     }
 
     function sendWhatsAppSupplierOnly(supplierName) {
         const supplierProducts = savedOrders.filter(p => p.supplier === supplierName);
-        let text = currentLang === 'ar' ? `طلب شراء من: *${supplierName}*:\n\n` : `Bestilling til *${supplierName}*:\n\n`;
+        let text = `Bestilling til *${supplierName}*:\n\n`;
         supplierProducts.forEach((p, idx) => {
             text += `${idx + 1}. *${p.name}* -> Antall: *${p.orderEsker}*\n`;
         });
@@ -406,26 +348,38 @@
 
     function sendWhatsAppMyDetails(supplierName) {
         const supplierProducts = savedOrders.filter(p => p.supplier === supplierName);
-        let text = `📋 *تقرير الأسعار والحسابات الخاص بي [${supplierName}]:*\n\n`;
+        let text = `📋 *Prisrapport [${supplierName}]:*\n\n`;
         supplierProducts.forEach((p, idx) => {
-            text += `${idx + 1}. *${p.name}*\n`;
-            text += `   - العدد المطلوب للطلب: ${p.orderEsker}\n`;
-            text += `   - سعر البيع النهائي: ${p.unitFinalPrice} kr\n`;
-            text += `   - التكلفة الإجمالية: ${p.cost} kr (${p.qty} وحدة)\n`;
-            text += `   - صافي ربح الوحدة: +${p.unitProfit} kr (فائدة: ${p.margin})\n\n`;
+            text += `${idx + 1}. *${p.name}*\n   - Antall: ${p.orderEsker}\n   - Pris: ${p.unitFinalPrice} kr\n   - Kost: ${p.cost} kr\n   - Profit: +${p.unitProfit} kr\n\n`;
         });
         window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
     }
 
+    function triggerPrint(isStaffMode) {
+        // تحديث التاريخ والوقت تلقائياً للـ A4 قبل عملية الطباعة
+        const now = new Date();
+        const dateStr = now.toLocaleDateString('no-NO') + ' kl. ' + now.toLocaleTimeString('no-NO', {hour: '2-digit', minute:'2-digit'});
+        
+        document.getElementById('printHeaderView').innerText = `Utskriftsdato: ${dateStr} | Prisliste`;
+        
+        if (isStaffMode) {
+            document.body.classList.add('staff-print-mode');
+        } else {
+            document.body.classList.remove('staff-print-mode');
+        }
+        
+        window.print();
+    }
+
     function exportData() {
         if(savedOrders.length === 0) {
-            alert(currentLang === 'ar' ? "لا توجد بيانات لتصديرها!" : "Ingen data å eksportere!");
+            alert("Ingen data å eksportere!");
             return;
         }
         const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(savedOrders));
         const downloadAnchor = document.createElement('a');
         downloadAnchor.setAttribute("href", dataStr);
-        downloadAnchor.setAttribute("download", "mr_intl_pris_backup.json");
+        downloadAnchor.setAttribute("download", "pris_app_backup.json");
         document.body.appendChild(downloadAnchor);
         downloadAnchor.click();
         downloadAnchor.remove();
@@ -434,33 +388,23 @@
     function importData(input) {
         const file = input.files[0];
         if (!file) return;
-
         const reader = new FileReader();
         reader.onload = function(e) {
             try {
                 const imported = JSON.parse(e.target.result);
                 if (Array.isArray(imported)) {
-                    if(confirm(currentLang === 'ar' ? "هل أنت متأكد من استيراد البيانات؟ هذا سيقوم بدمج المنتجات الجديدة." : "Er du sikker på at du vil importere? Dette vil legge til produktene.")){
+                    if(confirm("Er du sikker på at du vil importere? Dette vil legge til produktene.")){
                         savedOrders = [...imported, ...savedOrders];
-                        const uniqueOrders = Array.from(new Set(savedOrders.map(a => a.id)))
-                                            .map(id => savedOrders.find(a => a.id === id));
+                        const uniqueOrders = Array.from(new Set(savedOrders.map(a => a.id))).map(id => savedOrders.find(a => a.id === id));
                         savedOrders = uniqueOrders;
                         localStorage.setItem('mr_intl_orders', JSON.stringify(savedOrders));
-                        applyLanguage();
-                        alert(currentLang === 'ar' ? "تم استيراد البيانات بنجاح!" : "Data importert med suksess!");
+                        renderOrders();
+                        alert("Data importert med suksess!");
                     }
-                } else {
-                    alert(currentLang === 'ar' ? "ملف غير صالح!" : "Ugyldig filformat!");
                 }
-            } catch (err) {
-                alert(currentLang === 'ar' ? "حدث خطأ أثناء قراءة الملف!" : "Feil ved lesing av filen!");
-            }
+            } catch (err) { alert("Feil ved lesing av filen!"); }
         };
         reader.readAsText(file);
-    }
-
-    function handleImageError(img) {
-        img.src = fallbackImg;
     }
 
     function renderOrders() {
@@ -489,8 +433,8 @@
                             <span class="supplier-title">${supplier}</span>
                         </div>
                         <div class="supplier-actions">
-                            <button class="whatsapp-btn" onclick="sendWhatsAppSupplierOnly('${supplier}')">طلب للمورد 💬</button>
-                            <button class="share-me-btn" onclick="sendWhatsAppMyDetails('${supplier}')">مشاركة تفاصيلي 📝</button>
+                            <button class="whatsapp-btn" onclick="sendWhatsAppSupplierOnly('${supplier}')">Bestill 💬</button>
+                            <button class="share-me-btn" onclick="sendWhatsAppMyDetails('${supplier}')">Detaljer 📝</button>
                         </div>
                     </div>
             `;
@@ -501,22 +445,22 @@
                         <div class="select-box-container">
                             <input type="checkbox" class="select-box" data-id="${p.id}" onchange="updateSelectedCount()">
                         </div>
-                        <img src="${p.img}" class="product-img" onerror="handleImageError(this)">
+                        <img src="${p.img}" class="product-img" onerror="this.src=fallbackImg">
                         <div class="product-details">
                             <p class="p-name">${p.name}</p>
-                            <div class="p-meta" style="margin-top: 5px; margin-bottom: 5px;">
-                                Antall: <input type="number" value="${p.orderEsker}" style="width:60px; padding:2px 5px; display:inline-block; font-size:13px;" oninput="updateCardEsker(${p.id}, this.value)">
+                            <div class="p-meta">
+                                Antall: <input type="number" value="${p.orderEsker}" style="width:50px; padding:2px; display:inline-block; font-size:12px;" oninput="updateCardEsker(${p.id}, this.value)">
                             </div>
                             <div class="p-meta">Innhold: <b>${p.qty}</b> | Margin: <b>${p.margin}</b></div>
-                            <a href="${p.link}" target="_blank" class="p-link">${i18n[currentLang].openPage}</a>
+                            <a href="${p.link}" target="_blank" class="p-link">Leverandørside ↗</a>
                             <div class="actions-row">
-                                <button class="action-btn edit-btn" onclick="editProduct(${p.id})">${i18n[currentLang].edit}</button>
-                                <button class="action-btn del-btn" onclick="deleteOrder(${p.id})">${i18n[currentLang].del}</button>
+                                <button class="action-btn edit-btn" onclick="editProduct(${p.id})">Endre</button>
+                                <button class="action-btn del-btn" onclick="deleteOrder(${p.id})">Slett</button>
                             </div>
                         </div>
                         <div class="p-prices">
                             <div class="p-sales-price">${p.unitFinalPrice} kr</div>
-                            <div class="p-cost">Total kost: ${p.cost} kr</div>
+                            <div class="p-cost">Kost: ${p.cost} kr</div>
                             <div class="p-profit">Profit: ${p.unitProfit} kr</div>
                         </div>
                     </div>
@@ -526,9 +470,10 @@
             blockHtml += `</div>`;
             container.innerHTML += blockHtml;
         }
+        updateSelectedCount();
     }
 
-    applyLanguage();
+    renderOrders();
 </script>
 
 </body>
