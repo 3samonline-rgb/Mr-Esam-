@@ -32,11 +32,13 @@
         input, select { width: 100%; padding: 8px 10px; border: 2px solid #cbd5e1; border-radius: 6px; font-size: 14px; background: white; color: #0f172a; }
         input:focus, select:focus { border-color: #10b981; outline: none; }
         
-        /* زر الباركود المدمج بشكل أنيق بجانب حقل الاسم */
+        /* زر الباركود والتصوير المدمج */
         .input-with-btn { display: flex; gap: 6px; }
-        .scan-btn { background: #10b981; color: white; border: none; border-radius: 6px; padding: 0 12px; font-size: 12px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 4px; }
+        .scan-btn-container { position: relative; display: inline-block; }
+        .scan-btn { background: #10b981; color: white; border: none; border-radius: 6px; padding: 0 12px; font-size: 12px; font-weight: bold; cursor: pointer; height: 100%; display: flex; align-items: center; gap: 4px; }
+        .scan-file-input { position: absolute; left: 0; top: 0; opacity: 0; width: 100%; height: 100%; cursor: pointer; }
         
-        /* حاوية كاميرا الباركود المباشرة */
+        /* نافذة الكاميرا المباشرة */
         #scanner-container { display: none; margin-bottom: 12px; border: 2px solid #10b981; border-radius: 12px; overflow: hidden; background: #000; position: relative; }
         #scanner-close { position: absolute; top: 8px; right: 8px; background: rgba(239, 68, 68, 0.9); color: white; border: none; padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: bold; z-index: 10; cursor: pointer; }
 
@@ -139,7 +141,10 @@
         <label id="lblProdName">Produktnavn</label>
         <div class="input-with-btn">
             <input type="text" id="prodName" placeholder="F.eks. Nido Milk Powder 2.5kg">
-            <button class="scan-btn" onclick="startScanner()">📷 Scan</button>
+            <div class="scan-btn-container">
+                <button class="scan-btn" onclick="tryLiveScanner()">📷 Scan</button>
+                <input type="file" accept="image/*" capture="environment" class="scan-file-input" onchange="scanFromImage(this)">
+            </div>
         </div>
     </div>
     
@@ -255,25 +260,25 @@
         }
     };
 
-    // تشغيل الكاميرا لقراءة الباركود
-    function startScanner() {
+    // المحاولة 1: تشغيل الكاميرا المباشرة إذا كان الرابط يدعمها أمنياً
+    function tryLiveScanner() {
+        if (!window.isSecureContext) {
+            // إذا كان ملفاً محلياً، لن يفعل شيء وسيترك الكاميرا العادية تفتح عبر زر input المدمج خلفه تلقائياً
+            return;
+        }
         document.getElementById('scanner-container').style.display = 'block';
         html5QrcodeScanner = new Html5Qrcode("interactive");
         
-        const config = { fps: 15, qrbox: { width: 250, height: 150 } };
-        
         html5QrcodeScanner.start(
             { facingMode: "environment" }, 
-            config,
+            { fps: 15, qrbox: { width: 260, height: 160 } },
             (decodedText) => {
-                // عند نجاح القراءة
-                if (navigator.vibrate) navigator.vibrate(100); // اهتزاز خفيف للهاتف عند التقاط الكود
+                if (navigator.vibrate) navigator.vibrate(100);
                 stopScanner();
                 handleBarcodeScanned(decodedText);
             },
-            (errorMessage) => { /* تجنب الإزعاج بالأخطاء المستمرة أثناء البحث */ }
-        ).catch(err => {
-            alert(currentLang === 'ar' ? "فشل فتح الكاميرا، يرجى إعطاء الصلاحية." : "Kamerafeil, vennligst gi tilgang.");
+            (err) => {}
+        ).catch(() => {
             stopScanner();
         });
     }
@@ -290,35 +295,47 @@
         }
     }
 
-    // التعامل الذكي مع الرمز المقروء
+    // المحاولة 2 (الحل السحري للملف المحلي): التقاط صورة الباركود وقراءتها فوراً
+    function scanFromImage(inputEl) {
+        if (!inputEl.files || inputEl.files.length === 0) return;
+        const file = inputEl.files[0];
+        
+        const html5QrCode = new Html5Qrcode("interactive");
+        html5QrCode.scanFile(file, true)
+            .then(decodedText => {
+                if (navigator.vibrate) navigator.vibrate(100);
+                handleBarcodeScanned(decodedText);
+            })
+            .catch(err => {
+                alert(currentLang === 'ar' ? "لم يتم التقاط الباركود بوضوح، يرجى المحاولة مرة أخرى والتقريب." : "Klarte ikke å lese strekkoden. Prøv igjen nærmere.");
+            });
+    }
+
     function handleBarcodeScanned(barcode) {
         document.getElementById('barcodeStored').value = barcode;
-        
-        // البحث عن منتج مخزن يحمل نفس الباركود
-        const matchedProduct = savedOrders.find(p => p.barcode === barcode || p.name.includes(barcode));
+        const matchedProduct = savedOrders.find(p => p.barcode === barcode || (p.barcode && p.barcode.includes(barcode)));
         
         if (matchedProduct) {
-            // تعبئة البيانات تلقائياً وتوفير الوقت!
             document.getElementById('prodName').value = matchedProduct.name;
             document.getElementById('supplierName').value = matchedProduct.supplier;
             document.getElementById('imgUrl').value = matchedProduct.img.startsWith('data:') ? '' : matchedProduct.img;
             document.getElementById('supplierLink').value = matchedProduct.link === '#' ? '' : matchedProduct.link;
             document.getElementById('marginSelect').value = matchedProduct.margin;
             
-            // تنبيه المستخدم بالعربية أو النرويجية
             if(currentLang === 'ar') {
-                alert(`✨ تم العثور على المنتج تلقائياً: ${matchedProduct.name}\nيرجى فقط إدخال سعر الفاتورة الجديد والكمية!`);
+                alert(`✨ تم العثور على المنتج تلقائياً: ${matchedProduct.name}\nيرجى فقط إدخل سعر الفاتورة والكمية!`);
             } else {
                 alert(`✨ Produkt funnet: ${matchedProduct.name}\nVennligst oppgi ny pris og antall.`);
             }
         } else {
-            document.getElementById('prodName').value = "Barcode: " + barcode;
+            document.getElementById('prodName').value = barcode;
             if(currentLang === 'ar') {
-                alert("رمز جديد! تم وضعه في خانة الاسم لتكمل إدخاله أول مرة.");
+                alert("منتج جديد! تم وضع الباركود في خانة الاسم لتكمل إدخاله أول مرة.");
             } else {
-                alert("Ny strekkode! Skriv inn produktnavn for å lagre det.");
+                alert("Ny strekkode lagt til i produktnavn!");
             }
         }
+        calculatePricing(true);
     }
 
     function applyLanguage() {
@@ -442,7 +459,6 @@
 
         localStorage.setItem('mr_intl_orders', JSON.stringify(savedOrders));
 
-        // إعادة تعيين الحقول
         document.getElementById('prodName').value = '';
         document.getElementById('costPrice').value = '';
         document.getElementById('quantity').value = '';
@@ -612,7 +628,7 @@
                         </div>
                         <div class="supplier-actions">
                             <button class="whatsapp-btn" onclick="sendWhatsAppSupplierOnly('${supplier}')">Bestill 💬</button>
-                            <button class="share-me-btn" onclick="sendWhatsAppMyDetails('${supplier}')">Detalجر 📝</button>
+                            <button class="share-me-btn" onclick="sendWhatsAppMyDetails('${supplier}')">Detaljer 📝</button>
                         </div>
                     </div>
             `;
