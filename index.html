@@ -4,12 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Pris App - Bestilling</title>
+    <script src="https://unpkg.com/html5-qrcode"></script>
     <style>
         * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
         body { background-color: #f1f5f9; margin: 0; padding: 10px; color: #1e293b; -webkit-tap-highlight-color: transparent; }
         .app-container { width: 100%; max-width: 480px; margin: auto; background: white; padding: 15px 12px; border-radius: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
         
-        /* صف الأزرار العلوي - صف واحد مدمج للهاتف */
         .top-bar { display: flex; gap: 4px; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px; }
         .top-bar button { flex: 1; min-width: 0; padding: 8px 4px; border: none; border-radius: 6px; font-size: 11px; font-weight: bold; cursor: pointer; color: white; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }
         
@@ -25,13 +25,21 @@
         
         .section-title { font-size: 15px; font-weight: 700; border-bottom: 2px solid #e2e8f0; padding-bottom: 4px; margin: 20px 0 10px 0; color: #334155; }
         
-        .form-group { background: #f8fafc; padding: 10px; border-radius: 10px; margin-bottom: 8px; border: 1px solid #e2e8f0; text-align: left; }
+        .form-group { background: #f8fafc; padding: 10px; border-radius: 10px; margin-bottom: 8px; border: 1px solid #e2e8f0; text-align: left; position: relative; }
         html[dir="rtl"] .form-group { text-align: right; }
         
         label { font-size: 11px; font-weight: bold; color: #64748b; display: block; margin-bottom: 4px; }
         input, select { width: 100%; padding: 8px 10px; border: 2px solid #cbd5e1; border-radius: 6px; font-size: 14px; background: white; color: #0f172a; }
         input:focus, select:focus { border-color: #10b981; outline: none; }
         
+        /* زر الباركود المدمج بشكل أنيق بجانب حقل الاسم */
+        .input-with-btn { display: flex; gap: 6px; }
+        .scan-btn { background: #10b981; color: white; border: none; border-radius: 6px; padding: 0 12px; font-size: 12px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 4px; }
+        
+        /* حاوية كاميرا الباركود المباشرة */
+        #scanner-container { display: none; margin-bottom: 12px; border: 2px solid #10b981; border-radius: 12px; overflow: hidden; background: #000; position: relative; }
+        #scanner-close { position: absolute; top: 8px; right: 8px; background: rgba(239, 68, 68, 0.9); color: white; border: none; padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: bold; z-index: 10; cursor: pointer; }
+
         .row { display: flex; gap: 8px; margin-bottom: 4px; }
         .col { flex: 1; }
         
@@ -39,7 +47,6 @@
         html[dir="rtl"] .calc-box { text-align: right; }
         .calc-result { font-size: 12px; font-weight: 600; color: #475569; margin-bottom: 4px; display: flex; justify-content: space-between; align-items: center; }
         
-        /* حقل سعر البيع النهائي القابل للتعديل يدويّاً */
         .editable-price-input { width: 120px; text-align: right; font-size: 18px; font-weight: 900; color: #059669; border: 1px solid #10b981; padding: 4px 6px; border-radius: 6px; }
         .profit-unit-amount { font-size: 16px; color: #dc2626; font-weight: 800; }
         
@@ -82,13 +89,11 @@
         .edit-btn { background: #f59e0b; }
         .del-btn { background: #ef4444; }
 
-        /* منطقة تظهر فقط في الطباعة لعرض التاريخ */
         .print-header { display: none; text-align: center; margin-bottom: 20px; font-size: 14px; font-weight: bold; border-bottom: 2px solid #000; padding-bottom: 10px; }
 
-        /* ستايل الطباعة الشامل لـ A4 */
         @media print {
             body { background: white !important; color: black !important; padding: 0; }
-            .top-bar, .section-title, .form-group, .row, .calc-box, #saveBtn, .search-box, .supplier-actions, .actions-row, .reorder-bar, .select-box-container, .p-link, h1, .subtitle { display: none !important; }
+            .top-bar, .section-title, .form-group, .row, .calc-box, #saveBtn, .search-box, .supplier-actions, .actions-row, .reorder-bar, .select-box-container, .p-link, h1, .subtitle, #scanner-container { display: none !important; }
             .app-container { box-shadow: none !important; max-width: 100% !important; padding: 0 !important; background: white !important; }
             .print-header { display: block !important; }
             .supplier-block { background: white !important; border: none !important; padding: 0 !important; margin-bottom: 15px !important; page-break-inside: avoid; }
@@ -96,7 +101,6 @@
             .product-card { border-bottom: 1px solid #eee !important; border-radius: 0 !important; box-shadow: none !important; background: white !important; page-break-inside: avoid; padding: 8px 0 !important; }
             .p-sales-price { color: black !important; font-size: 17px !important; }
             
-            /* إخفاء تفاصيل التكلفة تماماً في خيار طباعة الموظفين */
             body.staff-print-mode .p-cost, 
             body.staff-print-mode .p-profit, 
             body.staff-print-mode .p-meta, 
@@ -108,7 +112,6 @@
 <body>
 
 <div class="app-container">
-    <!-- صف الأزرار الرشيق والذكي للاستخدام بيد واحدة -->
     <div class="top-bar">
         <button class="lang-btn" onclick="toggleLanguage()" id="btnLang">NO / AR</button>
         <button class="print-main-btn" onclick="triggerPrint(false)">Eier Print 🖨️</button>
@@ -122,26 +125,35 @@
     <h1>Pris App</h1>
     <div class="subtitle" id="subTitle">by Mr. Intl (Kalkulator & Ordre)</div>
     
+    <div id="scanner-container">
+        <button id="scanner-close" onclick="stopScanner()">Avbryt X</button>
+        <div id="interactive" style="width: 100%;"></div>
+    </div>
+
     <div class="print-header" id="printHeaderView"></div>
     
     <input type="hidden" id="editId" value="">
+    <input type="hidden" id="barcodeStored" value="">
     
     <div class="form-group">
         <label id="lblProdName">Produktnavn</label>
-        <input type="text" id="prodName" placeholder="F.eks. Nido Milk Powder 2.5kg">
+        <div class="input-with-btn">
+            <input type="text" id="prodName" placeholder="F.eks. Nido Milk Powder 2.5kg">
+            <button class="scan-btn" onclick="startScanner()">📷 Scan</button>
+        </div>
     </div>
     
     <div class="row">
         <div class="col" style="flex: 1.5;">
             <div class="form-group">
                 <label id="lblCostPrice">Innkjøpspris (Total)</label>
-                <input type="number" id="costPrice" placeholder="0.00" oninput="calculatePricing(true)">
+                <input type="text" inputmode="decimal" pattern="[0-9]*([\.,][0-9]*)?" id="costPrice" placeholder="0.00" oninput="cleanAndCalculate(this, true)">
             </div>
         </div>
         <div class="col">
             <div class="form-group">
                 <label id="lblQty">Antall</label>
-                <input type="number" id="quantity" placeholder="" oninput="calculatePricing(true)">
+                <input type="text" inputmode="decimal" pattern="[0-9]*([\.,][0-9]*)?" id="quantity" placeholder="" oninput="cleanAndCalculate(this, true)">
             </div>
         </div>
     </div>
@@ -198,8 +210,7 @@
         <div class="calc-result"><span id="txtExMva">Utsalgspris eks. MVA</span>: <span id="resExMva">0.00 kr</span></div>
         <div class="calc-result" style="margin-top: 8px; border-top: 1px dashed #10b981; padding-top: 8px;">
             <div id="txtFinalPrice" style="font-weight: bold;">Utsalgspris (Ink. MVA):</div>
-            <!-- حقل سعر متاح للتعديل الفوري من قبل المالك دون تخريب باقي العمليات -->
-            <input type="number" step="0.01" id="resFinalUnitPriceInput" class="editable-price-input" value="0.00" oninput="calculatePricing(false)">
+            <input type="text" inputmode="decimal" pattern="[0-9]*([\.,][0-9]*)?" id="resFinalUnitPriceInput" class="editable-price-input" value="0.00" oninput="cleanAndCalculate(this, false)">
         </div>
         <div class="calc-result">
             <div id="txtProfit">Fortjeneste:</div>
@@ -223,6 +234,7 @@
 <script>
     let savedOrders = JSON.parse(localStorage.getItem('mr_intl_orders')) || [];
     let currentLang = localStorage.getItem('mr_intl_lang') || 'no';
+    let html5QrcodeScanner = null;
 
     const fallbackImg = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='1.5'><path d='M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z'/><path d='m3.3 7 8.7 5 8.7-5'/><path d='M12 22V12'/></svg>";
 
@@ -242,6 +254,72 @@
             selected: "valgt (محدد)", reorderBtn: "Send reorder 🛒 (إرسال مجمع)", edit: "Endre (تعديل)", del: "Slett (حذف)", openPage: "Leverandørside ↗ (رابط المورد)"
         }
     };
+
+    // تشغيل الكاميرا لقراءة الباركود
+    function startScanner() {
+        document.getElementById('scanner-container').style.display = 'block';
+        html5QrcodeScanner = new Html5Qrcode("interactive");
+        
+        const config = { fps: 15, qrbox: { width: 250, height: 150 } };
+        
+        html5QrcodeScanner.start(
+            { facingMode: "environment" }, 
+            config,
+            (decodedText) => {
+                // عند نجاح القراءة
+                if (navigator.vibrate) navigator.vibrate(100); // اهتزاز خفيف للهاتف عند التقاط الكود
+                stopScanner();
+                handleBarcodeScanned(decodedText);
+            },
+            (errorMessage) => { /* تجنب الإزعاج بالأخطاء المستمرة أثناء البحث */ }
+        ).catch(err => {
+            alert(currentLang === 'ar' ? "فشل فتح الكاميرا، يرجى إعطاء الصلاحية." : "Kamerafeil, vennligst gi tilgang.");
+            stopScanner();
+        });
+    }
+
+    function stopScanner() {
+        if (html5QrcodeScanner) {
+            html5QrcodeScanner.stop().then(() => {
+                document.getElementById('scanner-container').style.display = 'none';
+            }).catch(() => {
+                document.getElementById('scanner-container').style.display = 'none';
+            });
+        } else {
+            document.getElementById('scanner-container').style.display = 'none';
+        }
+    }
+
+    // التعامل الذكي مع الرمز المقروء
+    function handleBarcodeScanned(barcode) {
+        document.getElementById('barcodeStored').value = barcode;
+        
+        // البحث عن منتج مخزن يحمل نفس الباركود
+        const matchedProduct = savedOrders.find(p => p.barcode === barcode || p.name.includes(barcode));
+        
+        if (matchedProduct) {
+            // تعبئة البيانات تلقائياً وتوفير الوقت!
+            document.getElementById('prodName').value = matchedProduct.name;
+            document.getElementById('supplierName').value = matchedProduct.supplier;
+            document.getElementById('imgUrl').value = matchedProduct.img.startsWith('data:') ? '' : matchedProduct.img;
+            document.getElementById('supplierLink').value = matchedProduct.link === '#' ? '' : matchedProduct.link;
+            document.getElementById('marginSelect').value = matchedProduct.margin;
+            
+            // تنبيه المستخدم بالعربية أو النرويجية
+            if(currentLang === 'ar') {
+                alert(`✨ تم العثور على المنتج تلقائياً: ${matchedProduct.name}\nيرجى فقط إدخال سعر الفاتورة الجديد والكمية!`);
+            } else {
+                alert(`✨ Produkt funnet: ${matchedProduct.name}\nVennligst oppgi ny pris og antall.`);
+            }
+        } else {
+            document.getElementById('prodName').value = "Barcode: " + barcode;
+            if(currentLang === 'ar') {
+                alert("رمز جديد! تم وضعه في خانة الاسم لتكمل إدخاله أول مرة.");
+            } else {
+                alert("Ny strekkode! Skriv inn produktnavn for å lagre det.");
+            }
+        }
+    }
 
     function applyLanguage() {
         const lang = currentLang;
@@ -278,7 +356,13 @@
         applyLanguage();
     }
 
-    // تعديل ذكي للحسابات يدعم الإدخال التلقائي والتعديل اليدوي
+    function cleanAndCalculate(inputEl, autoCalculateFinalPrice) {
+        let val = inputEl.value.replace(',', '.');
+        val = val.replace(/[^0-9.]/g, '');
+        inputEl.value = val;
+        calculatePricing(autoCalculateFinalPrice);
+    }
+
     function calculatePricing(autoCalculateFinalPrice = true) {
         const costPrice = parseFloat(document.getElementById('costPrice').value) || 0;
         const qty = parseFloat(document.getElementById('quantity').value) || 1;
@@ -302,7 +386,6 @@
             unitFinalPrice = parseFloat(document.getElementById('resFinalUnitPriceInput').value) || 0;
         }
 
-        // حساب الفائدة الحقيقية: سعر البيع النهائي المطروح منه الضريبة ناقص تكلفة القطعة الأصلية
         const finalExMva = unitFinalPrice / (1 + mvaRate);
         const unitProfit = finalExMva - unitCost;
 
@@ -317,6 +400,7 @@
         const name = document.getElementById('prodName').value.trim();
         const cost = parseFloat(document.getElementById('costPrice').value) || 0;
         const editId = document.getElementById('editId').value;
+        const currentBarcode = document.getElementById('barcodeStored').value;
         
         if (!name || cost === 0) {
             alert(currentLang === 'ar' ? "الرجاء إدخال اسم المنتج وسعر الشراء!" : "Vennligst fyll ut produktnavn og innkjøpspris!");
@@ -329,6 +413,7 @@
 
         const productData = {
             id: editId ? parseInt(editId) : Date.now(),
+            barcode: currentBarcode || "",
             name: name,
             cost: cost,
             qty: qty,
@@ -345,7 +430,10 @@
 
         if (editId) {
             const oldP = savedOrders.find(item => item.id === productData.id);
-            if(oldP) productData.orderEsker = oldP.orderEsker;
+            if(oldP) {
+                productData.orderEsker = oldP.orderEsker;
+                if(!productData.barcode) productData.barcode = oldP.barcode;
+            }
             savedOrders = savedOrders.map(p => p.id === productData.id ? productData : p);
             document.getElementById('editId').value = "";
         } else {
@@ -354,11 +442,13 @@
 
         localStorage.setItem('mr_intl_orders', JSON.stringify(savedOrders));
 
+        // إعادة تعيين الحقول
         document.getElementById('prodName').value = '';
         document.getElementById('costPrice').value = '';
         document.getElementById('quantity').value = '';
         document.getElementById('imgUrl').value = '';
         document.getElementById('supplierLink').value = '';
+        document.getElementById('barcodeStored').value = '';
         
         applyLanguage();
     }
@@ -368,6 +458,7 @@
         if (!p) return;
 
         document.getElementById('editId').value = p.id;
+        document.getElementById('barcodeStored').value = p.barcode || "";
         document.getElementById('prodName').value = p.name;
         document.getElementById('costPrice').value = p.cost;
         document.getElementById('quantity').value = p.qty;
@@ -382,7 +473,6 @@
 
         window.scrollTo({ top: 0, behavior: 'smooth' });
         
-        // تعبئة السعر يدوياً من البيانات المخزنة لمنع إعادة الحساب التلقائي
         calculatePricing(true);
         document.getElementById('resFinalUnitPriceInput').value = p.unitFinalPrice;
         calculatePricing(false);
@@ -507,7 +597,7 @@
 
         const grouped = {};
         savedOrders.forEach(p => {
-            if (p.name.toLowerCase().includes(query) || p.supplier.toLowerCase().includes(query)) {
+            if (p.name.toLowerCase().includes(query) || p.supplier.toLowerCase().includes(query) || (p.barcode && p.barcode.includes(query))) {
                 if (!grouped[p.supplier]) grouped[p.supplier] = [];
                 grouped[p.supplier].push(p);
             }
@@ -522,7 +612,7 @@
                         </div>
                         <div class="supplier-actions">
                             <button class="whatsapp-btn" onclick="sendWhatsAppSupplierOnly('${supplier}')">Bestill 💬</button>
-                            <button class="share-me-btn" onclick="sendWhatsAppMyDetails('${supplier}')">Detaljer 📝</button>
+                            <button class="share-me-btn" onclick="sendWhatsAppMyDetails('${supplier}')">Detalجر 📝</button>
                         </div>
                     </div>
             `;
@@ -536,6 +626,7 @@
                         <img src="${p.img}" class="product-img" onerror="this.src=fallbackImg">
                         <div class="product-details">
                             <p class="p-name">${p.name}</p>
+                            ${p.barcode ? `<div style="font-size:10px; color:#94a3b8;">BC: ${p.barcode}</div>` : ''}
                             <div class="p-meta">
                                 Antall: <input type="number" value="${p.orderEsker}" style="width:50px; padding:2px; display:inline-block; font-size:12px;" oninput="updateCardEsker(${p.id}, this.value)">
                             </div>
