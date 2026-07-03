@@ -2,7 +2,7 @@
 <html lang="no" dir="ltr" id="appHtml">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-color=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Pris App - Super Fast Entry</title>
     <style>
         * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
@@ -126,9 +126,10 @@
     
     <input type="hidden" id="editId" value="">
     
+    <!-- حقل اسم المنتج للبحث السريع الفوري والذكي -->
     <div class="form-group">
         <label id="lblProdName">Produktnavn</label>
-        <input type="text" id="prodName" placeholder="Skriv for å søke i katalogen..." oninput="showSuggestions(this)" autocomplete="off">
+        <input type="text" id="prodName" placeholder="Skriv for å søke..." oninput="showSuggestions(this)" autocomplete="off">
         <ul id="suggestionsBox" class="suggestions-list"></ul>
     </div>
     
@@ -136,6 +137,7 @@
         <div class="col" style="flex: 1.5;">
             <div class="form-group">
                 <label id="lblCostPrice">Innkjøpspris (Total)</label>
+                <!-- عند الضغط على Enter هنا سيقوم بحفظ المنتج فوراً واختصار الوقت -->
                 <input type="text" inputmode="decimal" pattern="[0-9]*([\.,][0-9]*)?" id="costPrice" placeholder="0.00" oninput="cleanAndCalculate(this, true)" onkeydown="handleEnterKey(event)">
             </div>
         </div>
@@ -221,8 +223,31 @@
 </div>
 
 <script>
-    // مستودع المنتجات العام (الكتالوج الدائم المسرّع)
-    let productCatalog = JSON.parse(localStorage.getItem('mr_intl_catalog')) || [];
+    // مستودع المنتجات الافتراضي المدمج مسبقاً (يمكنك التعديل أو الإضافة هنا مباشرة)
+    let productCatalog = [
+      {
+        "name": "Sweet Potatoes (بطاطا حلوة)",
+        "supplier": "Afro kjøp as",
+        "margin": "1.5",
+        "mva": "15%",
+        "link": "https://www.afrokjop.no"
+      },
+      {
+        "name": "Rød Paprika (فلفل أحمر)",
+        "supplier": "Afro kjøp as",
+        "margin": "1.6",
+        "mva": "15%",
+        "link": ""
+      },
+      {
+        "name": "Aubergine (باذنجان)",
+        "supplier": "Afro kjøp as",
+        "margin": "1.5",
+        "mva": "15%",
+        "link": ""
+      }
+    ];
+
     let savedOrders = JSON.parse(localStorage.getItem('mr_intl_orders')) || [];
     let currentLang = localStorage.getItem('mr_intl_lang') || 'no';
 
@@ -245,7 +270,7 @@
         }
     };
 
-    // ميزة المقترحات فائقة السرعة من الكتالوج المخزن مسبقاً
+    // ميزة المقترحات الفورية الذكية
     function showSuggestions(inputEl) {
         const query = inputEl.value.toLowerCase().trim();
         const box = document.getElementById('suggestionsBox');
@@ -256,7 +281,6 @@
             return;
         }
 
-        // دمج الكتالوج مع الطلبيات السابقة لضمان إيجاد المنتج فوراً
         const allAvailableProducts = [...productCatalog, ...savedOrders];
         const seenNames = new Set();
         
@@ -281,7 +305,7 @@
         }
     }
 
-    // بمجرد اختيار منتج مقترح، يعبئ البيانات ويفتح لوحة المفاتيح على حقل السعر فوراً!
+    // بمجرد اختيار المنتج من المقترحات، يعبئ البيانات فوراً وينقل التركيز لحقل السعر
     function selectSuggestion(product) {
         document.getElementById('prodName').value = product.name;
         document.getElementById('supplierName').value = product.supplier;
@@ -296,17 +320,17 @@
         
         document.getElementById('suggestionsBox').style.display = 'none';
         
-        // ميزة ذكية: فتح رابط المورد الخاص بالمنتج في صفحة جديدة للتأكد من السعر إذا وجد
+        // فتح الرابط في حال توفره
         if (product.link && product.link !== '#') {
             window.open(product.link, '_blank');
         }
         
-        // الانتقال الفوري لحقل السعر لتوفير اللمس
+        // الانتقال الفوري لحقل السعر لتوفير الوقت
         document.getElementById('costPrice').focus();
         calculatePricing(true);
     }
 
-    // الحفظ التلقائي عند الضغط على مفتاح Enter
+    // الحفظ التلقائي عند الضغط على Enter في حقول الإدخال
     function handleEnterKey(event) {
         if (event.key === "Enter") {
             event.preventDefault();
@@ -425,20 +449,6 @@
             unitProfit: calc.unitProfit.toFixed(2)
         };
 
-        // تخزين ذكي للمنتج الجديد في الكتالوج العام تلقائياً لحفظه للأبد ومستقبلاً
-        const existsInCatalog = productCatalog.some(c => c.name.toLowerCase() === name.toLowerCase());
-        if(!existsInCatalog) {
-            productCatalog.unshift({
-                name: productData.name,
-                supplier: productData.supplier,
-                margin: productData.margin,
-                mva: productData.mva,
-                img: productData.img,
-                link: productData.link
-            });
-            localStorage.setItem('mr_intl_catalog', JSON.stringify(productCatalog));
-        }
-
         if (editId) {
             const oldP = savedOrders.find(item => item.id === productData.id);
             if(oldP) productData.orderEsker = oldP.orderEsker;
@@ -450,7 +460,7 @@
 
         localStorage.setItem('mr_intl_orders', JSON.stringify(savedOrders));
 
-        // تفريغ فوري للحقول وإرجاع المؤشر للأعلى
+        // تفريغ الحقول لإدخال سريع للمنتج التالي
         document.getElementById('prodName').value = '';
         document.getElementById('costPrice').value = '';
         document.getElementById('quantity').value = '';
@@ -463,7 +473,7 @@
         
         applyLanguage();
         
-        // إعادة التركيز التلقائي لخانة اسم المنتج لتجهيز السجل التالي فوراً
+        // إعادة نقل مؤشر الماوس تلقائياً إلى خانة اسم المنتج لتجهيز الإدخال التالي
         document.getElementById('prodName').focus();
     }
 
@@ -574,7 +584,6 @@
         downloadAnchor.remove();
     }
 
-    // هنا استيراد قائمة الكتالوج أو المنتجات المجمع المسبق
     function importData(input) {
         const file = input.files[0];
         if (!file) return;
@@ -585,9 +594,7 @@
                 if (Array.isArray(imported)) {
                     if(confirm("Vil du importere produktkatalogen?")){
                         productCatalog = [...imported, ...productCatalog];
-                        // تفادي التكرار بناء على الاسم
                         productCatalog = Array.from(new Set(productCatalog.map(a => a.name.toLowerCase()))).map(name => productCatalog.find(a => a.name.toLowerCase() === name));
-                        localStorage.setItem('mr_intl_catalog', JSON.stringify(productCatalog));
                         applyLanguage();
                         alert("Katalogen ble importert med suksess!");
                     }
