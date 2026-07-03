@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Pris App - Bestilling</title>
-    <script src="https://unpkg.com/html5-qrcode"></script>
+    <script src="https://unpkg.com/tesseract.js@4.0.2/dist/tesseract.min.js"></script>
     <style>
         * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
         body { background-color: #f1f5f9; margin: 0; padding: 10px; color: #1e293b; -webkit-tap-highlight-color: transparent; }
@@ -32,15 +32,15 @@
         input, select { width: 100%; padding: 8px 10px; border: 2px solid #cbd5e1; border-radius: 6px; font-size: 14px; background: white; color: #0f172a; }
         input:focus, select:focus { border-color: #10b981; outline: none; }
         
-        /* زر الباركود والتصوير المدمج */
+        /* زر تصوير وقراءة الفاتورة الذكي */
         .input-with-btn { display: flex; gap: 6px; }
         .scan-btn-container { position: relative; display: inline-block; }
-        .scan-btn { background: #10b981; color: white; border: none; border-radius: 6px; padding: 0 12px; font-size: 12px; font-weight: bold; cursor: pointer; height: 100%; display: flex; align-items: center; gap: 4px; }
+        .scan-btn { background: #10b981; color: white; border: none; border-radius: 6px; padding: 0 12px; font-size: 12px; font-weight: bold; cursor: pointer; height: 100%; display: flex; align-items: center; gap: 4px; white-space: nowrap; }
         .scan-file-input { position: absolute; left: 0; top: 0; opacity: 0; width: 100%; height: 100%; cursor: pointer; }
         
-        /* نافذة الكاميرا المباشرة */
-        #scanner-container { display: none; margin-bottom: 12px; border: 2px solid #10b981; border-radius: 12px; overflow: hidden; background: #000; position: relative; }
-        #scanner-close { position: absolute; top: 8px; right: 8px; background: rgba(239, 68, 68, 0.9); color: white; border: none; padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: bold; z-index: 10; cursor: pointer; }
+        /* مؤشر التحميل أثناء معالجة الصورة */
+        #ocr-loading { display: none; background: #fffbeb; border: 1px solid #fef3c7; color: #b45309; padding: 8px; border-radius: 8px; font-size: 12px; font-weight: bold; text-align: center; margin-bottom: 10px; animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0% { opacity: 0.6; } 50% { opacity: 1; } 100% { opacity: 0.6; } }
 
         .row { display: flex; gap: 8px; margin-bottom: 4px; }
         .col { flex: 1; }
@@ -95,7 +95,7 @@
 
         @media print {
             body { background: white !important; color: black !important; padding: 0; }
-            .top-bar, .section-title, .form-group, .row, .calc-box, #saveBtn, .search-box, .supplier-actions, .actions-row, .reorder-bar, .select-box-container, .p-link, h1, .subtitle, #scanner-container { display: none !important; }
+            .top-bar, .section-title, .form-group, .row, .calc-box, #saveBtn, .search-box, .supplier-actions, .actions-row, .reorder-bar, .select-box-container, .p-link, h1, .subtitle, #ocr-loading { display: none !important; }
             .app-container { box-shadow: none !important; max-width: 100% !important; padding: 0 !important; background: white !important; }
             .print-header { display: block !important; }
             .supplier-block { background: white !important; border: none !important; padding: 0 !important; margin-bottom: 15px !important; page-break-inside: avoid; }
@@ -127,23 +127,19 @@
     <h1>Pris App</h1>
     <div class="subtitle" id="subTitle">by Mr. Intl (Kalkulator & Ordre)</div>
     
-    <div id="scanner-container">
-        <button id="scanner-close" onclick="stopScanner()">Avbryt X</button>
-        <div id="interactive" style="width: 100%;"></div>
-    </div>
+    <div id="ocr-loading">⏳ Leserar text fra faktura/produkt... Vennligst vent.</div>
 
     <div class="print-header" id="printHeaderView"></div>
     
     <input type="hidden" id="editId" value="">
-    <input type="hidden" id="barcodeStored" value="">
     
     <div class="form-group">
         <label id="lblProdName">Produktnavn</label>
         <div class="input-with-btn">
             <input type="text" id="prodName" placeholder="F.eks. Nido Milk Powder 2.5kg">
             <div class="scan-btn-container">
-                <button class="scan-btn" onclick="tryLiveScanner()">📷 Scan</button>
-                <input type="file" accept="image/*" capture="environment" class="scan-file-input" onchange="scanFromImage(this)">
+                <button class="scan-btn">📷 Scan</button>
+                <input type="file" accept="image/*" capture="environment" class="scan-file-input" onchange="extractTextFromImage(this)">
             </div>
         </div>
     </div>
@@ -239,7 +235,6 @@
 <script>
     let savedOrders = JSON.parse(localStorage.getItem('mr_intl_orders')) || [];
     let currentLang = localStorage.getItem('mr_intl_lang') || 'no';
-    let html5QrcodeScanner = null;
 
     const fallbackImg = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='1.5'><path d='M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z'/><path d='m3.3 7 8.7 5 8.7-5'/><path d='M12 22V12'/></svg>";
 
@@ -249,93 +244,67 @@
             prodName: "Produktnavn", cost: "Innkjøpspris (Total)", qty: "Antall", margin: "Margin", mva: "MVA", supplier: "Leverandør",
             img: "Bilde-URL", link: "Leverandør Link", uCost: "Innkjøpspris per enhet (Eks. MVA)", exMva: "Utsalgspris eks. MVA", fPrice: "Utsalgspris (Ink. MVA):",
             profit: "Fortjeneste:", save: "Lagre i ordreliste", update: "Oppdater Produkt", search: "Søk efter produkt...",
-            selected: "valgt", reorderBtn: "Send reorder 🛒", edit: "Endre", del: "Slett", openPage: "Leverandørside ↗"
+            selected: "valgt", reorderBtn: "Send reorder 🛒", edit: "Endre", del: "Slett", openPage: "Leverandørside ↗",
+            loading: "⏳ Leser tekst fra bildet... Vennligst vent."
         },
         ar: {
             sub: "بواسطة مستر إنترناشونال (الحاسبة والطلبيات)", sec2: "سجل طلبيات الموردين الحاليين",
             prodName: "Produktnavn (اسم المنتج)", cost: "Innkjøpspris (سعر الشراء الإجمالي)", qty: "Antall (الكمية)", margin: "Margin (الفائدة)", mva: "MVA (الضريبة)", supplier: "Leverandør (المورد)",
             img: "Bilde-URL (الصورة)", link: "Leverandør Link (الرابط)", uCost: "Innkjøpspris per enhet (سعر القطعة بدون ضريبة)", exMva: "Utsalgspris eks. MVA (البيع قبل الضريبة)", fPrice: "Utsalgspris (سعر البيع النهائي المتوقع):",
             profit: "Fortjeneste (صافي الربح):", save: "Lagre i ordreliste (حفظ في القائمة)", update: "Oppdater (تحديث وحفظ)", search: "Søk... (بحث سريع)",
-            selected: "valgt (محدد)", reorderBtn: "Send reorder 🛒 (إرسال مجمع)", edit: "Endre (تعديل)", del: "Slett (حذف)", openPage: "Leverandørside ↗ (رابط المورد)"
+            selected: "valgt (محدد)", reorderBtn: "Send reorder 🛒 (إرسال مجمع)", edit: "Endre (تعديل)", del: "Slett (حذف)", openPage: "Leverandørside ↗ (رابط المورد)",
+            loading: "⏳ جاري استخراج وقراءة الاسم من الفاتورة... يرجى الانتظار ثوانٍ."
         }
     };
 
-    // المحاولة 1: تشغيل الكاميرا المباشرة إذا كان الرابط يدعمها أمنياً
-    function tryLiveScanner() {
-        if (!window.isSecureContext) {
-            // إذا كان ملفاً محلياً، لن يفعل شيء وسيترك الكاميرا العادية تفتح عبر زر input المدمج خلفه تلقائياً
-            return;
-        }
-        document.getElementById('scanner-container').style.display = 'block';
-        html5QrcodeScanner = new Html5Qrcode("interactive");
-        
-        html5QrcodeScanner.start(
-            { facingMode: "environment" }, 
-            { fps: 15, qrbox: { width: 260, height: 160 } },
-            (decodedText) => {
-                if (navigator.vibrate) navigator.vibrate(100);
-                stopScanner();
-                handleBarcodeScanned(decodedText);
-            },
-            (err) => {}
-        ).catch(() => {
-            stopScanner();
-        });
-    }
-
-    function stopScanner() {
-        if (html5QrcodeScanner) {
-            html5QrcodeScanner.stop().then(() => {
-                document.getElementById('scanner-container').style.display = 'none';
-            }).catch(() => {
-                document.getElementById('scanner-container').style.display = 'none';
-            });
-        } else {
-            document.getElementById('scanner-container').style.display = 'none';
-        }
-    }
-
-    // المحاولة 2 (الحل السحري للملف المحلي): التقاط صورة الباركود وقراءتها فوراً
-    function scanFromImage(inputEl) {
+    // الدالة السحرية الجديدة: تصوير الفاتورة واستخراج اسم المنتج تلقائياً
+    function extractTextFromImage(inputEl) {
         if (!inputEl.files || inputEl.files.length === 0) return;
         const file = inputEl.files[0];
         
-        const html5QrCode = new Html5Qrcode("interactive");
-        html5QrCode.scanFile(file, true)
-            .then(decodedText => {
-                if (navigator.vibrate) navigator.vibrate(100);
-                handleBarcodeScanned(decodedText);
-            })
-            .catch(err => {
-                alert(currentLang === 'ar' ? "لم يتم التقاط الباركود بوضوح، يرجى المحاولة مرة أخرى والتقريب." : "Klarte ikke å lese strekkoden. Prøv igjen nærmere.");
-            });
-    }
+        const loader = document.getElementById('ocr-loading');
+        loader.innerText = i18n[currentLang].loading;
+        loader.style.display = 'block';
 
-    function handleBarcodeScanned(barcode) {
-        document.getElementById('barcodeStored').value = barcode;
-        const matchedProduct = savedOrders.find(p => p.barcode === barcode || (p.barcode && p.barcode.includes(barcode)));
-        
-        if (matchedProduct) {
-            document.getElementById('prodName').value = matchedProduct.name;
-            document.getElementById('supplierName').value = matchedProduct.supplier;
-            document.getElementById('imgUrl').value = matchedProduct.img.startsWith('data:') ? '' : matchedProduct.img;
-            document.getElementById('supplierLink').value = matchedProduct.link === '#' ? '' : matchedProduct.link;
-            document.getElementById('marginSelect').value = matchedProduct.margin;
-            
-            if(currentLang === 'ar') {
-                alert(`✨ تم العثور على المنتج تلقائياً: ${matchedProduct.name}\nيرجى فقط إدخل سعر الفاتورة والكمية!`);
-            } else {
-                alert(`✨ Produkt funnet: ${matchedProduct.name}\nVennligst oppgi ny pris og antall.`);
-            }
-        } else {
-            document.getElementById('prodName').value = barcode;
-            if(currentLang === 'ar') {
-                alert("منتج جديد! تم وضع الباركود في خانة الاسم لتكمل إدخاله أول مرة.");
-            } else {
-                alert("Ny strekkode lagt til i produktnavn!");
-            }
-        }
-        calculatePricing(true);
+        const reader = new FileReader();
+        reader.onload = function () {
+            Tesseract.recognize(
+                reader.result,
+                'eng+nor', // دعم اللغتين الإنجليزية والنرويجية معاً للحصول على أعلى دقة من الفواتير
+                { logger: m => console.log(m) }
+            ).then(({ data: { text } }) => {
+                loader.style.display = 'none';
+                
+                // تنظيف النص المستخرج: إزالة الأسطر الفارغة، والرموز الزائدة
+                let cleanText = text.trim().replace(/[\r\n]+/g, ' ');
+                // اختصار النص الطويل جداً ليركز فقط على السطر الأول أو اسم المنتج الأساسي
+                if(cleanText.length > 50) {
+                    cleanText = cleanText.substring(0, 50) + "...";
+                }
+
+                if (cleanText) {
+                    document.getElementById('prodName').value = cleanText;
+                    
+                    // محاولة البحث التلقائي إذا كان هذا الاسم تم حفظه مسبقاً لدى مورد
+                    const matched = savedOrders.find(p => cleanText.toLowerCase().includes(p.name.toLowerCase()) || p.name.toLowerCase().includes(cleanText.toLowerCase()));
+                    if(matched) {
+                        document.getElementById('supplierName').value = matched.supplier;
+                        document.getElementById('imgUrl').value = matched.img.startsWith('data:') ? '' : matched.img;
+                        document.getElementById('supplierLink').value = matched.link === '#' ? '' : matched.link;
+                        document.getElementById('marginSelect').value = matched.margin;
+                        if(currentLang === 'ar') {
+                            alert(`✨ تم التعرف على النص وضبط المورد تلقائياً: \n"${cleanText}"`);
+                        }
+                    }
+                } else {
+                    alert(currentLang === 'ar' ? "لم يتم العثور على نص واضح في الصورة. يرجى التصوير عن قرب وبإضاءة جيدة." : "Klarte ikke å lese tydelig tekst. Prøv igjen med bedre lys.");
+                }
+            }).catch(err => {
+                loader.style.display = 'none';
+                alert("Feil ved tekstgjenkjenning: " + err);
+            });
+        };
+        reader.readAsDataURL(file);
     }
 
     function applyLanguage() {
@@ -417,7 +386,6 @@
         const name = document.getElementById('prodName').value.trim();
         const cost = parseFloat(document.getElementById('costPrice').value) || 0;
         const editId = document.getElementById('editId').value;
-        const currentBarcode = document.getElementById('barcodeStored').value;
         
         if (!name || cost === 0) {
             alert(currentLang === 'ar' ? "الرجاء إدخال اسم المنتج وسعر الشراء!" : "Vennligst fyll ut produktnavn og innkjøpspris!");
@@ -430,7 +398,6 @@
 
         const productData = {
             id: editId ? parseInt(editId) : Date.now(),
-            barcode: currentBarcode || "",
             name: name,
             cost: cost,
             qty: qty,
@@ -447,10 +414,7 @@
 
         if (editId) {
             const oldP = savedOrders.find(item => item.id === productData.id);
-            if(oldP) {
-                productData.orderEsker = oldP.orderEsker;
-                if(!productData.barcode) productData.barcode = oldP.barcode;
-            }
+            if(oldP) productData.orderEsker = oldP.orderEsker;
             savedOrders = savedOrders.map(p => p.id === productData.id ? productData : p);
             document.getElementById('editId').value = "";
         } else {
@@ -464,7 +428,6 @@
         document.getElementById('quantity').value = '';
         document.getElementById('imgUrl').value = '';
         document.getElementById('supplierLink').value = '';
-        document.getElementById('barcodeStored').value = '';
         
         applyLanguage();
     }
@@ -474,7 +437,6 @@
         if (!p) return;
 
         document.getElementById('editId').value = p.id;
-        document.getElementById('barcodeStored').value = p.barcode || "";
         document.getElementById('prodName').value = p.name;
         document.getElementById('costPrice').value = p.cost;
         document.getElementById('quantity').value = p.qty;
@@ -613,7 +575,7 @@
 
         const grouped = {};
         savedOrders.forEach(p => {
-            if (p.name.toLowerCase().includes(query) || p.supplier.toLowerCase().includes(query) || (p.barcode && p.barcode.includes(query))) {
+            if (p.name.toLowerCase().includes(query) || p.supplier.toLowerCase().includes(query)) {
                 if (!grouped[p.supplier]) grouped[p.supplier] = [];
                 grouped[p.supplier].push(p);
             }
@@ -642,7 +604,6 @@
                         <img src="${p.img}" class="product-img" onerror="this.src=fallbackImg">
                         <div class="product-details">
                             <p class="p-name">${p.name}</p>
-                            ${p.barcode ? `<div style="font-size:10px; color:#94a3b8;">BC: ${p.barcode}</div>` : ''}
                             <div class="p-meta">
                                 Antall: <input type="number" value="${p.orderEsker}" style="width:50px; padding:2px; display:inline-block; font-size:12px;" oninput="updateCardEsker(${p.id}, this.value)">
                             </div>
