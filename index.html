@@ -16,8 +16,6 @@
         .print-main-btn { background: #475569; }
         .print-staff-btn { background: #0284c7; }
         .export-btn { background: #059669; }
-        .import-btn { background: #d97706; position: relative; overflow: hidden; }
-        .import-btn input[type="file"] { position: absolute; left: 0; top: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
 
         h1 { font-size: 24px; font-weight: 800; margin: 0; text-align: center; color: #0f172a; }
         .subtitle { font-size: 11px; font-weight: 700; color: #10b981; text-transform: uppercase; letter-spacing: 1px; text-align: center; margin-bottom: 15px; }
@@ -25,23 +23,22 @@
         .section-title { font-size: 15px; font-weight: 700; border-bottom: 2px solid #e2e8f0; padding-bottom: 4px; margin: 20px 0 10px 0; color: #334155; }
         
         .form-group { background: #f8fafc; padding: 10px; border-radius: 10px; margin-bottom: 8px; border: 1px solid #e2e8f0; text-align: left; position: relative; }
-        html[dir="rtl"] .form-group { text-align: right; }
         
         label { font-size: 11px; font-weight: bold; color: #64748b; display: block; margin-bottom: 4px; }
-        input, select { width: 100%; padding: 8px 10px; border: 2px solid #cbd5e1; border-radius: 6px; font-size: 14px; background: white; color: #0f172a; }
+        input, select { width: 100%; padding: 8px 10px; border: 2px solid #cbd5e1; border-radius: 6px; font-size: 14px; background: white; color: #0f172a; text-align: left; }
         input:focus, select:focus { border-color: #10b981; outline: none; }
         
-        /* قائمة المقترحات الفورية السريعة */
-        .suggestions-list { position: absolute; top: 100%; left: 0; width: 100%; background: white; border: 2px solid #10b981; border-top: none; border-radius: 0 0 8px 8px; max-height: 200px; overflow-y: auto; z-index: 100; box-shadow: 0 8px 16px rgba(0,0,0,0.1); display: none; padding: 0; margin: 0; list-style: none; }
-        .suggestions-list li { padding: 10px; font-size: 13px; border-bottom: 1px solid #f1f5f9; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+        /* قائمة المقترحات الفورية السريعة للبحث بالاسم أو الباركود */
+        .suggestions-list { position: absolute; top: 100%; left: 0; width: 100%; background: white; border: 2px solid #10b981; border-top: none; border-radius: 0 0 8px 8px; max-height: 220px; overflow-y: auto; z-index: 100; box-shadow: 0 8px 16px rgba(0,0,0,0.1); display: none; padding: 0; margin: 0; list-style: none; }
+        .suggestions-list li { padding: 10px; font-size: 13px; border-bottom: 1px solid #f1f5f9; cursor: pointer; display: flex; flex-direction: column; align-items: flex-start; gap: 2px; text-align: left; }
         .suggestions-list li:hover { background: #ecfdf5; }
-        .suggestions-list li .suggest-sup { font-size: 11px; background: #e2e8f0; padding: 2px 6px; border-radius: 4px; color: #475569; font-weight: bold; }
+        .suggestions-list li .suggest-meta { display: flex; gap: 6px; font-size: 10px; color: #64748b; font-weight: bold; margin-top: 2px; }
+        .suggestions-list li .badge { background: #e2e8f0; padding: 1px 4px; border-radius: 4px; }
 
         .row { display: flex; gap: 8px; margin-bottom: 4px; }
         .col { flex: 1; }
         
         .calc-box { background: #ecfdf5; border: 2px dashed #10b981; border-radius: 10px; padding: 12px; margin-top: 8px; text-align: left; }
-        html[dir="rtl"] .calc-box { text-align: right; }
         .calc-result { font-size: 12px; font-weight: 600; color: #475569; margin-bottom: 4px; display: flex; justify-content: space-between; align-items: center; }
         
         .editable-price-input { width: 120px; text-align: right; font-size: 18px; font-weight: 900; color: #059669; border: 1px solid #10b981; padding: 4px 6px; border-radius: 6px; }
@@ -50,10 +47,9 @@
         .btn { width: 100%; background: #10b981; color: white; padding: 12px; border: none; border-radius: 8px; font-size: 15px; font-weight: bold; cursor: pointer; margin-top: 8px; box-shadow: 0 4px 10px rgba(16, 185, 129, 0.15); }
         .btn:active { transform: scale(0.97); }
         
-        .search-box { width: 100%; padding: 10px; margin: 12px 0; border: 2px solid #10b981; border-radius: 8px; font-size: 14px; }
+        .search-box { width: 100%; padding: 10px; margin: 12px 0; border: 2px solid #10b981; border-radius: 8px; font-size: 14px; text-align: left; }
         
         .supplier-block { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 14px; padding: 12px; margin-bottom: 15px; text-align: left; }
-        html[dir="rtl"] .supplier-block { text-align: right; }
         .supplier-header { display: flex; flex-direction: column; gap: 4px; border-bottom: 2px solid #cbd5e1; padding-bottom: 6px; margin-bottom: 10px; }
         .supplier-header-top { display: flex; justify-content: space-between; align-items: center; }
         .supplier-title { font-size: 15px; font-weight: 800; color: #1e293b; }
@@ -66,15 +62,11 @@
         .select-box-container { display: flex; align-items: center; justify-content: center; }
         .select-box { width: 18px; height: 18px; cursor: pointer; }
         
-        .product-img { width: 65px; height: 65px; border-radius: 6px; object-fit: cover; background: #f1f5f9; border: 1px solid #e2e8f0; }
         .product-details { flex: 1; min-width: 0; text-align: left; }
-        html[dir="rtl"] .product-details { text-align: right; }
-        .p-name { font-weight: 700; font-size: 14px; color: #0f172a; margin: 0; }
-        .p-meta { font-size: 11px; margin-top: 2px; color: #64748b; }
-        .p-link { font-size: 11px; color: #3b82f6; text-decoration: none; display: inline-block; margin-top: 2px; font-weight: 600; }
+        .p-name { font-weight: 700; font-size: 14px; color: #0f172a; margin: 0; text-align: left; }
+        .p-meta { font-size: 11px; margin-top: 2px; color: #64748b; text-align: left; }
         
         .p-prices { text-align: right; min-width: 115px; display: flex; flex-direction: column; align-items: flex-end; }
-        html[dir="rtl"] .p-prices { text-align: left; align-items: flex-start; }
         .p-sales-price { font-size: 16px; font-weight: 800; color: #059669; }
         .p-cost { font-size: 11px; color: #64748b; margin-top: 1px; white-space: nowrap; }
         .p-profit { font-size: 11px; color: #dc2626; font-weight: bold; white-space: nowrap; }
@@ -90,7 +82,7 @@
 
         @media print {
             body { background: white !important; color: black !important; padding: 0; }
-            .top-bar, .section-title, .form-group, .row, .calc-box, #saveBtn, .search-box, .supplier-actions, .actions-row, .reorder-bar, .select-box-container, .p-link, h1, .subtitle, .suggestions-list { display: none !important; }
+            .top-bar, .section-title, .form-group, .row, .calc-box, #saveBtn, .search-box, .supplier-actions, .actions-row, .reorder-bar, .select-box-container, h1, .subtitle, .suggestions-list { display: none !important; }
             .app-container { box-shadow: none !important; max-width: 100% !important; padding: 0 !important; background: white !important; }
             .print-header { display: block !important; }
             .supplier-block { background: white !important; border: none !important; padding: 0 !important; margin-bottom: 15px !important; page-break-inside: avoid; }
@@ -100,8 +92,7 @@
             
             body.staff-print-mode .p-cost, 
             body.staff-print-mode .p-profit, 
-            body.staff-print-mode .p-meta, 
-            body.staff-print-mode .product-img { display: none !important; }
+            body.staff-print-mode .p-meta { display: none !important; }
             body.staff-print-mode .supplier-title { font-size: 13px !important; font-weight: normal !important; }
         }
     </style>
@@ -114,9 +105,6 @@
         <button class="print-main-btn" onclick="triggerPrint(false)">Eier Print 🖨️</button>
         <button class="print-staff-btn" onclick="triggerPrint(true)">Ansatte Print 👤</button>
         <button class="export-btn" onclick="exportData()">Export 📤</button>
-        <button class="import-btn">Import Catalog 📥
-            <input type="file" accept=".json" onchange="importData(this)">
-        </button>
     </div>
 
     <h1>Pris App</h1>
@@ -126,10 +114,9 @@
     
     <input type="hidden" id="editId" value="">
     
-    <!-- حقل اسم المنتج للبحث السريع الفوري والذكي -->
     <div class="form-group">
-        <label id="lblProdName">Produktnavn</label>
-        <input type="text" id="prodName" placeholder="Skriv for å søke..." oninput="showSuggestions(this)" autocomplete="off">
+        <label id="lblProdName">Produktnavn / Strekkode</label>
+        <input type="text" id="prodName" placeholder="Søk på navn eller strekkode..." oninput="showSuggestions(this)" autocomplete="off">
         <ul id="suggestionsBox" class="suggestions-list"></ul>
     </div>
     
@@ -137,7 +124,6 @@
         <div class="col" style="flex: 1.5;">
             <div class="form-group">
                 <label id="lblCostPrice">Innkjøpspris (Total)</label>
-                <!-- عند الضغط على Enter هنا سيقوم بحفظ المنتج فوراً واختصار الوقت -->
                 <input type="text" inputmode="decimal" pattern="[0-9]*([\.,][0-9]*)?" id="costPrice" placeholder="0.00" oninput="cleanAndCalculate(this, true)" onkeydown="handleEnterKey(event)">
             </div>
         </div>
@@ -186,14 +172,16 @@
         </div>
         <div class="col">
             <div class="form-group">
-                <label id="lblImg">Bilde-URL</label>
-                <input type="text" id="imgUrl" placeholder="https://...">
+                <label id="lblVaregruppe">Varegruppe</label>
+                <select id="varegruppeSelect">
+                    <option value="Tørrvarer" selected>Tørrvarer</option>
+                    <option value="Drikke">Drikke</option>
+                    <option value="Kosmetikk">Kosmetikk</option>
+                    <option value="Ferskvarer">Ferskvarer</option>
+                    <option value="Andre">Andre</option>
+                </select>
             </div>
         </div>
-    </div>
-    <div class="form-group">
-        <label id="lblLink">Leverandør Link</label>
-        <input type="text" id="supplierLink" placeholder="https://...">
     </div>
 
     <div class="calc-box">
@@ -212,7 +200,7 @@
     <button class="btn" id="saveBtn" onclick="saveToOrderList()">Lagre i ordreliste (Enter ↵)</button>
 
     <div class="section-title" id="tSection2">Leverandørbestillinger</div>
-    <input type="text" id="searchBar" class="search-box" placeholder="Søk efter produkt..." oninput="renderOrders()">
+    <input type="text" id="searchBar" class="search-box" placeholder="Søk efter produkt eller strekkode..." oninput="renderOrders()">
 
     <div id="ordersContainer"></div>
 
@@ -223,54 +211,50 @@
 </div>
 
 <script>
-    // مستودع المنتجات الافتراضي المدمج مسبقاً (يمكنك التعديل أو الإضافة هنا مباشرة)
+    // جميع المنتجات المستخرجة بدقة عالية من ملفك الـ Excel (الأسماء تظهر LTR لترتيب صحيح)
     let productCatalog = [
-      {
-        "name": "Sweet Potatoes (بطاطا حلوة)",
-        "supplier": "Afro kjøp as",
-        "margin": "1.5",
-        "mva": "15%",
-        "link": "https://www.afrokjop.no"
-      },
-      {
-        "name": "Rød Paprika (فلفل أحمر)",
-        "supplier": "Afro kjøp as",
-        "margin": "1.6",
-        "mva": "15%",
-        "link": ""
-      },
-      {
-        "name": "Aubergine (باذنجان)",
-        "supplier": "Afro kjøp as",
-        "margin": "1.5",
-        "mva": "15%",
-        "link": ""
-      }
+      { "barcode": "5017689012137", "name": "Trs Dalchini Cinamon Whole 50g", "supplier": "Norbygate as", "varegruppe": "Tørrvarer", "mva": "25%" },
+      { "barcode": "5017689002565", "name": "ginger", "supplier": "Norbygate as", "varegruppe": "Tørrvarer", "mva": "0%" },
+      { "barcode": "5578", "name": "Cola", "supplier": "", "varegruppe": "Drikke", "mva": "15%" },
+      { "barcode": "1", "name": "Norsk potet", "supplier": "", "varegruppe": "Tørrvarer", "mva": "15%" },
+      { "barcode": "5017689006617", "name": "Trs Black Pepper Powder 100g", "supplier": "Norbygate as", "varegruppe": "Tørrvarer", "mva": "15%" },
+      { "barcode": "5017689010669", "name": "Trs Black Pepper Coarse 100g", "supplier": "Norbygate as", "varegruppe": "Tørrvarer", "mva": "15%" },
+      { "barcode": "2", "name": "Khanum Butter Ghee 500g", "supplier": "Norbygate as", "varegruppe": "Tørrvarer", "mva": "15%" },
+      { "barcode": "5019124056058", "name": "Khanum Butter Ghee 2kg", "supplier": "Norbygate as", "varegruppe": "Tørrvarer", "mva": "15%" },
+      { "barcode": "4", "name": "Khanum Veg. Ghee 2kg", "supplier": "Norbygate as", "varegruppe": "Tørrvarer", "mva": "15%" },
+      { "barcode": "481393", "name": "Vincinni Tea Cookies Choco 800gr", "supplier": "Elite Engros", "varegruppe": "Tørrvarer", "mva": "15%" },
+      { "barcode": "481394", "name": "Monter ULTRA VIOLET", "supplier": "NORDIC Engros", "varegruppe": "Drikke", "mva": "15%" },
+      { "barcode": "481395", "name": "Treet PLATINUM", "supplier": "Norbygate as", "varegruppe": "Kosmetikk", "mva": "15%" },
+      { "barcode": "481396", "name": "Vincinni Tea Cookies Choco 400g", "supplier": "Elite Engros", "varegruppe": "Tørrvarer", "mva": "15%" },
+      { "barcode": "481397", "name": "Pluto Sumak Pulver 500g", "supplier": "PLUTO IMPORT", "varegruppe": "Tørrvarer", "mva": "15%" },
+      { "barcode": "481398", "name": "Trs Rosecoco Beans 2kg", "supplier": "Norbygate as", "varegruppe": "Tørrvarer", "mva": "15%" },
+      { "barcode": "481399", "name": "DIAMANT Sukker 2kg", "supplier": "Liya", "varegruppe": "Tørrvarer", "mva": "15%" },
+      { "barcode": "481400", "name": "Durra Pickled Grape Leaves 1200g", "supplier": "Ramco Norge", "varegruppe": "Tørrvarer", "mva": "15%" },
+      { "barcode": "481402", "name": "BASRA DATE SYRUP 400g", "supplier": "Ramco Norge", "varegruppe": "Tørrvarer", "mva": "15%" },
+      { "barcode": "481403", "name": "Basimo Mychallale fetaost", "supplier": "Ny varer", "varegruppe": "Tørrvarer", "mva": "15%" }
     ];
 
     let savedOrders = JSON.parse(localStorage.getItem('mr_intl_orders')) || [];
     let currentLang = localStorage.getItem('mr_intl_lang') || 'no';
 
-    const fallbackImg = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='1.5'><path d='M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z'/><path d='m3.3 7 8.7 5 8.7-5'/><path d='M12 22V12'/></svg>";
-
     const i18n = {
         no: {
             sub: "by Mr. Intl (Kalkulator & Ordre)", sec2: "Leverandørbestillinger",
-            prodName: "Produktnavn", cost: "Innkjøpspris (Total)", qty: "Antall", margin: "Margin", mva: "MVA", supplier: "Leverandør",
-            img: "Bilde-URL", link: "Leverandør Link", uCost: "Innkjøpspris per enhet (Eks. MVA)", exMva: "Utsalgspris eks. MVA", fPrice: "Utsalgspris (Ink. MVA):",
+            prodName: "Produktnavn / Strekkode", cost: "Innkjøpspris (Total)", qty: "Antall", margin: "Margin", mva: "MVA", supplier: "Leverandør",
+            varegruppe: "Varegruppe", uCost: "Innkjøpspris per enhet (Eks. MVA)", exMva: "Utsalgspris eks. MVA", fPrice: "Utsalgspris (Ink. MVA):",
             profit: "Fortjeneste:", save: "Lagre i ordreliste (Enter ↵)", update: "Oppdater Produkt", search: "Søk efter produkt...",
-            selected: "valgt", reorderBtn: "Send reorder 🛒", edit: "Endre", del: "Slett", openPage: "Leverandørside ↗"
+            selected: "valgt", reorderBtn: "Send reorder 🛒", edit: "Endre", del: "Slett"
         },
         ar: {
             sub: "بواسطة مستر إنترناشونال (الحاسبة والطلبيات)", sec2: "سجل طلبيات الموردين الحاليين",
-            prodName: "Produktnavn (اسم المنتج)", cost: "Innkjøpspris (سعر الشراء الإجمالي)", qty: "Antall (الكمية)", margin: "Margin (الفائدة)", mva: "MVA (الضريبة)", supplier: "Leverandør (المورد)",
-            img: "Bilde-URL (الصورة)", link: "Leverandør Link (الرابط)", uCost: "Innkjøpspris per enhet (سعر القطعة بدون ضريبة)", exMva: "Utsalgspris eks. MVA (البيع قبل الضريبة)", fPrice: "Utsalgspris (سعر البيع النهائي المتوقع):",
-            profit: "Fortjeneste (صافي الربح):", save: "Lagre i ordreliste (اضغط Enter ↵)", update: "Oppdater (تحديث وحفظ)", search: "Søk... (بحث سريع)",
-            selected: "valgt (محدد)", reorderBtn: "Send reorder 🛒 (إرسال مجمع)", edit: "Endre (تعديل)", del: "Slett (حذف)", openPage: "Leverandørside ↗ (رابط المورد)"
+            prodName: "اسم المنتج أو الباركود", cost: "سعر الشراء الإجمالي من الفاتورة", qty: "الكمية (عدد القطع)", margin: "Margin (الفائدة)", mva: "MVA (الضريبة)", supplier: "Leverandør (المورد)",
+            varegruppe: "المجموعة (Varegruppe)", uCost: "سعر القطعة بدون ضريبة", exMva: "البيع قبل الضريبة", fPrice: "سعر البيع النهائي المتوقع:",
+            profit: "Fortjeneste (صافي الربح):", save: "Lagre i ordreliste (اضغط Enter ↵)", update: "تحديث وحفظ المنتج", search: "بحث سريع بالاسم أو الباركود...",
+            selected: "محدد", reorderBtn: "إرسال الطلبية مجمعة 🛒", edit: "تعديل", del: "حذف"
         }
     };
 
-    // ميزة المقترحات الفورية الذكية
+    // ميزة المقترحات الفورية والبحث السريع بالاسم والباركود
     function showSuggestions(inputEl) {
         const query = inputEl.value.toLowerCase().trim();
         const box = document.getElementById('suggestionsBox');
@@ -281,21 +265,22 @@
             return;
         }
 
-        const allAvailableProducts = [...productCatalog, ...savedOrders];
-        const seenNames = new Set();
-        
-        const filtered = allAvailableProducts.filter(p => {
-            if (p.name.toLowerCase().includes(query) && !seenNames.has(p.name.toLowerCase())) {
-                seenNames.add(p.name.toLowerCase());
-                return true;
-            }
-            return false;
-        }).slice(0, 6);
+        const filtered = productCatalog.filter(p => 
+            p.name.toLowerCase().includes(query) || 
+            (p.barcode && p.barcode.toString().includes(query))
+        ).slice(0, 6);
 
         if (filtered.length > 0) {
             filtered.forEach(p => {
                 const li = document.createElement('li');
-                li.innerHTML = `<span><b>${p.name}</b></span> <span class="suggest-sup">${p.supplier}</span>`;
+                li.innerHTML = `
+                    <span><b>${p.name}</b></span>
+                    <div class="suggest-meta">
+                        <span class="badge">${p.supplier || 'Ukjent'}</span>
+                        ${p.barcode ? `<span>BC: ${p.barcode}</span>` : ''}
+                        <span class="badge" style="background:#ecfdf5; color:#059669">${p.varegruppe}</span>
+                    </div>
+                `;
                 li.onclick = () => selectSuggestion(p);
                 box.appendChild(li);
             });
@@ -305,32 +290,23 @@
         }
     }
 
-    // بمجرد اختيار المنتج من المقترحات، يعبئ البيانات فوراً وينقل التركيز لحقل السعر
+    // تعبئة البيانات الذكية فوراً عند اختيار المنتج
     function selectSuggestion(product) {
         document.getElementById('prodName').value = product.name;
-        document.getElementById('supplierName').value = product.supplier;
-        document.getElementById('marginSelect').value = product.margin || "1.5";
+        document.getElementById('supplierName').value = product.supplier || '';
+        document.getElementById('varegruppeSelect').value = product.varegruppe || 'Tørrvarer';
         
         let rawMva = parseFloat(product.mva) / 100;
         if(isNaN(rawMva)) rawMva = 0.15;
         document.getElementById('vvaSelect').value = rawMva;
         
-        document.getElementById('imgUrl').value = (product.img && !product.img.startsWith('data:')) ? product.img : '';
-        document.getElementById('supplierLink').value = (product.link && product.link !== '#') ? product.link : '';
-        
         document.getElementById('suggestionsBox').style.display = 'none';
         
-        // فتح الرابط في حال توفره
-        if (product.link && product.link !== '#') {
-            window.open(product.link, '_blank');
-        }
-        
-        // الانتقال الفوري لحقل السعر لتوفير الوقت
+        // الانتقال التلقائي المباشر لخانة السعر لفتح لوحة الأرقام وتوفير الوقت
         document.getElementById('costPrice').focus();
         calculatePricing(true);
     }
 
-    // الحفظ التلقائي عند الضغط على Enter في حقول الإدخال
     function handleEnterKey(event) {
         if (event.key === "Enter") {
             event.preventDefault();
@@ -346,8 +322,6 @@
 
     function applyLanguage() {
         const lang = currentLang;
-        document.getElementById('appHtml').setAttribute('dir', lang === 'ar' ? 'rtl' : 'ltr');
-        
         document.getElementById('subTitle').innerText = i18n[lang].sub;
         document.getElementById('tSection2').innerText = i18n[lang].sec2;
         document.getElementById('lblProdName').innerText = i18n[lang].prodName;
@@ -356,8 +330,7 @@
         document.getElementById('lblMargin').innerText = i18n[lang].margin;
         document.getElementById('lblMva').innerText = i18n[lang].mva;
         document.getElementById('lblSupplier').innerText = i18n[lang].supplier;
-        document.getElementById('lblImg').innerText = i18n[lang].img;
-        document.getElementById('lblLink').innerText = i18n[lang].link;
+        document.getElementById('lblVaregruppe').innerText = i18n[lang].varegruppe;
         document.getElementById('txtUnitCost').innerText = i18n[lang].uCost;
         document.getElementById('txtExMva').innerText = i18n[lang].exMva;
         document.getElementById('txtFinalPrice').innerText = i18n[lang].fPrice;
@@ -401,7 +374,6 @@
         const unitPriceExMva = unitCost * margin;
         
         let unitFinalPrice = 0;
-        
         if (autoCalculateFinalPrice) {
             unitFinalPrice = unitPriceExMva * (1 + mvaRate);
             document.getElementById('resFinalUnitPriceInput').value = unitFinalPrice.toFixed(2);
@@ -425,26 +397,24 @@
         const editId = document.getElementById('editId').value;
         
         if (!name || cost === 0) {
-            alert(currentLang === 'ar' ? "الرجاء إدخال اسم المنتج وسعر الشراء!" : "Vennligst fyll ut produktnavn og innkjøpspris!");
+            alert(currentLang === 'ar' ? "الرجاء إدخال الاسم وسعر الشراء!" : "Vennligst fyll ut produktnavn og innkjøpspris!");
             return;
         }
 
         const calc = calculatePricing(false);
         const qty = parseFloat(document.getElementById('quantity').value) || 1;
-        const singleUnitCost = cost / qty;
 
         const productData = {
             id: editId ? parseInt(editId) : Date.now(),
             name: name,
             cost: cost,
             qty: qty,
-            unitCost: singleUnitCost.toFixed(2), 
+            unitCost: (cost / qty).toFixed(2), 
             orderEsker: "1",
             margin: document.getElementById('marginSelect').value,
             mva: (parseFloat(document.getElementById('vvaSelect').value) * 100) + "%",
             supplier: document.getElementById('supplierName').value.trim() || "Ukjent Leverandør",
-            img: document.getElementById('imgUrl').value.trim() || fallbackImg,
-            link: document.getElementById('supplierLink').value.trim() || "#",
+            varegruppe: document.getElementById('varegruppeSelect').value,
             unitFinalPrice: calc.unitFinalPrice.toFixed(2),
             unitProfit: calc.unitProfit.toFixed(2)
         };
@@ -460,20 +430,16 @@
 
         localStorage.setItem('mr_intl_orders', JSON.stringify(savedOrders));
 
-        // تفريغ الحقول لإدخال سريع للمنتج التالي
+        // تصفير الخانات فوراً لتعبئة الفاتورة بسرعة فائقة للقطعة التالية
         document.getElementById('prodName').value = '';
         document.getElementById('costPrice').value = '';
         document.getElementById('quantity').value = '';
-        document.getElementById('imgUrl').value = '';
-        document.getElementById('supplierLink').value = '';
         document.getElementById('resUnitCost').innerText = "0.00 kr";
         document.getElementById('resExMva').innerText = "0.00 kr";
         document.getElementById('resFinalUnitPriceInput').value = "0.00";
         document.getElementById('resUnitProfit').innerText = "0.00 kr";
         
         applyLanguage();
-        
-        // إعادة نقل مؤشر الماوس تلقائياً إلى خانة اسم المنتج لتجهيز الإدخال التالي
         document.getElementById('prodName').focus();
     }
 
@@ -486,13 +452,11 @@
         document.getElementById('costPrice').value = p.cost;
         document.getElementById('quantity').value = p.qty;
         document.getElementById('marginSelect').value = p.margin;
+        document.getElementById('varegruppeSelect').value = p.varegruppe || 'Tørrvarer';
         
         const rawMva = parseFloat(p.mva) / 100;
         document.getElementById('vvaSelect').value = rawMva;
-        
         document.getElementById('supplierName').value = p.supplier;
-        document.getElementById('imgUrl').value = p.img.startsWith('data:') ? '' : p.img;
-        document.getElementById('supplierLink').value = p.link === '#' ? '' : p.link;
 
         window.scrollTo({ top: 0, behavior: 'smooth' });
         
@@ -552,7 +516,7 @@
         const supplierProducts = savedOrders.filter(p => p.supplier === supplierName);
         let text = `📋 *Prisrapport [${supplierName}]:*\n\n`;
         supplierProducts.forEach((p, idx) => {
-            text += `${idx + 1}. *${p.name}*\n   - Antall: ${p.orderEsker}\n   - Pris: ${p.unitFinalPrice} kr\n   - Enhet Kost: ${p.unitCost} kr\n   - Fortjeneste: +${p.unitProfit} kr\n\n`;
+            text += `${idx + 1}. *${p.name}*\n   - Gruppe: ${p.varegruppe}\n   - Pris: ${p.unitFinalPrice} kr\n   - Enhet Kost: ${p.unitCost} kr\n   - Fortjeneste: +${p.unitProfit} kr\n\n`;
         });
         window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
     }
@@ -584,26 +548,6 @@
         downloadAnchor.remove();
     }
 
-    function importData(input) {
-        const file = input.files[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            try {
-                const imported = JSON.parse(e.target.result);
-                if (Array.isArray(imported)) {
-                    if(confirm("Vil du importere produktkatalogen?")){
-                        productCatalog = [...imported, ...productCatalog];
-                        productCatalog = Array.from(new Set(productCatalog.map(a => a.name.toLowerCase()))).map(name => productCatalog.find(a => a.name.toLowerCase() === name));
-                        applyLanguage();
-                        alert("Katalogen ble importert med suksess!");
-                    }
-                }
-            } catch (err) { alert("Feil ved import!"); }
-        };
-        reader.readAsText(file);
-    }
-
     function renderOrders() {
         const container = document.getElementById('ordersContainer');
         const query = document.getElementById('searchBar').value.toLowerCase();
@@ -616,7 +560,7 @@
 
         const grouped = {};
         savedOrders.forEach(p => {
-            if (p.name.toLowerCase().includes(query) || p.supplier.toLowerCase().includes(query)) {
+            if (p.name.toLowerCase().includes(query) || p.supplier.toLowerCase().includes(query) || (p.varegruppe && p.varegruppe.toLowerCase().includes(query))) {
                 if (!grouped[p.supplier]) grouped[p.supplier] = [];
                 grouped[p.supplier].push(p);
             }
@@ -642,14 +586,13 @@
                         <div class="select-box-container">
                             <input type="checkbox" class="select-box" data-id="${p.id}" onchange="updateSelectedCount()">
                         </div>
-                        <img src="${p.img}" class="product-img" onerror="this.src=fallbackImg">
                         <div class="product-details">
                             <p class="p-name">${p.name}</p>
+                            <div class="p-meta">Gruppe: <b style="color:#0284c7">${p.varegruppe || 'Tørrvarer'}</b></div>
                             <div class="p-meta">
                                 Antall: <input type="number" value="${p.orderEsker}" style="width:50px; padding:2px; display:inline-block; font-size:12px;" oninput="updateCardEsker(${p.id}, this.value)">
                             </div>
                             <div class="p-meta">Total Qty: <b>${p.qty} enheter</b> | MVA: <b>${p.mva}</b></div>
-                            <a href="${p.link}" target="_blank" class="p-link">${i18n[currentLang].openPage}</a>
                             <div class="actions-row">
                                 <button class="action-btn edit-btn" onclick="editProduct(${p.id})">${i18n[currentLang].edit}</button>
                                 <button class="action-btn del-btn" onclick="deleteOrder(${p.id})">${i18n[currentLang].del}</button>
@@ -657,7 +600,7 @@
                         </div>
                         <div class="p-prices">
                             <div class="p-sales-price">${p.unitFinalPrice} kr</div>
-                            <div class="p-cost">Enhet Kost: ${p.unitCost || (p.cost / p.qty).toFixed(2)} kr</div>
+                            <div class="p-cost">Enhet Kost: ${p.unitCost} kr</div>
                             <div class="p-cost">Total Kost: ${p.cost} kr</div>
                             <div class="p-profit">Fortjeneste: +${p.unitProfit} kr</div>
                         </div>
