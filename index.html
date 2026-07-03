@@ -1,287 +1,344 @@
 <!DOCTYPE html>
-<html lang="no" dir="ltr" id="appHtml">
+<html lang="no" dir="ltr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Pris App - Super Fast Entry</title>
+    <title>Bestilling & Vareliste App</title>
     <style>
         * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-        body { background-color: #f1f5f9; margin: 0; padding: 10px; color: #1e293b; -webkit-tap-highlight-color: transparent; }
-        .app-container { width: 100%; max-width: 480px; margin: auto; background: white; padding: 15px 12px; border-radius: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+        body { background-color: #f8fafc; margin: 0; padding: 10px; color: #1e293b; -webkit-tap-highlight-color: transparent; }
+        .app-container { width: 100%; max-width: 480px; margin: auto; background: white; padding: 16px; border-radius: 24px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
         
-        .top-bar { display: flex; gap: 4px; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px; }
-        .top-bar button { flex: 1; min-width: 0; padding: 8px 4px; border: none; border-radius: 6px; font-size: 11px; font-weight: bold; cursor: pointer; color: white; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }
+        /* شريط التنقل العلوي للموبايل */
+        .nav-tabs { display: flex; background: #e2e8f0; padding: 4px; border-radius: 12px; margin-bottom: 16px; gap: 4px; }
+        .tab-btn { flex: 1; padding: 10px; border: none; background: transparent; font-weight: bold; font-size: 13px; border-radius: 8px; cursor: pointer; color: #475569; transition: 0.2s; }
+        .tab-btn.active { background: white; color: #0f172a; box-shadow: 0 2px 6px rgba(0,0,0,0.08); }
         
-        .lang-btn { background: #3b82f6; }
-        .print-main-btn { background: #475569; }
-        .print-staff-btn { background: #0284c7; }
-        .export-btn { background: #059669; }
-
-        h1 { font-size: 24px; font-weight: 800; margin: 0; text-align: center; color: #0f172a; }
-        .subtitle { font-size: 11px; font-weight: 700; color: #10b981; text-transform: uppercase; letter-spacing: 1px; text-align: center; margin-bottom: 15px; }
+        .top-actions { display: flex; gap: 6px; margin-bottom: 16px; }
+        .top-actions button, .file-label { flex: 1; padding: 8px; border: none; border-radius: 8px; font-size: 11px; font-weight: bold; cursor: pointer; color: white; text-align: center; display: inline-block; }
+        .btn-lang { background: #3b82f6; }
+        .btn-import { background: #059669; }
+        .btn-export { background: #475569; }
         
-        .section-title { font-size: 15px; font-weight: 700; border-bottom: 2px solid #e2e8f0; padding-bottom: 4px; margin: 20px 0 10px 0; color: #334155; }
+        h1 { font-size: 22px; font-weight: 800; text-align: center; margin: 0 0 2px 0; color: #0f172a; }
+        .subtitle { font-size: 11px; font-weight: 700; color: #10b981; text-align: center; margin-bottom: 16px; text-transform: uppercase; letter-spacing: 0.5px; }
         
-        .form-group { background: #f8fafc; padding: 10px; border-radius: 10px; margin-bottom: 8px; border: 1px solid #e2e8f0; text-align: left; position: relative; }
+        .page-section { display: none; }
+        .page-section.active { display: block; }
         
+        .form-group { background: #f1f5f9; padding: 10px; border-radius: 10px; margin-bottom: 8px; border: 1px solid #e2e8f0; text-align: left; position: relative; }
         label { font-size: 11px; font-weight: bold; color: #64748b; display: block; margin-bottom: 4px; }
-        input, select { width: 100%; padding: 8px 10px; border: 2px solid #cbd5e1; border-radius: 6px; font-size: 14px; background: white; color: #0f172a; text-align: left; }
+        input, select { width: 100%; padding: 8px 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 14px; background: white; color: #0f172a; }
         input:focus, select:focus { border-color: #10b981; outline: none; }
         
-        /* قائمة المقترحات الفورية السريعة للبحث بالاسم أو الباركود */
-        .suggestions-list { position: absolute; top: 100%; left: 0; width: 100%; background: white; border: 2px solid #10b981; border-top: none; border-radius: 0 0 8px 8px; max-height: 220px; overflow-y: auto; z-index: 100; box-shadow: 0 8px 16px rgba(0,0,0,0.1); display: none; padding: 0; margin: 0; list-style: none; }
-        .suggestions-list li { padding: 10px; font-size: 13px; border-bottom: 1px solid #f1f5f9; cursor: pointer; display: flex; flex-direction: column; align-items: flex-start; gap: 2px; text-align: left; }
-        .suggestions-list li:hover { background: #ecfdf5; }
-        .suggestions-list li .suggest-meta { display: flex; gap: 6px; font-size: 10px; color: #64748b; font-weight: bold; margin-top: 2px; }
-        .suggestions-list li .badge { background: #e2e8f0; padding: 1px 4px; border-radius: 4px; }
-
+        /* قائمة اقتراحات البحث السريع للموبايل */
+        .suggestions-list { position: absolute; top: 100%; left: 0; width: 100%; background: white; border: 1px solid #cbd5e1; border-radius: 0 0 8px 8px; max-height: 200px; overflow-y: auto; z-index: 100; box-shadow: 0 4px 12px rgba(0,0,0,0.1); display: none; padding: 0; margin: 0; list-style: none; }
+        .suggestions-list li { padding: 10px; font-size: 13px; border-bottom: 1px solid #f1f5f9; cursor: pointer; text-align: left; }
+        .suggestions-list li:hover { background: #f0fdf4; }
+        
         .row { display: flex; gap: 8px; margin-bottom: 4px; }
         .col { flex: 1; }
         
-        .calc-box { background: #ecfdf5; border: 2px dashed #10b981; border-radius: 10px; padding: 12px; margin-top: 8px; text-align: left; }
-        .calc-result { font-size: 12px; font-weight: 600; color: #475569; margin-bottom: 4px; display: flex; justify-content: space-between; align-items: center; }
+        .calc-box { background: #f0fdf4; border: 1px dashed #16a34a; border-radius: 10px; padding: 10px; margin-top: 8px; }
+        .calc-line { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 4px; font-weight: 500; }
+        .final-price-input { width: 100px; font-size: 16px; font-weight: 800; color: #16a34a; border: 1px solid #16a34a; text-align: right; padding: 2px 4px; border-radius: 4px; }
         
-        .editable-price-input { width: 120px; text-align: right; font-size: 18px; font-weight: 900; color: #059669; border: 1px solid #10b981; padding: 4px 6px; border-radius: 6px; }
-        .profit-unit-amount { font-size: 16px; color: #dc2626; font-weight: 800; }
+        .btn-main { width: 100%; background: #10b981; color: white; padding: 12px; border: none; border-radius: 8px; font-size: 14px; font-weight: bold; cursor: pointer; margin-top: 8px; }
+        .btn-main:active { transform: scale(0.98); }
         
-        .btn { width: 100%; background: #10b981; color: white; padding: 12px; border: none; border-radius: 8px; font-size: 15px; font-weight: bold; cursor: pointer; margin-top: 8px; box-shadow: 0 4px 10px rgba(16, 185, 129, 0.15); }
-        .btn:active { transform: scale(0.97); }
+        .search-box { width: 100%; padding: 10px; margin-bottom: 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 14px; }
         
-        .search-box { width: 100%; padding: 10px; margin: 12px 0; border: 2px solid #10b981; border-radius: 8px; font-size: 14px; text-align: left; }
+        /* كروت المنتجات */
+        .product-card { background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 10px; margin-bottom: 8px; display: flex; gap: 10px; align-items: center; position: relative; }
+        .prod-img { width: 50px; height: 50px; border-radius: 6px; object-fit: cover; background: #e2e8f0; border: 1px solid #cbd5e1; }
+        .prod-info { flex: 1; min-width: 0; text-align: left; }
+        .prod-title { font-weight: 700; font-size: 13px; margin: 0; color: #0f172a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .prod-meta { font-size: 11px; color: #64748b; margin-top: 2px; }
+        .prod-actions { display: flex; gap: 6px; margin-top: 6px; }
+        .action-btn { border: none; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; cursor: pointer; color: white; }
+        .btn-edit { background: #ea580c; }
+        .btn-del { background: #ef4444; }
+        .btn-order { background: #0284c7; }
+        .prod-price-tag { text-align: right; min-width: 80px; font-weight: 800; font-size: 15px; color: #16a34a; }
         
-        .supplier-block { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 14px; padding: 12px; margin-bottom: 15px; text-align: left; }
-        .supplier-header { display: flex; flex-direction: column; gap: 4px; border-bottom: 2px solid #cbd5e1; padding-bottom: 6px; margin-bottom: 10px; }
-        .supplier-header-top { display: flex; justify-content: space-between; align-items: center; }
-        .supplier-title { font-size: 15px; font-weight: 800; color: #1e293b; }
-        .supplier-actions { display: flex; gap: 4px; width: 100%; justify-content: flex-start; }
+        .order-qty-input { width: 50px; padding: 2px; font-size: 12px; text-align: center; border: 1px solid #cbd5e1; border-radius: 4px; display: inline-block; margin-left: 4px; }
         
-        .whatsapp-btn { background: #25d366; color: white; border: none; padding: 5px 10px; border-radius: 5px; font-size: 11px; font-weight: bold; cursor: pointer; }
-        .share-me-btn { background: #3b82f6; color: white; border: none; padding: 5px 10px; border-radius: 5px; font-size: 11px; font-weight: bold; cursor: pointer; }
+        .reorder-sticky-bar { background: #fffbeb; border-top: 2px solid #fef3c7; padding: 12px; margin-top: 15px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; }
+        .btn-whatsapp-send { background: #25d366; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-size: 13px; font-weight: bold; cursor: pointer; }
         
-        .product-card { background: white; border: 1px solid #f1f5f9; border-radius: 10px; padding: 10px; margin-bottom: 8px; display: flex; gap: 10px; align-items: center; box-shadow: 0 2px 6px rgba(0,0,0,0.01); position: relative; }
-        .select-box-container { display: flex; align-items: center; justify-content: center; }
-        .select-box { width: 18px; height: 18px; cursor: pointer; }
-        
-        .product-details { flex: 1; min-width: 0; text-align: left; }
-        .p-name { font-weight: 700; font-size: 14px; color: #0f172a; margin: 0; text-align: left; }
-        .p-meta { font-size: 11px; margin-top: 2px; color: #64748b; text-align: left; }
-        
-        .p-prices { text-align: right; min-width: 115px; display: flex; flex-direction: column; align-items: flex-end; }
-        .p-sales-price { font-size: 16px; font-weight: 800; color: #059669; }
-        .p-cost { font-size: 11px; color: #64748b; margin-top: 1px; white-space: nowrap; }
-        .p-profit { font-size: 11px; color: #dc2626; font-weight: bold; white-space: nowrap; }
-
-        .reorder-bar { background: #fffbeb; border: 1px solid #fef3c7; padding: 10px; border-radius: 10px; margin-top: 12px; display: flex; justify-content: space-between; align-items: center; }
-        .reorder-btn { background: #d97706; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: bold; cursor: pointer; }
-        .actions-row { display: flex; gap: 4px; margin-top: 4px; }
-        .action-btn { border: none; padding: 3px 6px; border-radius: 4px; font-size: 11px; font-weight: bold; cursor: pointer; color: white; }
-        .edit-btn { background: #f59e0b; }
-        .del-btn { background: #ef4444; }
-
-        .print-header { display: none; text-align: center; margin-bottom: 20px; font-size: 14px; font-weight: bold; border-bottom: 2px solid #000; padding-bottom: 10px; }
-
-        @media print {
-            body { background: white !important; color: black !important; padding: 0; }
-            .top-bar, .section-title, .form-group, .row, .calc-box, #saveBtn, .search-box, .supplier-actions, .actions-row, .reorder-bar, .select-box-container, h1, .subtitle, .suggestions-list { display: none !important; }
-            .app-container { box-shadow: none !important; max-width: 100% !important; padding: 0 !important; background: white !important; }
-            .print-header { display: block !important; }
-            .supplier-block { background: white !important; border: none !important; padding: 0 !important; margin-bottom: 15px !important; page-break-inside: avoid; }
-            .supplier-header { border-bottom: 1px dashed #000 !important; }
-            .product-card { border-bottom: 1px solid #eee !important; border-radius: 0 !important; box-shadow: none !important; background: white !important; page-break-inside: avoid; padding: 8px 0 !important; }
-            .p-sales-price { color: black !important; font-size: 17px !important; }
-            
-            body.staff-print-mode .p-cost, 
-            body.staff-print-mode .p-profit, 
-            body.staff-print-mode .p-meta { display: none !important; }
-            body.staff-print-mode .supplier-title { font-size: 13px !important; font-weight: normal !important; }
-        }
+        #fileInput { display: none; }
     </style>
 </head>
 <body>
 
 <div class="app-container">
-    <div class="top-bar">
-        <button class="lang-btn" onclick="toggleLanguage()" id="btnLang">NO / AR</button>
-        <button class="print-main-btn" onclick="triggerPrint(false)">Eier Print 🖨️</button>
-        <button class="print-staff-btn" onclick="triggerPrint(true)">Ansatte Print 👤</button>
-        <button class="export-btn" onclick="exportData()">Export 📤</button>
+    <div class="top-actions">
+        <button class="btn-lang" onclick="toggleLanguage()">NO / AR</button>
+        <label class="btn-import" for="fileInput" id="lblImportBtn">Import CSV 📥</label>
+        <input type="file" id="fileInput" accept=".csv" onchange="handleCSVImport(event)">
+        <button class="btn-export" onclick="exportBackup()" id="lblExportBtn">Backup 📤</button>
     </div>
 
-    <h1>Pris App</h1>
-    <div class="subtitle" id="subTitle">by Mr. Intl (Kalkulator & Ordre)</div>
+    <h1 id="appTitle">Pris & Bestilling</h1>
+    <div class="subtitle">Vareliste & Ordreliste System</div>
 
-    <div class="print-header" id="printHeaderView"></div>
-    
-    <input type="hidden" id="editId" value="">
-    
-    <div class="form-group">
-        <label id="lblProdName">Produktnavn / Strekkode</label>
-        <input type="text" id="prodName" placeholder="Søk på navn eller strekkode..." oninput="showSuggestions(this)" autocomplete="off">
-        <ul id="suggestionsBox" class="suggestions-list"></ul>
-    </div>
-    
-    <div class="row">
-        <div class="col" style="flex: 1.5;">
-            <div class="form-group">
-                <label id="lblCostPrice">Innkjøpspris (Total)</label>
-                <input type="text" inputmode="decimal" pattern="[0-9]*([\.,][0-9]*)?" id="costPrice" placeholder="0.00" oninput="cleanAndCalculate(this, true)" onkeydown="handleEnterKey(event)">
-            </div>
-        </div>
-        <div class="col">
-            <div class="form-group">
-                <label id="lblQty">Antall</label>
-                <input type="text" inputmode="decimal" pattern="[0-9]*([\.,][0-9]*)?" id="quantity" placeholder="1" oninput="cleanAndCalculate(this, true)" onkeydown="handleEnterKey(event)">
-            </div>
-        </div>
-    </div>
-    
-    <div class="row">
-        <div class="col">
-            <div class="form-group">
-                <label id="lblMargin">Margin</label>
-                <select id="marginSelect" onchange="calculatePricing(true)">
-                    <option value="1.3">1.3</option>
-                    <option value="1.4">1.4</option>
-                    <option value="1.5" selected>1.5</option>
-                    <option value="1.6">1.6</option>
-                    <option value="1.7">1.7</option>
-                    <option value="1.8">1.8</option>
-                    <option value="1.9">1.9</option>
-                    <option value="2.0">2.0</option>
-                </select>
-            </div>
-        </div>
-        <div class="col">
-            <div class="form-group">
-                <label id="lblMva">MVA</label>
-                <select id="vvaSelect" onchange="calculatePricing(true)">
-                    <option value="0.25">25% (Standard)</option>
-                    <option value="0.15" selected>15% (Matvarer)</option>
-                    <option value="0">0% (Ingen)</option>
-                </select>
-            </div>
-        </div>
+    <div class="nav-tabs">
+        <button class="tab-btn active" id="tabVarelisteBtn" onclick="switchTab('vareliste')">Vareliste (المنتجات)</button>
+        <button class="tab-btn" id="tabOrdrelisteBtn" onclick="switchTab('ordreliste')">Ordreliste (الطلبيات) <span id="orderBadge">(0)</span></button>
     </div>
 
-    <div class="row">
-        <div class="col">
-            <div class="form-group">
-                <label id="lblSupplier">Leverandør</label>
-                <input type="text" id="supplierName" placeholder="F.eks. Afro kjøp">
+    <div id="sectionVareliste" class="page-section active">
+        <input type="hidden" id="editId" value="">
+        
+        <div class="form-group">
+            <label id="lblProdName">Produktnavn / Strekkode</label>
+            <input type="text" id="prodName" placeholder="Søk eller skriv inn navn..." oninput="searchCatalogSuggestions(this)" autocomplete="off">
+            <ul id="suggestBox" class="suggestions-list"></ul>
+        </div>
+
+        <div class="row">
+            <div class="col">
+                <div class="form-group">
+                    <label id="lblBarcode">Strekkode</label>
+                    <input type="text" id="prodBarcode" placeholder="Barcode">
+                </div>
+            </div>
+            <div class="col">
+                <div class="form-group">
+                    <label id="lblVaregruppe">Varegruppe</label>
+                    <select id="prodVaregruppe">
+                        <option value="Tørrvarer">Tørrvarer</option>
+                        <option value="Drikke">Drikke</option>
+                        <option value="Kosmetikk">Kosmetikk</option>
+                        <option value="Ferskvarer">Ferskvarer</option>
+                        <option value="Andre">Andre</option>
+                    </select>
+                </div>
             </div>
         </div>
-        <div class="col">
-            <div class="form-group">
-                <label id="lblVaregruppe">Varegruppe</label>
-                <select id="varegruppeSelect">
-                    <option value="Tørrvarer" selected>Tørrvarer</option>
-                    <option value="Drikke">Drikke</option>
-                    <option value="Kosmetikk">Kosmetikk</option>
-                    <option value="Ferskvarer">Ferskvarer</option>
-                    <option value="Andre">Andre</option>
-                </select>
+
+        <div class="row">
+            <div class="col" style="flex: 1.5;">
+                <div class="form-group">
+                    <label id="lblCost">Innkjøpspris (Total Faktu.)</label>
+                    <input type="number" step="any" id="prodCost" placeholder="0.00" oninput="runCalculations()">
+                </div>
             </div>
+            <div class="col">
+                <div class="form-group">
+                    <label id="lblQty">Antall i eske</label>
+                    <input type="number" id="prodQty" value="1" oninput="runCalculations()">
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col">
+                <div class="form-group">
+                    <label>Margin</label>
+                    <select id="prodMargin" onchange="runCalculations()">
+                        <option value="1.3">1.3</option><option value="1.4">1.4</option>
+                        <option value="1.5" selected>1.5</option><option value="1.6">1.6</option>
+                        <option value="1.7">1.7</option><option value="1.8">1.8</option><option value="1.9">1.9</option>
+                    </select>
+                </div>
+            </div>
+            <div class="col">
+                <div class="form-group">
+                    <label>MVA</label>
+                    <select id="prodMva" onchange="runCalculations()">
+                        <option value="0.25">25%</option>
+                        <option value="0.15" selected>15%</option>
+                        <option value="0">0%</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col">
+                <div class="form-group">
+                    <label id="lblImgUrl">Bilde URL (رابط الصورة)</label>
+                    <input type="text" id="prodImgUrl" placeholder="https://...">
+                </div>
+            </div>
+            <div class="col">
+                <div class="form-group">
+                    <label id="lblProdUrl">Produkt URL (رابط المنتج)</label>
+                    <input type="text" id="prodLinkUrl" placeholder="https://...">
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label id="lblLeverandoer">Leverandør (المورد)</label>
+            <input type="text" id="prodSupplier" placeholder="F.eks. Afro kjøp as">
+        </div>
+
+        <div class="calc-box">
+            <div class="calc-line"><span id="c1">Kost per enhet (Eks MVA)</span>:<span id="resUnitCost">0.00 kr</span></div>
+            <div class="calc-line"><span id="c2">Utsalgspris Eks MVA</span>:<span id="resExMva">0.00 kr</span></div>
+            <div class="calc-line" style="margin-top:5px; border-top:1px dashed #16a34a; padding-top:5px; align-items:center;">
+                <b id="c3">Utsalgspris (Ink MVA):</b>
+                <input type="number" step="any" id="resFinalPriceInput" class="final-price-input" value="0.00" oninput="runCalculations(false)">
+            </div>
+            <div class="calc-line" style="font-weight:bold; color:#dc2626;">
+                <span id="c4">Fortjeneste per enhet:</span><span id="resProfit">0.00 kr</span>
+            </div>
+        </div>
+
+        <button class="btn-main" id="btnSave" onclick="saveProductToCatalog()">Lagre produkt (حفظ في الكتالوج)</button>
+
+        <div style="margin-top: 20px;">
+            <input type="text" id="searchCatalogBar" class="search-box" placeholder="Søk i vareliste (الاسم أو الباركود)..." oninput="renderCatalogList()">
+            <div id="catalogContainer"></div>
         </div>
     </div>
 
-    <div class="calc-box">
-        <div class="calc-result"><span id="txtUnitCost">Innkjøpspris per enhet (Eks. MVA)</span>: <span id="resUnitCost">0.00 kr</span></div>
-        <div class="calc-result"><span id="txtExMva">Utsalgspris eks. MVA</span>: <span id="resExMva">0.00 kr</span></div>
-        <div class="calc-result" style="margin-top: 8px; border-top: 1px dashed #10b981; padding-top: 8px;">
-            <div id="txtFinalPrice" style="font-weight: bold;">Utsalgspris (Ink. MVA):</div>
-            <input type="text" inputmode="decimal" pattern="[0-9]*([\.,][0-9]*)?" id="resFinalUnitPriceInput" class="editable-price-input" value="0.00" oninput="cleanAndCalculate(this, false)">
+    <div id="sectionOrdreliste" class="page-section">
+        <input type="text" id="searchOrderBar" class="search-box" placeholder="Søk i ordreliste..." oninput="renderOrderList()">
+        
+        <div id="orderContainer"></div>
+
+        <div class="reorder-sticky-bar">
+            <div>
+                <b id="lblTotalOrdre">Totalt valgt:</b> 
+                <span id="totalOrdreCount" style="color:#ea580c; font-weight:bold;">0 produkter</span>
+            </div>
+            <button class="btn-whatsapp-send" onclick="sendOrderViaWhatsApp()">Send til WhatsApp 💬</button>
         </div>
-        <div class="calc-result">
-            <div id="txtProfit">Fortjeneste:</div>
-            <div class="profit-unit-amount" id="resUnitProfit">0.00 kr</div>
-        </div>
-    </div>
-
-    <button class="btn" id="saveBtn" onclick="saveToOrderList()">Lagre i ordreliste (Enter ↵)</button>
-
-    <div class="section-title" id="tSection2">Leverandørbestillinger</div>
-    <input type="text" id="searchBar" class="search-box" placeholder="Søk efter produkt eller strekkode..." oninput="renderOrders()">
-
-    <div id="ordersContainer"></div>
-
-    <div class="reorder-bar">
-        <span id="txtSelectedCount">0 valgt</span>
-        <button class="reorder-btn" onclick="bulkReorder()" id="btnReorder">Send reorder 🛒</button>
     </div>
 </div>
 
 <script>
-    // جميع المنتجات المستخرجة بدقة عالية من ملفك الـ Excel (الأسماء تظهر LTR لترتيب صحيح)
-    let productCatalog = [
-      { "barcode": "5017689012137", "name": "Trs Dalchini Cinamon Whole 50g", "supplier": "Norbygate as", "varegruppe": "Tørrvarer", "mva": "25%" },
-      { "barcode": "5017689002565", "name": "ginger", "supplier": "Norbygate as", "varegruppe": "Tørrvarer", "mva": "0%" },
-      { "barcode": "5578", "name": "Cola", "supplier": "", "varegruppe": "Drikke", "mva": "15%" },
-      { "barcode": "1", "name": "Norsk potet", "supplier": "", "varegruppe": "Tørrvarer", "mva": "15%" },
-      { "barcode": "5017689006617", "name": "Trs Black Pepper Powder 100g", "supplier": "Norbygate as", "varegruppe": "Tørrvarer", "mva": "15%" },
-      { "barcode": "5017689010669", "name": "Trs Black Pepper Coarse 100g", "supplier": "Norbygate as", "varegruppe": "Tørrvarer", "mva": "15%" },
-      { "barcode": "2", "name": "Khanum Butter Ghee 500g", "supplier": "Norbygate as", "varegruppe": "Tørrvarer", "mva": "15%" },
-      { "barcode": "5019124056058", "name": "Khanum Butter Ghee 2kg", "supplier": "Norbygate as", "varegruppe": "Tørrvarer", "mva": "15%" },
-      { "barcode": "4", "name": "Khanum Veg. Ghee 2kg", "supplier": "Norbygate as", "varegruppe": "Tørrvarer", "mva": "15%" },
-      { "barcode": "481393", "name": "Vincinni Tea Cookies Choco 800gr", "supplier": "Elite Engros", "varegruppe": "Tørrvarer", "mva": "15%" },
-      { "barcode": "481394", "name": "Monter ULTRA VIOLET", "supplier": "NORDIC Engros", "varegruppe": "Drikke", "mva": "15%" },
-      { "barcode": "481395", "name": "Treet PLATINUM", "supplier": "Norbygate as", "varegruppe": "Kosmetikk", "mva": "15%" },
-      { "barcode": "481396", "name": "Vincinni Tea Cookies Choco 400g", "supplier": "Elite Engros", "varegruppe": "Tørrvarer", "mva": "15%" },
-      { "barcode": "481397", "name": "Pluto Sumak Pulver 500g", "supplier": "PLUTO IMPORT", "varegruppe": "Tørrvarer", "mva": "15%" },
-      { "barcode": "481398", "name": "Trs Rosecoco Beans 2kg", "supplier": "Norbygate as", "varegruppe": "Tørrvarer", "mva": "15%" },
-      { "barcode": "481399", "name": "DIAMANT Sukker 2kg", "supplier": "Liya", "varegruppe": "Tørrvarer", "mva": "15%" },
-      { "barcode": "481400", "name": "Durra Pickled Grape Leaves 1200g", "supplier": "Ramco Norge", "varegruppe": "Tørrvarer", "mva": "15%" },
-      { "barcode": "481402", "name": "BASRA DATE SYRUP 400g", "supplier": "Ramco Norge", "varegruppe": "Tørrvarer", "mva": "15%" },
-      { "barcode": "481403", "name": "Basimo Mychallale fetaost", "supplier": "Ny varer", "varegruppe": "Tørrvarer", "mva": "15%" }
+    // كتالوج المنتجات الأساسي
+    let catalog = JSON.parse(localStorage.getItem('mr_intl_catalog')) || [
+        { id: 1, name: "Trs Dalchini Cinamon Whole 50g", barcode: "5017689012137", varegruppe: "Tørrvarer", cost: 0, qty: 1, margin: 1.5, mva: 0.25, supplier: "Norbygate as", img: "", link: "", finalPrice: 19.9 },
+        { id: 2, name: "ginger", barcode: "5017689002565", varegruppe: "Tørrvarer", cost: 15.47, qty: 1, margin: 1.5, mva: 0, supplier: "Norbygate as", img: "", link: "", finalPrice: 25 },
+        { id: 3, name: "Cola", barcode: "5578", varegruppe: "Drikke", cost: 12.36, qty: 1, margin: 1.5, mva: 0.15, supplier: "Afro kjøp as", img: "", link: "", finalPrice: 25 }
     ];
 
-    let savedOrders = JSON.parse(localStorage.getItem('mr_intl_orders')) || [];
+    let orderList = JSON.parse(localStorage.getItem('mr_intl_orders_v2')) || [];
     let currentLang = localStorage.getItem('mr_intl_lang') || 'no';
 
-    const i18n = {
+    const words = {
         no: {
-            sub: "by Mr. Intl (Kalkulator & Ordre)", sec2: "Leverandørbestillinger",
-            prodName: "Produktnavn / Strekkode", cost: "Innkjøpspris (Total)", qty: "Antall", margin: "Margin", mva: "MVA", supplier: "Leverandør",
-            varegruppe: "Varegruppe", uCost: "Innkjøpspris per enhet (Eks. MVA)", exMva: "Utsalgspris eks. MVA", fPrice: "Utsalgspris (Ink. MVA):",
-            profit: "Fortjeneste:", save: "Lagre i ordreliste (Enter ↵)", update: "Oppdater Produkt", search: "Søk efter produkt...",
-            selected: "valgt", reorderBtn: "Send reorder 🛒", edit: "Endre", del: "Slett"
+            title: "Pris & Bestilling", varelisteTab: "Vareliste (المنتجات)", ordrelisteTab: "Ordreliste (الطلبيات)",
+            prodName: "Produktnavn", barcode: "Strekkode", varegruppe: "Varegruppe", cost: "Innkjøpspris (Total)",
+            qty: "Antall i eske", imgUrl: "Bilde URL", prodUrl: "Produkt URL", supplier: "Leverandør",
+            saveBtn: "Lagre produkt (Enter ↵)", updateBtn: "Oppdater produkt", searchPlh: "Søk i vareliste...",
+            c1: "Kost per enhet", c2: "Utsalgspris Eks MVA", c3: "Utsalgspris (Ink MVA):", c4: "Fortjeneste:",
+            totalValgt: "Totalt valgt:"
         },
         ar: {
-            sub: "بواسطة مستر إنترناشونال (الحاسبة والطلبيات)", sec2: "سجل طلبيات الموردين الحاليين",
-            prodName: "اسم المنتج أو الباركود", cost: "سعر الشراء الإجمالي من الفاتورة", qty: "الكمية (عدد القطع)", margin: "Margin (الفائدة)", mva: "MVA (الضريبة)", supplier: "Leverandør (المورد)",
-            varegruppe: "المجموعة (Varegruppe)", uCost: "سعر القطعة بدون ضريبة", exMva: "البيع قبل الضريبة", fPrice: "سعر البيع النهائي المتوقع:",
-            profit: "Fortjeneste (صافي الربح):", save: "Lagre i ordreliste (اضغط Enter ↵)", update: "تحديث وحفظ المنتج", search: "بحث سريع بالاسم أو الباركود...",
-            selected: "محدد", reorderBtn: "إرسال الطلبية مجمعة 🛒", edit: "تعديل", del: "حذف"
+            title: "قائمة المنتجات والطلبيات", varelisteTab: "شاشة البضائع والأسعار", ordrelisteTab: "سجل الطلبيات الحالي",
+            prodName: "اسم المنتج", barcode: "الباركود (Strekkode)", varegruppe: "المجموعة (Varegruppe)", cost: "سعر الشراء الإجمالي للفاتورة",
+            qty: "الكمية داخل الكرتونة", imgUrl: "رابط صورة المنتج", prodUrl: "رابط صفحة المنتج", supplier: "Leverandør (المورد)",
+            saveBtn: "إدخال وحفظ المنتج في الكتالوج", updateBtn: "تحديث وتعديل بيانات المنتج", searchPlh: "ابحث عن أي منتج هنا بالاسم أو الباركود...",
+            c1: "سعر القطعة المفردة", c2: "سعر البيع قبل الضريبة", c3: "سعر البيع النهائي (مع الضريبة):", c4: "صافي الربح المتوقع:",
+            totalValgt: "إجمالي المنتجات المختارة:"
         }
     };
 
-    // ميزة المقترحات الفورية والبحث السريع بالاسم والباركود
-    function showSuggestions(inputEl) {
-        const query = inputEl.value.toLowerCase().trim();
-        const box = document.getElementById('suggestionsBox');
-        box.innerHTML = '';
+    function switchTab(tab) {
+        document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
         
-        if (!query) {
-            box.style.display = 'none';
-            return;
+        if(tab === 'vareliste') {
+            document.getElementById('sectionVareliste').classList.add('active');
+            document.getElementById('tabVarelisteBtn').classList.add('active');
+        } else {
+            document.getElementById('sectionOrdreliste').classList.add('active');
+            document.getElementById('tabOrdrelisteBtn').classList.add('active');
+            renderOrderList();
+        }
+    }
+
+    function toggleLanguage() {
+        currentLang = currentLang === 'no' ? 'ar' : 'no';
+        localStorage.setItem('mr_intl_lang', currentLang);
+        applyLanguageStrings();
+    }
+
+    function applyLanguageStrings() {
+        const l = currentLang;
+        document.getElementById('appTitle').innerText = words[l].title;
+        document.getElementById('tabVarelisteBtn').innerText = words[l].varelisteTab;
+        document.getElementById('lblProdName').innerText = words[l].prodName;
+        document.getElementById('lblBarcode').innerText = words[l].barcode;
+        document.getElementById('lblVaregruppe').innerText = words[l].varegruppe;
+        document.getElementById('lblCost').innerText = words[l].cost;
+        document.getElementById('lblQty').innerText = words[l].qty;
+        document.getElementById('lblImgUrl').innerText = words[l].imgUrl;
+        document.getElementById('lblProdUrl').innerText = words[l].prodUrl;
+        document.getElementById('lblLeverandoer').innerText = words[l].supplier;
+        document.getElementById('searchCatalogBar').placeholder = words[l].searchPlh;
+        document.getElementById('c1').innerText = words[l].c1;
+        document.getElementById('c2').innerText = words[l].c2;
+        document.getElementById('c3').innerText = words[l].c3;
+        document.getElementById('c4').innerText = words[l].c4;
+        document.getElementById('lblTotalOrdre').innerText = words[l].totalValgt;
+        
+        const isEdit = document.getElementById('editId').value;
+        document.getElementById('btnSave').innerText = isEdit ? words[l].updateBtn : words[l].saveBtn;
+        
+        document.getElementById('orderBadge').innerText = `(${orderList.length})`;
+        renderCatalogList();
+    }
+
+    function runCalculations(autoFinal = true) {
+        const cost = parseFloat(document.getElementById('prodCost').value) || 0;
+        const qty = parseFloat(document.getElementById('prodQty').value) || 1;
+        const margin = parseFloat(document.getElementById('prodMargin').value) || 1.5;
+        const mva = parseFloat(document.getElementById('prodMva').value) || 0;
+
+        const unitCost = cost / qty;
+        const exMva = unitCost * margin;
+        
+        let finalPrice = 0;
+        if (autoFinal) {
+            finalPrice = exMva * (1 + mva);
+            document.getElementById('resFinalPriceInput').value = finalPrice.toFixed(2);
+        } else {
+            finalPrice = parseFloat(document.getElementById('resFinalPriceInput').value) || 0;
         }
 
-        const filtered = productCatalog.filter(p => 
-            p.name.toLowerCase().includes(query) || 
-            (p.barcode && p.barcode.toString().includes(query))
-        ).slice(0, 6);
+        const calculatedExMva = finalPrice / (1 + mva);
+        const profit = calculatedExMva - unitCost;
 
-        if (filtered.length > 0) {
-            filtered.forEach(p => {
+        document.getElementById('resUnitCost').innerText = unitCost.toFixed(2) + " kr";
+        document.getElementById('resExMva').innerText = exMva.toFixed(2) + " kr";
+        document.getElementById('resProfit').innerText = profit.toFixed(2) + " kr";
+    }
+
+    function searchCatalogSuggestions(input) {
+        const query = input.value.toLowerCase().trim();
+        const box = document.getElementById('suggestBox');
+        box.innerHTML = '';
+        if(!query) { box.style.display = 'none'; return; }
+
+        const hits = catalog.filter(p => p.name.toLowerCase().includes(query) || (p.barcode && p.barcode.includes(query))).slice(0, 5);
+        if(hits.length > 0) {
+            hits.forEach(p => {
                 const li = document.createElement('li');
-                li.innerHTML = `
-                    <span><b>${p.name}</b></span>
-                    <div class="suggest-meta">
-                        <span class="badge">${p.supplier || 'Ukjent'}</span>
-                        ${p.barcode ? `<span>BC: ${p.barcode}</span>` : ''}
-                        <span class="badge" style="background:#ecfdf5; color:#059669">${p.varegruppe}</span>
-                    </div>
-                `;
-                li.onclick = () => selectSuggestion(p);
+                li.innerText = `[${p.supplier || 'Ukjent'}] ${p.name}`;
+                li.onclick = () => {
+                    document.getElementById('editId').value = p.id;
+                    document.getElementById('prodName').value = p.name;
+                    document.getElementById('prodBarcode').value = p.barcode || '';
+                    document.getElementById('prodVaregruppe').value = p.varegruppe || 'Tørrvarer';
+                    document.getElementById('prodCost').value = p.cost || '';
+                    document.getElementById('prodQty').value = p.qty || 1;
+                    document.getElementById('prodMargin').value = p.margin || 1.5;
+                    document.getElementById('prodMva').value = p.mva || 0.15;
+                    document.getElementById('prodImgUrl').value = p.img || '';
+                    document.getElementById('prodLinkUrl').value = p.link || '';
+                    document.getElementById('prodSupplier').value = p.supplier || '';
+                    document.getElementById('resFinalPriceInput').value = (p.finalPrice || 0).toFixed(2);
+                    box.style.display = 'none';
+                    runCalculations(false);
+                    applyLanguageStrings();
+                };
                 box.appendChild(li);
             });
             box.style.display = 'block';
@@ -290,331 +347,237 @@
         }
     }
 
-    // تعبئة البيانات الذكية فوراً عند اختيار المنتج
-    function selectSuggestion(product) {
-        document.getElementById('prodName').value = product.name;
-        document.getElementById('supplierName').value = product.supplier || '';
-        document.getElementById('varegruppeSelect').value = product.varegruppe || 'Tørrvarer';
+    function saveProductToCatalog() {
+        const name = document.getElementById('prodName').value.trim();
+        if(!name) { alert("Skriv produktnavn!"); return; }
+
+        const editId = document.getElementById('editId').value;
+        const pData = {
+            id: editId ? parseInt(editId) : Date.now(),
+            name: name,
+            barcode: document.getElementById('prodBarcode').value.trim(),
+            varegruppe: document.getElementById('prodVaregruppe').value,
+            cost: parseFloat(document.getElementById('prodCost').value) || 0,
+            qty: parseInt(document.getElementById('prodQty').value) || 1,
+            margin: parseFloat(document.getElementById('prodMargin').value) || 1.5,
+            mva: parseFloat(document.getElementById('prodMva').value) || 0,
+            img: document.getElementById('prodImgUrl').value.trim(),
+            link: document.getElementById('prodLinkUrl').value.trim(),
+            supplier: document.getElementById('prodSupplier').value.trim() || "Ukjent",
+            finalPrice: parseFloat(document.getElementById('resFinalPriceInput').value) || 0
+        };
+
+        if(editId) {
+            catalog = catalog.map(p => p.id === pData.id ? pData : p);
+            document.getElementById('editId').value = "";
+        } else {
+            catalog.unshift(pData);
+        }
+
+        localStorage.setItem('mr_catalog', JSON.stringify(catalog));
         
-        let rawMva = parseFloat(product.mva) / 100;
-        if(isNaN(rawMva)) rawMva = 0.15;
-        document.getElementById('vvaSelect').value = rawMva;
+        // تصفير سريع للخانات
+        document.getElementById('prodName').value = '';
+        document.getElementById('prodBarcode').value = '';
+        document.getElementById('prodCost').value = '';
+        document.getElementById('prodQty').value = '1';
+        document.getElementById('prodImgUrl').value = '';
+        document.getElementById('prodLinkUrl').value = '';
         
-        document.getElementById('suggestionsBox').style.display = 'none';
-        
-        // الانتقال التلقائي المباشر لخانة السعر لفتح لوحة الأرقام وتوفير الوقت
-        document.getElementById('costPrice').focus();
-        calculatePricing(true);
+        applyLanguageStrings();
     }
 
-    function handleEnterKey(event) {
-        if (event.key === "Enter") {
-            event.preventDefault();
-            saveToOrderList();
+    function addToOrderList(id) {
+        const p = catalog.find(item => item.id === id);
+        if(!p) return;
+        
+        const exists = orderList.find(o => o.catalogId === id);
+        if(!exists) {
+            orderList.push({
+                id: Date.now() + Math.random(),
+                catalogId: p.id,
+                name: p.name,
+                supplier: p.supplier,
+                esker: 1
+            });
+            localStorage.setItem('mr_intl_orders_v2', JSON.stringify(orderList));
+            document.getElementById('orderBadge').innerText = `(${orderList.length})`;
+            alert(`${p.name} lagt til i ordreliste!`);
+        } else {
+            alert("Produktet ligger allerede i ordrelisten.");
         }
     }
 
-    document.addEventListener('click', function(e) {
-        if (e.target.id !== 'prodName') {
-            document.getElementById('suggestionsBox').style.display = 'none';
+    function deleteFromCatalog(id) {
+        if(confirm("Slette fra vareliste?")) {
+            catalog = catalog.filter(p => p.id !== id);
+            localStorage.setItem('mr_catalog', JSON.stringify(catalog));
+            renderCatalogList();
+        }
+    }
+
+    function renderCatalogList() {
+        const container = document.getElementById('catalogContainer');
+        const query = document.getElementById('searchCatalogBar').value.toLowerCase();
+        container.innerHTML = '';
+
+        const filtered = catalog.filter(p => p.name.toLowerCase().includes(query) || (p.barcode && p.barcode.includes(query)));
+        
+        filtered.forEach(p => {
+            const card = document.createElement('div');
+            card.className = 'product-card';
+            
+            const imgEl = p.img ? `<img src="${p.img}" class="prod-img">` : `<div class="prod-img" style="display:flex;align-items:center;justify-content:center;font-size:18px;">📦</div>`;
+            
+            card.innerHTML = `
+                ${imgEl}
+                <div class="prod-info">
+                    <p class="prod-title">${p.name}</p>
+                    <div class="prod-meta">Leverandør: <b>${p.supplier}</b> | Gr: ${p.varegruppe}</div>
+                    ${p.link ? `<div class="prod-meta"><a href="${p.link}" target="_blank" style="color:#3b82f6;">Se produktlenke 🔗</a></div>` : ''}
+                    <div class="prod-actions">
+                        <button class="action-btn btn-order" onclick="addToOrderList(${p.id})">+ Bestill🛒</button>
+                        <button class="action-btn btn-edit" onclick="loadToForm(${p.id})">Endre</button>
+                        <button class="action-btn btn-del" onclick="deleteFromCatalog(${p.id})">X</button>
+                    </div>
+                </div>
+                <div class="prod-price-tag">${(p.finalPrice || 0).toFixed(2)} kr</div>
+            `;
+            container.appendChild(card);
+        });
+    }
+
+    function loadToForm(id) {
+        const p = catalog.find(item => item.id === id);
+        if(!p) return;
+        document.getElementById('editId').value = p.id;
+        document.getElementById('prodName').value = p.name;
+        document.getElementById('prodBarcode').value = p.barcode || '';
+        document.getElementById('prodVaregruppe').value = p.varegruppe || 'Tørrvarer';
+        document.getElementById('prodCost').value = p.cost || '';
+        document.getElementById('prodQty').value = p.qty || 1;
+        document.getElementById('prodMargin').value = p.margin || 1.5;
+        document.getElementById('prodMva').value = p.mva || 0.15;
+        document.getElementById('prodImgUrl').value = p.img || '';
+        document.getElementById('prodLinkUrl').value = p.link || '';
+        document.getElementById('prodSupplier').value = p.supplier || '';
+        document.getElementById('resFinalPriceInput').value = (p.finalPrice || 0).toFixed(2);
+        window.scrollTo({top: 0, behavior: 'smooth'});
+        runCalculations(false);
+        applyLanguageStrings();
+    }
+
+    function changeOrderQty(id, val) {
+        const o = orderList.find(item => item.id === id);
+        if(o) {
+            o.esker = parseInt(val) || 1;
+            localStorage.setItem('mr_intl_orders_v2', JSON.stringify(orderList));
+        }
+    }
+
+    function removeFromOrder(id) {
+        orderList = orderList.filter(o => o.id !== id);
+        localStorage.setItem('mr_intl_orders_v2', JSON.stringify(orderList));
+        document.getElementById('orderBadge').innerText = `(${orderList.length})`;
+        renderOrderList();
+    }
+
+    function renderOrderList() {
+        const container = document.getElementById('orderContainer');
+        const query = document.getElementById('searchOrderBar').value.toLowerCase();
+        container.innerHTML = '';
+
+        const filtered = orderList.filter(o => o.name.toLowerCase().includes(query) || o.supplier.toLowerCase().includes(query));
+        document.getElementById('totalOrdreCount').innerText = `${filtered.length} produkter`;
+
+        filtered.forEach(o => {
+            const card = document.createElement('div');
+            card.className = 'product-card';
+            card.innerHTML = `
+                <div class="prod-info">
+                    <p class="prod-title">${o.name}</p>
+                    <div class="prod-meta">Leverandør: <b style="color:#ea580c">${o.supplier}</b></div>
+                    <div class="prod-meta" style="margin-top:5px;">
+                        Antall kasser/esker: 
+                        <input type="number" class="order-qty-input" value="${o.esker}" min="1" oninput="changeOrderQty(${o.id}, this.value)">
+                    </div>
+                </div>
+                <div>
+                    <button class="action-btn btn-del" onclick="removeFromOrder(${o.id})">Fjern</button>
+                </div>
+            `;
+            container.appendChild(card);
+        });
+    }
+
+    function sendOrderViaWhatsApp() {
+        if(orderList.length === 0) { alert("Ordrelisten er tom!"); return; }
+        
+        let text = "*Varebestilling / الطلبية الجديدة:*\n\n";
+        
+        // تجميع المنتجات حسب الموردين تلقائياً
+        const groups = {};
+        orderList.forEach(o => {
+            if(!groups[o.supplier]) groups[o.supplier] = [];
+            groups[o.supplier].push(o);
+        });
+
+        for(const sup in groups) {
+            text += `*Leverandør: ${sup}*\n`;
+            groups[sup].forEach((o, i) => {
+                text += `${i+1}. ${o.name} -> (*${o.esker}* esker)\n`;
+            });
+            text += `\n`;
+        }
+
+        window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
+    }
+
+    function handleCSVImport(e) {
+        const file = e.target.files[0];
+        if(!file) return;
+        const reader = new FileReader();
+        reader.onload = function(evt) {
+            const lines = evt.target.result.split('\n');
+            // تخطي السطر الأول (العناوين) والبدء بالدمج
+            for(let i = 1; i < lines.length; i++) {
+                if(!lines[i].trim()) continue;
+                const cols = lines[i].split(',');
+                if(cols.length >= 3) {
+                    catalog.push({
+                        id: Date.now() + Math.random(),
+                        name: cols[2].replace(/"/g, '').trim(),
+                        barcode: cols[1] ? cols[1].trim() : '',
+                        varegruppe: cols[3] ? cols[3].trim() : 'Tørrvarer',
+                        supplier: cols[4] ? cols[4].trim() : 'Ukjent',
+                        cost: 0, qty: 1, margin: 1.5, mva: 0.15, img: '', link: '', finalPrice: 0
+                    });
+                }
+            }
+            localStorage.setItem('mr_catalog', JSON.stringify(catalog));
+            alert("تم استيراد الكتالوج بنجاح وتحديث الكشوفات!");
+            renderCatalogList();
+        };
+        reader.readAsText(file);
+    }
+
+    function exportBackup() {
+        const str = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(catalog));
+        const dl = document.createElement('a');
+        dl.setAttribute("href", str);
+        dl.setAttribute("download", "vareliste_backup.json");
+        document.body.appendChild(dl);
+        dl.click();
+        dl.remove();
+    }
+
+    document.addEventListener("click", function(e) {
+        if(e.target.id !== 'prodName') {
+            document.getElementById('suggestBox').style.display = 'none';
         }
     });
 
-    function applyLanguage() {
-        const lang = currentLang;
-        document.getElementById('subTitle').innerText = i18n[lang].sub;
-        document.getElementById('tSection2').innerText = i18n[lang].sec2;
-        document.getElementById('lblProdName').innerText = i18n[lang].prodName;
-        document.getElementById('lblCostPrice').innerText = i18n[lang].cost;
-        document.getElementById('lblQty').innerText = i18n[lang].qty;
-        document.getElementById('lblMargin').innerText = i18n[lang].margin;
-        document.getElementById('lblMva').innerText = i18n[lang].mva;
-        document.getElementById('lblSupplier').innerText = i18n[lang].supplier;
-        document.getElementById('lblVaregruppe').innerText = i18n[lang].varegruppe;
-        document.getElementById('txtUnitCost').innerText = i18n[lang].uCost;
-        document.getElementById('txtExMva').innerText = i18n[lang].exMva;
-        document.getElementById('txtFinalPrice').innerText = i18n[lang].fPrice;
-        document.getElementById('txtProfit').innerText = i18n[lang].profit;
-        document.getElementById('searchBar').placeholder = i18n[lang].search;
-        document.getElementById('btnReorder').innerText = i18n[lang].reorderBtn;
-        document.getElementById('btnLang').innerText = `Language: ${lang.toUpperCase()}`;
-        
-        const saveBtn = document.getElementById('saveBtn');
-        saveBtn.innerText = document.getElementById('editId').value ? i18n[lang].update : i18n[lang].save;
-        
-        updateSelectedCount();
-        renderOrders();
-    }
-
-    function toggleLanguage() {
-        currentLang = currentLang === 'no' ? 'ar' : 'no';
-        localStorage.setItem('mr_intl_lang', currentLang);
-        applyLanguage();
-    }
-
-    function cleanAndCalculate(inputEl, autoCalculateFinalPrice) {
-        let val = inputEl.value.replace(',', '.');
-        val = val.replace(/[^0-9.]/g, '');
-        inputEl.value = val;
-        calculatePricing(autoCalculateFinalPrice);
-    }
-
-    function calculatePricing(autoCalculateFinalPrice = true) {
-        const costPrice = parseFloat(document.getElementById('costPrice').value) || 0;
-        const qty = parseFloat(document.getElementById('quantity').value) || 1;
-        const margin = parseFloat(document.getElementById('marginSelect').value);
-        const mvaRate = parseFloat(document.getElementById('vvaSelect').value);
-
-        if (costPrice === 0) {
-            document.getElementById('resUnitProfit').innerText = "0.00 kr";
-            return { unitCost: 0, unitFinalPrice: 0, unitProfit: 0 };
-        }
-
-        const unitCost = costPrice / qty;
-        const unitPriceExMva = unitCost * margin;
-        
-        let unitFinalPrice = 0;
-        if (autoCalculateFinalPrice) {
-            unitFinalPrice = unitPriceExMva * (1 + mvaRate);
-            document.getElementById('resFinalUnitPriceInput').value = unitFinalPrice.toFixed(2);
-        } else {
-            unitFinalPrice = parseFloat(document.getElementById('resFinalUnitPriceInput').value) || 0;
-        }
-
-        const finalExMva = unitFinalPrice / (1 + mvaRate);
-        const unitProfit = finalExMva - unitCost;
-
-        document.getElementById('resUnitCost').innerText = unitCost.toFixed(2) + " kr";
-        document.getElementById('resExMva').innerText = unitPriceExMva.toFixed(2) + " kr";
-        document.getElementById('resUnitProfit').innerText = (unitProfit >= 0 ? "+" : "") + unitProfit.toFixed(2) + " kr";
-        
-        return { unitCost, unitFinalPrice, unitProfit };
-    }
-
-    function saveToOrderList() {
-        const name = document.getElementById('prodName').value.trim();
-        const cost = parseFloat(document.getElementById('costPrice').value) || 0;
-        const editId = document.getElementById('editId').value;
-        
-        if (!name || cost === 0) {
-            alert(currentLang === 'ar' ? "الرجاء إدخال الاسم وسعر الشراء!" : "Vennligst fyll ut produktnavn og innkjøpspris!");
-            return;
-        }
-
-        const calc = calculatePricing(false);
-        const qty = parseFloat(document.getElementById('quantity').value) || 1;
-
-        const productData = {
-            id: editId ? parseInt(editId) : Date.now(),
-            name: name,
-            cost: cost,
-            qty: qty,
-            unitCost: (cost / qty).toFixed(2), 
-            orderEsker: "1",
-            margin: document.getElementById('marginSelect').value,
-            mva: (parseFloat(document.getElementById('vvaSelect').value) * 100) + "%",
-            supplier: document.getElementById('supplierName').value.trim() || "Ukjent Leverandør",
-            varegruppe: document.getElementById('varegruppeSelect').value,
-            unitFinalPrice: calc.unitFinalPrice.toFixed(2),
-            unitProfit: calc.unitProfit.toFixed(2)
-        };
-
-        if (editId) {
-            const oldP = savedOrders.find(item => item.id === productData.id);
-            if(oldP) productData.orderEsker = oldP.orderEsker;
-            savedOrders = savedOrders.map(p => p.id === productData.id ? productData : p);
-            document.getElementById('editId').value = "";
-        } else {
-            savedOrders.unshift(productData);
-        }
-
-        localStorage.setItem('mr_intl_orders', JSON.stringify(savedOrders));
-
-        // تصفير الخانات فوراً لتعبئة الفاتورة بسرعة فائقة للقطعة التالية
-        document.getElementById('prodName').value = '';
-        document.getElementById('costPrice').value = '';
-        document.getElementById('quantity').value = '';
-        document.getElementById('resUnitCost').innerText = "0.00 kr";
-        document.getElementById('resExMva').innerText = "0.00 kr";
-        document.getElementById('resFinalUnitPriceInput').value = "0.00";
-        document.getElementById('resUnitProfit').innerText = "0.00 kr";
-        
-        applyLanguage();
-        document.getElementById('prodName').focus();
-    }
-
-    function editProduct(id) {
-        const p = savedOrders.find(item => item.id === id);
-        if (!p) return;
-
-        document.getElementById('editId').value = p.id;
-        document.getElementById('prodName').value = p.name;
-        document.getElementById('costPrice').value = p.cost;
-        document.getElementById('quantity').value = p.qty;
-        document.getElementById('marginSelect').value = p.margin;
-        document.getElementById('varegruppeSelect').value = p.varegruppe || 'Tørrvarer';
-        
-        const rawMva = parseFloat(p.mva) / 100;
-        document.getElementById('vvaSelect').value = rawMva;
-        document.getElementById('supplierName').value = p.supplier;
-
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-        
-        calculatePricing(true);
-        document.getElementById('resFinalUnitPriceInput').value = p.unitFinalPrice;
-        calculatePricing(false);
-        
-        document.getElementById('saveBtn').innerText = i18n[currentLang].update;
-    }
-
-    function deleteOrder(id) {
-        if (confirm(currentLang === 'ar' ? "هل تريد الحذف؟" : "Vil du slette dette produktet?")) {
-            savedOrders = savedOrders.filter(p => p.id !== id);
-            localStorage.setItem('mr_intl_orders', JSON.stringify(savedOrders));
-            renderOrders();
-        }
-    }
-
-    function updateCardEsker(id, val) {
-        const p = savedOrders.find(item => item.id === id);
-        if (p) {
-            p.orderEsker = val || "1";
-            localStorage.setItem('mr_intl_orders', JSON.stringify(savedOrders));
-        }
-    }
-
-    function updateSelectedCount() {
-        const checked = document.querySelectorAll('.select-box:checked').length;
-        document.getElementById('txtSelectedCount').innerText = `${checked} ${i18n[currentLang].selected}`;
-    }
-
-    function bulkReorder() {
-        const checkboxes = document.querySelectorAll('.select-box:checked');
-        if(checkboxes.length === 0) {
-            alert("Velg produkter først!");
-            return;
-        }
-        let msg = "*Innkjøpsliste til Leverandør:*\n\n";
-        checkboxes.forEach((cb, idx) => {
-            const pId = parseInt(cb.getAttribute('data-id'));
-            const p = savedOrders.find(item => item.id === pId);
-            if(p) msg += `${idx + 1}. *${p.name}* -> Antall: *${p.orderEsker}*\n`;
-        });
-        window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`, '_blank');
-    }
-
-    function sendWhatsAppSupplierOnly(supplierName) {
-        const supplierProducts = savedOrders.filter(p => p.supplier === supplierName);
-        let text = `Bestilling til *${supplierName}*:\n\n`;
-        supplierProducts.forEach((p, idx) => {
-            text += `${idx + 1}. *${p.name}* -> Antall: *${p.orderEsker}*\n`;
-        });
-        window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
-    }
-
-    function sendWhatsAppMyDetails(supplierName) {
-        const supplierProducts = savedOrders.filter(p => p.supplier === supplierName);
-        let text = `📋 *Prisrapport [${supplierName}]:*\n\n`;
-        supplierProducts.forEach((p, idx) => {
-            text += `${idx + 1}. *${p.name}*\n   - Gruppe: ${p.varegruppe}\n   - Pris: ${p.unitFinalPrice} kr\n   - Enhet Kost: ${p.unitCost} kr\n   - Fortjeneste: +${p.unitProfit} kr\n\n`;
-        });
-        window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
-    }
-
-    function triggerPrint(isStaffMode) {
-        const now = new Date();
-        const dateStr = now.toLocaleDateString('no-NO') + ' kl. ' + now.toLocaleTimeString('no-NO', {hour: '2-digit', minute:'2-digit'});
-        document.getElementById('printHeaderView').innerText = `Dato: ${dateStr} | ${isStaffMode ? 'Ansatte Prisliste' : 'Eier Prisliste'}`;
-        
-        if (isStaffMode) {
-            document.body.classList.add('staff-print-mode');
-        } else {
-            document.body.classList.remove('staff-print-mode');
-        }
-        window.print();
-    }
-
-    function exportData() {
-        if(savedOrders.length === 0) {
-            alert("Ingen data!");
-            return;
-        }
-        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(savedOrders));
-        const downloadAnchor = document.createElement('a');
-        downloadAnchor.setAttribute("href", dataStr);
-        downloadAnchor.setAttribute("download", "pris_app_orders_backup.json");
-        document.body.appendChild(downloadAnchor);
-        downloadAnchor.click();
-        downloadAnchor.remove();
-    }
-
-    function renderOrders() {
-        const container = document.getElementById('ordersContainer');
-        const query = document.getElementById('searchBar').value.toLowerCase();
-        container.innerHTML = '';
-
-        if (savedOrders.length === 0) {
-            container.innerHTML = `<div style="text-align:center; padding:15px; color:#64748b;">Tomt</div>`;
-            return;
-        }
-
-        const grouped = {};
-        savedOrders.forEach(p => {
-            if (p.name.toLowerCase().includes(query) || p.supplier.toLowerCase().includes(query) || (p.varegruppe && p.varegruppe.toLowerCase().includes(query))) {
-                if (!grouped[p.supplier]) grouped[p.supplier] = [];
-                grouped[p.supplier].push(p);
-            }
-        });
-
-        for (const supplier in grouped) {
-            let blockHtml = `
-                <div class="supplier-block">
-                    <div class="supplier-header">
-                        <div class="supplier-header-top">
-                            <span class="supplier-title">${supplier}</span>
-                        </div>
-                        <div class="supplier-actions">
-                            <button class="whatsapp-btn" onclick="sendWhatsAppSupplierOnly('${supplier}')">Bestill 💬</button>
-                            <button class="share-me-btn" onclick="sendWhatsAppMyDetails('${supplier}')">Detaljer 📝</button>
-                        </div>
-                    </div>
-            `;
-
-            grouped[supplier].forEach(p => {
-                blockHtml += `
-                    <div class="product-card">
-                        <div class="select-box-container">
-                            <input type="checkbox" class="select-box" data-id="${p.id}" onchange="updateSelectedCount()">
-                        </div>
-                        <div class="product-details">
-                            <p class="p-name">${p.name}</p>
-                            <div class="p-meta">Gruppe: <b style="color:#0284c7">${p.varegruppe || 'Tørrvarer'}</b></div>
-                            <div class="p-meta">
-                                Antall: <input type="number" value="${p.orderEsker}" style="width:50px; padding:2px; display:inline-block; font-size:12px;" oninput="updateCardEsker(${p.id}, this.value)">
-                            </div>
-                            <div class="p-meta">Total Qty: <b>${p.qty} enheter</b> | MVA: <b>${p.mva}</b></div>
-                            <div class="actions-row">
-                                <button class="action-btn edit-btn" onclick="editProduct(${p.id})">${i18n[currentLang].edit}</button>
-                                <button class="action-btn del-btn" onclick="deleteOrder(${p.id})">${i18n[currentLang].del}</button>
-                            </div>
-                        </div>
-                        <div class="p-prices">
-                            <div class="p-sales-price">${p.unitFinalPrice} kr</div>
-                            <div class="p-cost">Enhet Kost: ${p.unitCost} kr</div>
-                            <div class="p-cost">Total Kost: ${p.cost} kr</div>
-                            <div class="p-profit">Fortjeneste: +${p.unitProfit} kr</div>
-                        </div>
-                    </div>
-                `;
-            });
-
-            blockHtml += `</div>`;
-            container.innerHTML += blockHtml;
-        }
-        updateSelectedCount();
-    }
-
-    applyLanguage();
+    applyLanguageStrings();
 </script>
 
 </body>
