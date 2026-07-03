@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Pris App - Bestilling</title>
-    <script src="https://unpkg.com/tesseract.js@4.0.2/dist/tesseract.min.js"></script>
     <style>
         * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
         body { background-color: #f1f5f9; margin: 0; padding: 10px; color: #1e293b; -webkit-tap-highlight-color: transparent; }
@@ -32,15 +31,11 @@
         input, select { width: 100%; padding: 8px 10px; border: 2px solid #cbd5e1; border-radius: 6px; font-size: 14px; background: white; color: #0f172a; }
         input:focus, select:focus { border-color: #10b981; outline: none; }
         
-        /* زر تصوير وقراءة الفاتورة الذكي */
-        .input-with-btn { display: flex; gap: 6px; }
-        .scan-btn-container { position: relative; display: inline-block; }
-        .scan-btn { background: #10b981; color: white; border: none; border-radius: 6px; padding: 0 12px; font-size: 12px; font-weight: bold; cursor: pointer; height: 100%; display: flex; align-items: center; gap: 4px; white-space: nowrap; }
-        .scan-file-input { position: absolute; left: 0; top: 0; opacity: 0; width: 100%; height: 100%; cursor: pointer; }
-        
-        /* مؤشر التحميل أثناء معالجة الصورة */
-        #ocr-loading { display: none; background: #fffbeb; border: 1px solid #fef3c7; color: #b45309; padding: 8px; border-radius: 8px; font-size: 12px; font-weight: bold; text-align: center; margin-bottom: 10px; animation: pulse 1.5s infinite; }
-        @keyframes pulse { 0% { opacity: 0.6; } 50% { opacity: 1; } 100% { opacity: 0.6; } }
+        /* قائمة المقترحات الذكية */
+        .suggestions-list { position: absolute; top: 100%; left: 0; width: 100%; background: white; border: 2px solid #10b981; border-top: none; border-radius: 0 0 8px 8px; max-height: 180px; overflow-y: auto; z-index: 100; box-shadow: 0 8px 16px rgba(0,0,0,0.1); display: none; padding: 0; margin: 0; list-style: none; }
+        .suggestions-list li { padding: 10px; font-size: 13px; border-bottom: 1px solid #f1f5f9; cursor: pointer; display: flex; justify-content: space-between; }
+        .suggestions-list li:hover { background: #ecfdf5; }
+        .suggestions-list li .suggest-sup { font-size: 11px; color: #64748b; font-weight: bold; }
 
         .row { display: flex; gap: 8px; margin-bottom: 4px; }
         .col { flex: 1; }
@@ -95,7 +90,7 @@
 
         @media print {
             body { background: white !important; color: black !important; padding: 0; }
-            .top-bar, .section-title, .form-group, .row, .calc-box, #saveBtn, .search-box, .supplier-actions, .actions-row, .reorder-bar, .select-box-container, .p-link, h1, .subtitle, #ocr-loading { display: none !important; }
+            .top-bar, .section-title, .form-group, .row, .calc-box, #saveBtn, .search-box, .supplier-actions, .actions-row, .reorder-bar, .select-box-container, .p-link, h1, .subtitle, .suggestions-list { display: none !important; }
             .app-container { box-shadow: none !important; max-width: 100% !important; padding: 0 !important; background: white !important; }
             .print-header { display: block !important; }
             .supplier-block { background: white !important; border: none !important; padding: 0 !important; margin-bottom: 15px !important; page-break-inside: avoid; }
@@ -126,8 +121,6 @@
 
     <h1>Pris App</h1>
     <div class="subtitle" id="subTitle">by Mr. Intl (Kalkulator & Ordre)</div>
-    
-    <div id="ocr-loading">⏳ Leserar text fra faktura/produkt... Vennligst vent.</div>
 
     <div class="print-header" id="printHeaderView"></div>
     
@@ -135,13 +128,8 @@
     
     <div class="form-group">
         <label id="lblProdName">Produktnavn</label>
-        <div class="input-with-btn">
-            <input type="text" id="prodName" placeholder="F.eks. Nido Milk Powder 2.5kg">
-            <div class="scan-btn-container">
-                <button class="scan-btn">📷 Scan</button>
-                <input type="file" accept="image/*" capture="environment" class="scan-file-input" onchange="extractTextFromImage(this)">
-            </div>
-        </div>
+        <input type="text" id="prodName" placeholder="F.eks. Nido Milk Powder 2.5kg" oninput="showSuggestions(this)" autocomplete="off">
+        <ul id="suggestionsBox" class="suggestions-list"></ul>
     </div>
     
     <div class="row">
@@ -154,7 +142,7 @@
         <div class="col">
             <div class="form-group">
                 <label id="lblQty">Antall</label>
-                <input type="text" inputmode="decimal" pattern="[0-9]*([\.,][0-9]*)?" id="quantity" placeholder="" oninput="cleanAndCalculate(this, true)">
+                <input type="text" inputmode="decimal" pattern="[0-9]*([\.,][0-9]*)?" id="quantity" placeholder="1" oninput="cleanAndCalculate(this, true)">
             </div>
         </div>
     </div>
@@ -244,68 +232,76 @@
             prodName: "Produktnavn", cost: "Innkjøpspris (Total)", qty: "Antall", margin: "Margin", mva: "MVA", supplier: "Leverandør",
             img: "Bilde-URL", link: "Leverandør Link", uCost: "Innkjøpspris per enhet (Eks. MVA)", exMva: "Utsalgspris eks. MVA", fPrice: "Utsalgspris (Ink. MVA):",
             profit: "Fortjeneste:", save: "Lagre i ordreliste", update: "Oppdater Produkt", search: "Søk efter produkt...",
-            selected: "valgt", reorderBtn: "Send reorder 🛒", edit: "Endre", del: "Slett", openPage: "Leverandørside ↗",
-            loading: "⏳ Leser tekst fra bildet... Vennligst vent."
+            selected: "valgt", reorderBtn: "Send reorder 🛒", edit: "Endre", del: "Slett", openPage: "Leverandørside ↗"
         },
         ar: {
             sub: "بواسطة مستر إنترناشونال (الحاسبة والطلبيات)", sec2: "سجل طلبيات الموردين الحاليين",
             prodName: "Produktnavn (اسم المنتج)", cost: "Innkjøpspris (سعر الشراء الإجمالي)", qty: "Antall (الكمية)", margin: "Margin (الفائدة)", mva: "MVA (الضريبة)", supplier: "Leverandør (المورد)",
             img: "Bilde-URL (الصورة)", link: "Leverandør Link (الرابط)", uCost: "Innkjøpspris per enhet (سعر القطعة بدون ضريبة)", exMva: "Utsalgspris eks. MVA (البيع قبل الضريبة)", fPrice: "Utsalgspris (سعر البيع النهائي المتوقع):",
             profit: "Fortjeneste (صافي الربح):", save: "Lagre i ordreliste (حفظ في القائمة)", update: "Oppdater (تحديث وحفظ)", search: "Søk... (بحث سريع)",
-            selected: "valgt (محدد)", reorderBtn: "Send reorder 🛒 (إرسال مجمع)", edit: "Endre (تعديل)", del: "Slett (حذف)", openPage: "Leverandørside ↗ (رابط المورد)",
-            loading: "⏳ جاري استخراج وقراءة الاسم من الفاتورة... يرجى الانتظار ثوانٍ."
+            selected: "valgt (محدد)", reorderBtn: "Send reorder 🛒 (إرسال مجمع)", edit: "Endre (تعديل)", del: "Slett (حذف)", openPage: "Leverandørside ↗ (رابط المورد)"
         }
     };
 
-    // الدالة السحرية الجديدة: تصوير الفاتورة واستخراج اسم المنتج تلقائياً
-    function extractTextFromImage(inputEl) {
-        if (!inputEl.files || inputEl.files.length === 0) return;
-        const file = inputEl.files[0];
+    // ميزة المقترحات الذكية فائقة السرعة
+    function showSuggestions(inputEl) {
+        const query = inputEl.value.toLowerCase().trim();
+        const box = document.getElementById('suggestionsBox');
+        box.innerHTML = '';
         
-        const loader = document.getElementById('ocr-loading');
-        loader.innerText = i18n[currentLang].loading;
-        loader.style.display = 'block';
+        if (!query) {
+            box.style.display = 'none';
+            return;
+        }
 
-        const reader = new FileReader();
-        reader.onload = function () {
-            Tesseract.recognize(
-                reader.result,
-                'eng+nor', // دعم اللغتين الإنجليزية والنرويجية معاً للحصول على أعلى دقة من الفواتير
-                { logger: m => console.log(m) }
-            ).then(({ data: { text } }) => {
-                loader.style.display = 'none';
-                
-                // تنظيف النص المستخرج: إزالة الأسطر الفارغة، والرموز الزائدة
-                let cleanText = text.trim().replace(/[\r\n]+/g, ' ');
-                // اختصار النص الطويل جداً ليركز فقط على السطر الأول أو اسم المنتج الأساسي
-                if(cleanText.length > 50) {
-                    cleanText = cleanText.substring(0, 50) + "...";
-                }
+        // ترشيح المنتجات الفريدة بناءً على الاسم لتفادي التكرار
+        const seenNames = new Set();
+        const filtered = savedOrders.filter(p => {
+            if (p.name.toLowerCase().includes(query) && !seenNames.has(p.name.toLowerCase())) {
+                seenNames.add(p.name.toLowerCase());
+                return true;
+            }
+            return false;
+        }).slice(0, 5); // عرض أول 5 منتجات مطابقة لسرعة الاختيار
 
-                if (cleanText) {
-                    document.getElementById('prodName').value = cleanText;
-                    
-                    // محاولة البحث التلقائي إذا كان هذا الاسم تم حفظه مسبقاً لدى مورد
-                    const matched = savedOrders.find(p => cleanText.toLowerCase().includes(p.name.toLowerCase()) || p.name.toLowerCase().includes(cleanText.toLowerCase()));
-                    if(matched) {
-                        document.getElementById('supplierName').value = matched.supplier;
-                        document.getElementById('imgUrl').value = matched.img.startsWith('data:') ? '' : matched.img;
-                        document.getElementById('supplierLink').value = matched.link === '#' ? '' : matched.link;
-                        document.getElementById('marginSelect').value = matched.margin;
-                        if(currentLang === 'ar') {
-                            alert(`✨ تم التعرف على النص وضبط المورد تلقائياً: \n"${cleanText}"`);
-                        }
-                    }
-                } else {
-                    alert(currentLang === 'ar' ? "لم يتم العثور على نص واضح في الصورة. يرجى التصوير عن قرب وبإضاءة جيدة." : "Klarte ikke å lese tydelig tekst. Prøv igjen med bedre lys.");
-                }
-            }).catch(err => {
-                loader.style.display = 'none';
-                alert("Feil ved tekstgjenkjenning: " + err);
+        if (filtered.length > 0) {
+            filtered.forEach(p => {
+                const li = document.createElement('li');
+                li.innerHTML = `<span>${p.name}</span> <span class="suggest-sup">(${p.supplier})</span>`;
+                li.onclick = () => selectSuggestion(p);
+                box.appendChild(li);
             });
-        };
-        reader.readAsDataURL(file);
+            box.style.display = 'block';
+        } else {
+            box.style.display = 'none';
+        }
     }
+
+    // تعبئة البيانات تلقائياً بمجرد اختيار منتج مقترح
+    function selectSuggestion(product) {
+        document.getElementById('prodName').value = product.name;
+        document.getElementById('supplierName').value = product.supplier;
+        document.getElementById('marginSelect').value = product.margin;
+        
+        const rawMva = parseFloat(product.mva) / 100;
+        document.getElementById('vvaSelect').value = isNaN(rawMva) ? 0.15 : rawMva;
+        
+        document.getElementById('imgUrl').value = product.img.startsWith('data:') ? '' : product.img;
+        document.getElementById('supplierLink').value = product.link === '#' ? '' : product.link;
+        
+        document.getElementById('suggestionsBox').style.display = 'none';
+        
+        // نقل التركيز فوراً إلى سعر الشراء لتوفير الوقت
+        document.getElementById('costPrice').focus();
+        calculatePricing(true);
+    }
+
+    // إغلاق المقترحات عند الضغط في أي مكان خارج الحقل
+    document.addEventListener('click', function(e) {
+        if (e.target.id !== 'prodName') {
+            document.getElementById('suggestionsBox').style.display = 'none';
+        }
+    });
 
     function applyLanguage() {
         const lang = currentLang;
@@ -423,13 +419,21 @@
 
         localStorage.setItem('mr_intl_orders', JSON.stringify(savedOrders));
 
+        // تفريغ الحقول وإعادة تهيئة الحسابات
         document.getElementById('prodName').value = '';
         document.getElementById('costPrice').value = '';
         document.getElementById('quantity').value = '';
         document.getElementById('imgUrl').value = '';
         document.getElementById('supplierLink').value = '';
+        document.getElementById('resUnitCost').innerText = "0.00 kr";
+        document.getElementById('resExMva').innerText = "0.00 kr";
+        document.getElementById('resFinalUnitPriceInput').value = "0.00";
+        document.getElementById('resUnitProfit').innerText = "0.00 kr";
         
         applyLanguage();
+        
+        // وضع مؤشر الكتابة تلقائياً في خانة الاسم ليكون جاهزاً للمنتج التالي فوراً
+        document.getElementById('prodName').focus();
     }
 
     function editProduct(id) {
@@ -479,6 +483,7 @@
         document.getElementById('txtSelectedCount').innerText = `${checked} ${i18n[currentLang].selected}`;
     }
 
+    // كود مجمع لإرسال الطلبية
     function bulkReorder() {
         const checkboxes = document.querySelectorAll('.select-box:checked');
         if(checkboxes.length === 0) {
