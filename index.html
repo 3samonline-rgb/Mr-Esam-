@@ -17,11 +17,12 @@
         .tab-btn.active { background: white; color: #0f172a; box-shadow: 0 2px 6px rgba(0,0,0,0.08); }
         
         .top-actions { display: flex; gap: 6px; margin-bottom: 16px; flex-wrap: wrap; }
-        .top-actions button, .file-label { flex: 1; min-width: 80px; padding: 8px; border: none; border-radius: 8px; font-size: 11px; font-weight: bold; cursor: pointer; color: white; text-align: center; display: inline-block; }
+        .top-actions button, .file-label { flex: 1; min-width: 75px; padding: 8px 4px; border: none; border-radius: 8px; font-size: 10px; font-weight: bold; cursor: pointer; color: white; text-align: center; display: inline-block; }
         .btn-lang { background: #3b82f6; }
         .btn-import { background: #10b981; }
         .btn-export { background: #475569; }
-        .btn-print { background: #7c3aed; }
+        .btn-print-kunder { background: #7c3aed; }
+        .btn-print-ansatte { background: #db2777; }
         
         h1 { font-size: 26px; font-weight: 900; text-align: center; margin: 0 0 2px 0; color: #0f172a; letter-spacing: -0.5px; }
         .subtitle { font-size: 12px; font-weight: 700; color: #10b981; text-align: center; margin-bottom: 16px; text-transform: uppercase; letter-spacing: 0.5px; }
@@ -43,10 +44,6 @@
         #scanner-container { display: none; background: #000; border-radius: 12px; overflow: hidden; margin-bottom: 12px; position: relative; }
         #scanner-view { width: 100%; min-height: 250px; }
         .close-scan-btn { position: absolute; top: 10px; right: 10px; background: #ef4444; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-weight: bold; z-index: 10; cursor: pointer; }
-
-        .suggestions-list { position: absolute; top: 100%; left: 0; width: 100%; background: white; border: 1px solid #cbd5e1; border-radius: 0 0 8px 8px; max-height: 200px; overflow-y: auto; z-index: 100; box-shadow: 0 4px 12px rgba(0,0,0,0.1); display: none; padding: 0; margin: 0; list-style: none; }
-        .suggestions-list li { padding: 10px; font-size: 13px; border-bottom: 1px solid #f1f5f9; cursor: pointer; text-align: left; }
-        .suggestions-list li:hover { background: #f0fdf4; }
         
         .row { display: flex; gap: 8px; margin-bottom: 4px; }
         .col { flex: 1; }
@@ -57,18 +54,19 @@
         
         .btn-main { width: 100%; background: #10b981; color: white; padding: 12px; border: none; border-radius: 8px; font-size: 14px; font-weight: bold; cursor: pointer; margin-top: 8px; }
         
-        .search-box { width: 100%; padding: 10px; margin-bottom: 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 14px; }
+        .search-box { width: 100%; padding: 12px; margin: 15px 0 10px 0; border: 2px solid #10b981; border-radius: 10px; font-size: 15px; font-weight: bold; background: #fff; }
         
         .product-card { background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 10px; margin-bottom: 8px; display: flex; gap: 10px; align-items: center; }
         .prod-img { width: 50px; height: 50px; border-radius: 6px; object-fit: cover; background: #e2e8f0; border: 1px solid #cbd5e1; }
         .prod-info { flex: 1; min-width: 0; text-align: left; }
         .prod-title { font-weight: 700; font-size: 13px; margin: 0; color: #0f172a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .prod-meta { font-size: 11px; color: #64748b; margin-top: 2px; }
-        .prod-actions { display: flex; gap: 6px; margin-top: 6px; }
-        .action-btn { border: none; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; cursor: pointer; color: white; }
+        .prod-actions { display: flex; gap: 4px; margin-top: 6px; flex-wrap: wrap; }
+        .action-btn { border: none; padding: 4px 6px; border-radius: 4px; font-size: 10px; font-weight: bold; cursor: pointer; color: white; }
         .btn-edit { background: #ea580c; }
         .btn-del { background: #ef4444; }
         .btn-order { background: #0284c7; }
+        .btn-add-fak { background: #475569; }
         .prod-price-tag { text-align: right; min-width: 80px; font-weight: 800; font-size: 15px; color: #16a34a; }
         
         .order-qty-input { width: 50px; padding: 2px; font-size: 12px; text-align: center; border: 1px solid #cbd5e1; border-radius: 4px; display: inline-block; margin-left: 4px; }
@@ -86,16 +84,23 @@
 
         #fileInput { display: none; }
 
+        /* الحقول المخفية المخصصة للطباعة الداخلية والخارجية */
+        .print-only-info { display: none; }
+
         /* إعدادات طباعة الكشوفات المخصصة لـ A4 ورقة كاملة ونظيفة */
         @media print {
-            @page { size: A4; margin: 15mm; }
-            body { background: white; padding: 0; color: #000; font-size: 12pt; }
+            @page { size: A4; margin: 12mm; }
+            body { background: white; padding: 0; color: #000; font-size: 11pt; }
             .app-container { box-shadow: none; max-width: 100%; width: 100%; padding: 0; }
             .top-actions, .nav-tabs, .form-group, .calc-box, .btn-main, .search-box, .prod-actions, .reorder-sticky-bar, .btn-del, .scan-btn, .add-grp-btn { display: none !important; }
-            .product-card { border: none; border-bottom: 1px solid #ddd; padding: 12px 0; page-break-inside: avoid; }
+            .product-card { border: none; border-bottom: 1px solid #ddd; padding: 10px 0; page-break-inside: avoid; display: flex !important; justify-content: space-between; align-items: center; }
             .prod-price-tag { color: #000 !important; font-size: 14pt; font-weight: bold; }
-            h1 { font-size: 28pt; margin-top: 0; }
-            .subtitle { font-size: 14pt; color: #555 !important; margin-bottom: 30px; }
+            h1 { font-size: 26pt; margin-top: 0; text-align: center; }
+            .subtitle { font-size: 13pt; color: #333 !important; margin-bottom: 20px; text-align: center; }
+            
+            /* التحكم بإخفاء وإظهار بيانات الموظفين أو الزبائن */
+            body.print-mode-kunder .print-only-info { display: none !important; }
+            body.print-mode-ansatte .print-only-info { display: block !important; font-size: 10pt; color: #444; margin-top: 4px; }
         }
     </style>
 </head>
@@ -107,7 +112,8 @@
         <label class="btn-import" for="fileInput" id="lblImportBtn">Import CSV</label>
         <input type="file" id="fileInput" accept=".csv" onchange="handleCSVImport(event)">
         <button class="btn-export" onclick="exportBackup()" id="lblExportBtn">Backup</button>
-        <button class="btn-print" onclick="window.print()" id="lblPrintBtn">Prisliste 🖨️</button>
+        <button class="btn-print-kunder" onclick="triggerPrint('kunder')" id="lblPrintKunderBtn">Prisliste 🖨️</button>
+        <button class="btn-print-ansatte" onclick="triggerPrint('ansatte')" id="lblPrintAnsatteBtn">Ansatte 🖨️</button>
     </div>
 
     <h1>Mr intl</h1>
@@ -119,7 +125,7 @@
         <div id="scanner-view"></div>
     </div>
 
-    <!-- شريط التنقل الثلاثي الجديد للموبايل -->
+    <!-- شريط التنقل الثلاثي للموبايل -->
     <div class="nav-tabs">
         <button class="tab-btn active" id="tabVarelisteBtn" onclick="switchTab('vareliste')">Vareliste</button>
         <button class="tab-btn" id="tabOrdrelisteBtn" onclick="switchTab('ordreliste')">Ordreliste <span id="orderBadge">(0)</span></button>
@@ -131,12 +137,11 @@
         <input type="hidden" id="editId" value="">
         
         <div class="form-group">
-            <label id="lblProdName">Produktnavn / Søk</label>
+            <label id="lblProdName">Produktnavn</label>
             <div class="input-with-btn">
-                <input type="text" id="prodName" placeholder="Søk eller skriv..." oninput="searchCatalogSuggestions(this)" autocomplete="off">
+                <input type="text" id="prodName" placeholder="Skriv produktnavn..." autocomplete="off">
                 <button class="scan-btn" onclick="startScanner('prodName')">Scan 📷</button>
             </div>
-            <ul id="suggestBox" class="suggestions-list"></ul>
         </div>
 
         <div class="row">
@@ -232,8 +237,9 @@
 
         <button class="btn-main" id="btnSave" onclick="saveProductToCatalog()">Lagre produkt</button>
 
-        <div style="margin-top: 20px;">
-            <input type="text" id="searchCatalogBar" class="search-box" placeholder="Søk..." oninput="renderCatalogList()">
+        <!-- حقل البحث المستقل والمنفصل كلياً لمنع تعليق النظام -->
+        <div style="margin-top: 10px;">
+            <input type="text" id="searchCatalogBar" class="search-box" placeholder="🔍 ابحث هنا بالاسم أو الباركود..." oninput="renderCatalogList()">
             <div id="catalogContainer"></div>
         </div>
     </div>
@@ -272,9 +278,9 @@
             </div>
         </div>
         <div class="form-group">
-            <label id="lblFakItems">Legg til produkt fra katalogen</label>
+            <label id="lblFakItems">المنتج المختار حالياً</label>
             <select id="fakItemSelect">
-                <option value="">-- Velg produkt --</option>
+                <option value="">-- كشف فارغ، اضغط إضافة للفاتورة من الأسفل --</option>
             </select>
         </div>
         <button class="btn-main" style="background:#475569;" id="btnNewInvoice" onclick="createNewInvoice()">Opprett Faktura</button>
@@ -287,7 +293,7 @@
     let html5QrcodeScanner = null;
     let activeScanTarget = '';
 
-    // المجموعات الأساسية المستقرة والتلقائية
+    // المجموعات الأساسية التلقائية المستقرة
     let varegrupper = JSON.parse(localStorage.getItem('mr_varegrupper')) || ["Tørrvarer", "Drikke", "Kosmetikk", "Ferskvarer", "Grønnsaker", "Andre"];
     
     let catalog = JSON.parse(localStorage.getItem('mr_catalog_v4')) || [
@@ -302,21 +308,21 @@
     const words = {
         no: {
             varelisteTab: "Vareliste", ordrelisteTab: "Ordreliste", fakturaTab: "Fakturaliste",
-            prodName: "Produktnavn / Søk", barcode: "Strekkode", varegruppe: "Varegruppe", cost: "Innkjøpspris (Total)",
+            prodName: "Produktnavn", barcode: "Strekkode", varegruppe: "Varegruppe", cost: "Innkjøpspris (Total)",
             qty: "Antall i eske", imgUrl: "Bilde URL", prodUrl: "Produkt URL", supplier: "Leverandør",
-            saveBtn: "Lagre produkt", updateBtn: "Oppdater produkt", searchPlh: "Søk i vareliste...",
+            saveBtn: "Lagre produkt", updateBtn: "Oppdater produkt", searchPlh: "🔍 Søk etter navn eller strekkode...",
             c1: "Kost per enhet", c2: "Utsalgspris Eks MVA", c3: "Utsalgspris (Ink MVA):", c4: "Fortjeneste per enhet:",
             totalValgt: "Totalt valgt:", sendBtn: "Send til WhatsApp 💬", 
-            lblFakSupplier: "Leverandørnavn", lblFakNum: "Fakturanummer", lblFakDate: "Dato", lblFakItems: "Velg produkt til faktura"
+            lblFakSupplier: "Leverandørnavn", lblFakNum: "Fakturanummer", lblFakDate: "Dato", lblFakItems: "Mottatt produkt"
         },
         ar: {
-            varelisteTab: "قائمة المنتجات", ordrelisteTab: "قائمة الطلبيات", fakturaTab: "قائمة الفواتير والأرباح",
-            prodName: "اسم المنتج أو البحث السريع", barcode: "الباركود", varegruppe: "المجموعة التموينية", cost: "سعر الشراء الإجمالي للفاتورة",
-            qty: "الكمية داخل الكرتونة", imgUrl: "رابط صورة المنتج", prodUrl: "رابط صفحة المنتج", supplier: "اسم المورد",
-            saveBtn: "حفظ في الكتالوج", updateBtn: "تعديل وحفظ البيانات", searchPlh: "ابحث بالاسم أو الباركود...",
-            c1: "التكلفة للقطعة المفردة", c2: "سعر البيع قبل الضريبة", c3: "سعر البيع النهائي (مع الضريبة):", c4: "صافي الفائدة والأرباح للقطعة:",
+            varelisteTab: "قائمة المنتجات", ordrelisteTab: "قائمة الطلبيات", fakturaTab: "الفواتير والأرباح",
+            prodName: "اسم المنتج", barcode: "الباركود", varegruppe: "المجموعة التموينية", cost: "سعر الشراء الإجمالي للفاتورة",
+            qty: "الكمية داخل الكرتونة", imgUrl: "رابط صورة المنتج", prodUrl: "رابط صفحة المنتج", supplier: "اسم Mva / المورد",
+            saveBtn: "حفظ في الكتالوج", updateBtn: "تعديل وحفظ البيانات", searchPlh: "🔍 ابحث هنا بالاسم أو الباركود...",
+            c1: "التكلفة للقطعة المفردة", c2: "سعر البيع قبل الضريبة", c3: "سعر البيع النهائي (مع الضريبة):", c4: "صافي الأرباح للقطعة:",
             totalValgt: "إجمالي السلع المحددة:", sendBtn: "إرسال الكشف عبر الواتساب 💬",
-            lblFakSupplier: "اسم المورد صاحب الفاتورة", lblFakNum: "رقم الفاتورة", lblFakDate: "تاريخ الفاتورة", lblFakItems: "اختر الصنف المراد إدراجه بالفاتورة"
+            lblFakSupplier: "اسم المورد صاحب الفاتورة", lblFakNum: "رقم الفاتورة", lblFakDate: "تاريخ الفاتورة", lblFakItems: "المنتج المستهدف بالفاتورة"
         }
     };
 
@@ -452,29 +458,6 @@
         }
     }
 
-    function searchCatalogSuggestions(input) {
-        const query = input.value.toLowerCase().trim();
-        const box = document.getElementById('suggestBox');
-        box.innerHTML = '';
-        if(!query) { box.style.display = 'none'; return; }
-
-        const hits = catalog.filter(p => p.name.toLowerCase().includes(query) || (p.barcode && p.barcode.includes(query))).slice(0, 5);
-        if(hits.length > 0) {
-            hits.forEach(p => {
-                const li = document.createElement('li');
-                li.innerText = `[${p.supplier}] ${p.name}`;
-                li.onclick = () => {
-                    loadToForm(p.id);
-                    box.style.display = 'none';
-                };
-                box.appendChild(li);
-            });
-            box.style.display = 'block';
-        } else {
-            box.style.display = 'none';
-        }
-    }
-
     function saveProductToCatalog() {
         const name = document.getElementById('prodName').value.trim();
         if(!name) return;
@@ -516,7 +499,7 @@
 
     function renderCatalogList() {
         const container = document.getElementById('catalogContainer');
-        const query = document.getElementById('searchCatalogBar').value.toLowerCase();
+        const query = document.getElementById('searchCatalogBar').value.toLowerCase().trim();
         container.innerHTML = '';
 
         const filtered = catalog.filter(p => p.name.toLowerCase().includes(query) || (p.barcode && p.barcode.includes(query)));
@@ -530,9 +513,14 @@
                 ${imgEl}
                 <div class="prod-info">
                     <p class="prod-title">${p.name}</p>
-                    <div class="prod-meta">Leverandør: <b>${p.supplier}</b> | Varegruppe: <b>${p.varegruppe}</b></div>
+                    <div class="prod-meta">Leverandør: <b>${p.supplier}</b> | Gruppe: <b>${p.varegruppe}</b></div>
+                    <!-- معلومات إضافية تظهر للموظفين فقط أثناء الطباعة الداخلية -->
+                    <div class="print-only-info">
+                        BC: ${p.barcode || '-'} | Innkjøp: ${(p.cost/p.qty).toFixed(2)} kr | Margin: ${p.margin}
+                    </div>
                     <div class="prod-actions">
                         <button class="action-btn btn-order" onclick="addToOrderList(${p.id})">+ Bestill</button>
+                        <button class="action-btn btn-add-fak" onclick="autoSendToFakturaForm(${p.id})">📄+ الفاتورة</button>
                         <button class="action-btn btn-edit" onclick="loadToForm(${p.id})">Endre</button>
                         <button class="action-btn btn-del" onclick="deleteFromCatalog(${p.id})">X</button>
                     </div>
@@ -558,9 +546,26 @@
         document.getElementById('prodLinkUrl').value = p.link;
         document.getElementById('prodSupplier').value = p.supplier;
         document.getElementById('resFinalPriceInput').value = (p.finalPrice || 0).toFixed(2);
+        
         window.scrollTo({top: 0, behavior: 'smooth'});
         runCalculations(false);
-        applyLanguageStrings();
+        
+        const l = currentLang;
+        document.getElementById('btnSave').innerText = words[l].updateBtn;
+    }
+
+    // ميزة الإضافة الآلية للفاتورة بضغطة زر واحدة
+    function autoSendToFakturaForm(id) {
+        const p = catalog.find(item => item.id === id);
+        if(!p) return;
+        
+        switchTab('faktura');
+        document.getElementById('fakSupplier').value = p.supplier;
+        
+        const select = document.getElementById('fakItemSelect');
+        select.innerHTML = `<option value="${p.id}" selected>${p.name}</option>`;
+        
+        window.scrollTo({top: 0, behavior: 'smooth'});
     }
 
     function addToOrderList(id) {
@@ -603,6 +608,7 @@
 
     function populateFakturaSelect() {
         const select = document.getElementById('fakItemSelect');
+        if(select.value !== "") return; 
         select.innerHTML = '<option value="">-- Velg produkt --</option>';
         catalog.forEach(p => {
             const opt = document.createElement('option');
@@ -618,7 +624,7 @@
         const date = document.getElementById('fakDate').value;
         const itemId = document.getElementById('fakItemSelect').value;
 
-        if(!sup || !num || !itemId) { alert("Vennligست fyll ut alle felter!"); return; }
+        if(!sup || !num || !itemId) { alert("Vennligst fyll ut alle felter!"); return; }
         const prod = catalog.find(p => p.id == itemId);
 
         const unitCost = prod.cost / prod.qty;
@@ -638,6 +644,10 @@
 
         fakturaList.unshift(newFak);
         localStorage.setItem('mr_faktura_v4', JSON.stringify(fakturaList));
+        
+        document.getElementById('fakNumber').value = '';
+        document.getElementById('fakItemSelect').innerHTML = '<option value="">-- Velg produkt --</option>';
+        populateFakturaSelect();
         renderFakturaRecords();
     }
 
@@ -662,7 +672,7 @@
                             <th>Produkt</th>
                             <th>Kost</th>
                             <th>Inntekt/Verdi</th>
-                            <th>Frist/Verdi</th>
+                            <th>Gevinst</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -688,6 +698,17 @@
         }
     }
 
+    // وظيفة التحكم بالطباعة وفصل الهويات
+    function triggerPrint(mode) {
+        document.body.classList.remove('print-mode-kunder', 'print-mode-ansatte');
+        if(mode === 'kunder') {
+            document.body.classList.add('print-mode-kunder');
+        } else {
+            document.body.classList.add('print-mode-ansatte');
+        }
+        window.print();
+    }
+
     function handleCSVImport(e) {
         const file = e.target.files[0];
         if(!file) return;
@@ -699,7 +720,6 @@
                 const cols = lines[i].split(';');
                 if(cols.length >= 2) {
                     let importedGroup = cols[8] ? cols[8].replace(/"/g, '').trim() : 'Tørrvarer';
-                    // إذا كانت المجموعة المستوردة غير موجودة في القائمة، يتم إضافتها تلقائياً لضمان الاستقرار
                     if(!varegrupper.includes(importedGroup)) {
                         varegrupper.push(importedGroup);
                     }
