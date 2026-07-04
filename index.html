@@ -85,10 +85,17 @@
         .faktura-header { display: flex; justify-content: space-between; font-weight: bold; border-bottom: 1px solid #e2e8f0; padding-bottom: 6px; margin-bottom: 6px; font-size: 12px; }
 
         #fileInput { display: none; }
+
+        /* إعدادات طباعة الكشوفات المخصصة لـ A4 ورقة كاملة ونظيفة */
         @media print {
-            body { background: white; padding: 0; }
-            .app-container { box-shadow: none; max-width: 100%; }
-            .top-actions, .nav-tabs, .form-group, .calc-box, .btn-main, .search-box, .prod-actions, .reorder-sticky-bar { display: none !important; }
+            @page { size: A4; margin: 15mm; }
+            body { background: white; padding: 0; color: #000; font-size: 12pt; }
+            .app-container { box-shadow: none; max-width: 100%; width: 100%; padding: 0; }
+            .top-actions, .nav-tabs, .form-group, .calc-box, .btn-main, .search-box, .prod-actions, .reorder-sticky-bar, .btn-del, .scan-btn, .add-grp-btn { display: none !important; }
+            .product-card { border: none; border-bottom: 1px solid #ddd; padding: 12px 0; page-break-inside: avoid; }
+            .prod-price-tag { color: #000 !important; font-size: 14pt; font-weight: bold; }
+            h1 { font-size: 28pt; margin-top: 0; }
+            .subtitle { font-size: 14pt; color: #555 !important; margin-bottom: 30px; }
         }
     </style>
 </head>
@@ -100,7 +107,7 @@
         <label class="btn-import" for="fileInput" id="lblImportBtn">Import CSV</label>
         <input type="file" id="fileInput" accept=".csv" onchange="handleCSVImport(event)">
         <button class="btn-export" onclick="exportBackup()" id="lblExportBtn">Backup</button>
-        <button class="btn-print" onclick="window.print()" id="lblPrintBtn">Print 🖨️</button>
+        <button class="btn-print" onclick="window.print()" id="lblPrintBtn">Prisliste 🖨️</button>
     </div>
 
     <h1>Mr intl</h1>
@@ -244,33 +251,33 @@
         </div>
     </div>
 
-    <!-- ================== شاشة الفواتير الجديدة بالكامل (FAKTURALISTE) ================== -->
+    <!-- ================== شاشة الفواتير الاحترافية (FAKTURALISTE) ================== -->
     <div id="sectionFaktura" class="page-section">
         <div class="form-group">
-            <label id="lblFakSupplier">Leverandørnavn (المورد)</label>
+            <label id="lblFakSupplier">Leverandørnavn</label>
             <input type="text" id="fakSupplier" placeholder="F.eks. Afro kjøp as">
         </div>
         <div class="row">
             <div class="col">
                 <div class="form-group">
-                    <label id="lblFakNum">Fakturanummer (رقم الفاتورة)</label>
+                    <label id="lblFakNum">Fakturanummer</label>
                     <input type="text" id="fakNumber" placeholder="Fak #">
                 </div>
             </div>
             <div class="col">
                 <div class="form-group">
-                    <label id="lblFakDate">Dato (التاريخ)</label>
+                    <label id="lblFakDate">Dato</label>
                     <input type="date" id="fakDate">
                 </div>
             </div>
         </div>
         <div class="form-group">
-            <label id="lblFakItems">Legg til produkt fra katalogen (اختر صنف الفاتورة)</label>
+            <label id="lblFakItems">Legg til produkt fra katalogen</label>
             <select id="fakItemSelect">
                 <option value="">-- Velg produkt --</option>
             </select>
         </div>
-        <button class="btn-main" style="background:#475569;" id="btnNewInvoice" onclick="createNewInvoice()">Opprett Faktura (إدخال الفاتورة للجدول)</button>
+        <button class="btn-main" style="background:#475569;" id="btnNewInvoice" onclick="createNewInvoice()">Opprett Faktura</button>
         
         <div style="margin-top: 20px;" id="fakturaRecordsContainer"></div>
     </div>
@@ -280,7 +287,7 @@
     let html5QrcodeScanner = null;
     let activeScanTarget = '';
 
-    // قائمة المجموعات الأساسية مع دعم إضافة يدوي وإضافة خضار تلقائياً
+    // المجموعات الأساسية المستقرة والتلقائية
     let varegrupper = JSON.parse(localStorage.getItem('mr_varegrupper')) || ["Tørrvarer", "Drikke", "Kosmetikk", "Ferskvarer", "Grønnsaker", "Andre"];
     
     let catalog = JSON.parse(localStorage.getItem('mr_catalog_v4')) || [
@@ -523,7 +530,7 @@
                 ${imgEl}
                 <div class="prod-info">
                     <p class="prod-title">${p.name}</p>
-                    <div class="prod-meta">Leverandør: <b>${p.supplier}</b> | BC: ${p.barcode || 'Ingen'}</div>
+                    <div class="prod-meta">Leverandør: <b>${p.supplier}</b> | Varegruppe: <b>${p.varegruppe}</b></div>
                     <div class="prod-actions">
                         <button class="action-btn btn-order" onclick="addToOrderList(${p.id})">+ Bestill</button>
                         <button class="action-btn btn-edit" onclick="loadToForm(${p.id})">Endre</button>
@@ -560,7 +567,7 @@
         const p = catalog.find(item => item.id === id);
         if(!p) return;
         if(!orderList.find(o => o.catalogId === id)) {
-            orderList.push({ id: Date.now(), catalogId: p.id, name: p.name, supplier: p.supplier, esker: 1 });
+            orderList.push({ id: Date.now(), catalogId: p.id, name: p.name, supplier: p.supplier, antall: 1 });
             localStorage.setItem('mr_orders_v4', JSON.stringify(orderList));
             document.getElementById('orderBadge').innerText = `(${orderList.length})`;
         }
@@ -579,7 +586,7 @@
                     <p class="prod-title">${o.name}</p>
                     <div class="prod-meta">Leverandør: <b>${o.supplier}</b></div>
                     <div class="prod-meta" style="margin-top:5px;">
-                        Esker: <input type="number" class="order-qty-input" value="${o.esker}" min="1" oninput="o.esker=parseInt(this.value);localStorage.setItem('mr_orders_v4', JSON.stringify(orderList));">
+                        Antall: <input type="number" class="order-qty-input" value="${o.antall}" min="1" oninput="o.antall=parseInt(this.value);localStorage.setItem('mr_orders_v4', JSON.stringify(orderList));">
                     </div>
                 </div>
                 <button class="action-btn btn-del" onclick="orderList=orderList.filter(item=>item.id!==${o.id});localStorage.setItem('mr_orders_v4', JSON.stringify(orderList));renderOrderList();applyLanguageStrings();">X</button>
@@ -590,11 +597,10 @@
 
     function sendOrderViaWhatsApp() {
         let text = "*Varebestilling:*\n\n";
-        orderList.forEach((o, i) => { text += `${i+1}. ${o.name} (${o.supplier}) -> *${o.esker}* esker\n`; });
+        orderList.forEach((o, i) => { text += `${i+1}. ${o.name} (${o.supplier}) -> *${o.antall}*\n`; });
         window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
     }
 
-    // ================== منطق شاشة الفواتير الاحترافي ==================
     function populateFakturaSelect() {
         const select = document.getElementById('fakItemSelect');
         select.innerHTML = '<option value="">-- Velg produkt --</option>';
@@ -612,7 +618,7 @@
         const date = document.getElementById('fakDate').value;
         const itemId = document.getElementById('fakItemSelect').value;
 
-        if(!sup || !num || !itemId) { alert("Vennligst fyll ut alle felter!"); return; }
+        if(!sup || !num || !itemId) { alert("Vennligست fyll ut alle felter!"); return; }
         const prod = catalog.find(p => p.id == itemId);
 
         const unitCost = prod.cost / prod.qty;
@@ -692,11 +698,16 @@
                 if(!lines[i].trim()) continue;
                 const cols = lines[i].split(';');
                 if(cols.length >= 2) {
+                    let importedGroup = cols[8] ? cols[8].replace(/"/g, '').trim() : 'Tørrvarer';
+                    // إذا كانت المجموعة المستوردة غير موجودة في القائمة، يتم إضافتها تلقائياً لضمان الاستقرار
+                    if(!varegrupper.includes(importedGroup)) {
+                        varegrupper.push(importedGroup);
+                    }
                     catalog.push({
                         id: Date.now() + Math.random(),
                         name: cols[1].replace(/"/g, '').trim(),
                         barcode: cols[0] ? cols[0].replace(/"/g, '').trim() : '',
-                        varegruppe: cols[8] ? cols[8].replace(/"/g, '').trim() : 'Tørrvarer',
+                        varegruppe: importedGroup,
                         supplier: cols[9] ? cols[9].replace(/"/g, '').trim() : 'Afro kjøp as',
                         cost: cols[4] ? parseFloat(cols[4].replace(',', '.')) : 0,
                         qty: 1, margin: 1.5, mva: 0.15, img: '', link: '',
@@ -705,7 +716,8 @@
                 }
             }
             localStorage.setItem('mr_catalog_v4', JSON.stringify(catalog));
-            renderCatalogList();
+            localStorage.setItem('mr_varegrupper', JSON.stringify(varegrupper));
+            applyLanguageStrings();
             alert("Importert OK!");
         };
         reader.readAsText(file, "UTF-8");
