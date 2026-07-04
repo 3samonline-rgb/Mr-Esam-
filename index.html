@@ -692,7 +692,7 @@
         window.print();
     }
 
-    // الدالة الفائقة والذكية لمعالجة وتخطي الأسطر العشوائية وقراءة ملف الـ CSV الحقيقي بثبات
+    // الدالة الذكية والمطورة بالكامل لفك وتحليل ملفك بشكل دقيق وثابت
     function handleCSVImport(e) {
         const file = e.target.files[0];
         if(!file) return;
@@ -700,74 +700,59 @@
         reader.onload = function(evt) {
             const content = evt.target.result;
             
-            // تحديد الفاصلة المستخدمة تلقائياً
-            let delimiter = ";";
-            if (!content.includes(";") && content.includes(",")) {
-                delimiter = ",";
-            }
-            
+            // تقسيم الملف إلى أسطر
             const lines = content.split('\n');
+            if (lines.length < 1) { alert("Filen er tom!"); return; }
+
+            // الترويسة الفعلية دائماً بالسطر الأول في بنيتك الجديدة
+            let headers = lines[0].toLowerCase().split(';').map(h => h.replace(/"/g, '').trim());
             
-            // 1. البحث عن السطر الحقيقي الذي يحتوي على ترويسة الأعمدة
-            let headerRowIndex = -1;
-            for(let i = 0; i < lines.length; i++) {
-                let checkLine = lines[i].toLowerCase();
-                if(checkLine.includes('navn') || checkLine.includes('varenummer') || checkLine.includes('strekkode')) {
-                    headerRowIndex = i;
-                    break;
-                }
-            }
-
-            // إذا لم يجد ترويسة واضحة، نفترض أنه السطر الأول
-            if (headerRowIndex === -1) headerRowIndex = 0;
-
-            let headers = lines[headerRowIndex].toLowerCase().split(delimiter).map(h => h.replace(/"/g, '').trim());
-            
-            // ربط الأعمدة بالفهارس بشكل ديناميكي كامل
-            let idxBarcode = headers.findIndex(h => h.includes('strekkode') || h.includes('barcode'));
-            let idxVarenummer = headers.findIndex(h => h.includes('varenummer'));
-            let idxName = headers.findIndex(h => h.includes('navn') || h.includes('name') || h.includes('produkt'));
-            let idxCost = headers.findIndex(h => h.includes('innkjoepspris') || h.includes('cost') || h.includes('kjøpspris'));
-            let idxVaregruppe = headers.findIndex(h => h.includes('varegruppe') || h.includes('group') || h.includes('kategori'));
-            let idxSupplier = headers.findIndex(h => h.includes('leverandoer') || h.includes('supplier'));
-            let idxMva = headers.findIndex(h => h.includes('mva_prosent') || h.includes('mva'));
-            let idxPrice = headers.findIndex(h => h.includes('pris_inkl_mva') || h.includes('utsalgpris') || h.includes('price'));
-
-            // تأمين الفهارس الأساسية في حال فقدانها
-            if(idxName === -1) idxName = 1;
+            let idxVarenummer = headers.indexOf('varenummer');
+            let idxNavn = headers.indexOf('navn');
+            let idxCost = headers.indexOf('innkjoepspris');
+            let idxVaregruppe = headers.indexOf('varegruppe');
+            let idxSupplier = headers.indexOf('leverandoer');
+            let idxMva = headers.indexOf('mva_prosent');
+            let idxPrice = headers.indexOf('pris_inkl_mva');
 
             let count = 0;
-            // نبدأ القراءة الفعلية من السطر الذي يلي الترويسة مباشرة
-            for(let i = headerRowIndex + 1; i < lines.length; i++) {
+
+            for(let i = 1; i < lines.length; i++) {
                 let currentLine = lines[i].trim();
                 if(!currentLine) continue;
                 
-                let cols = currentLine.split(delimiter);
-                if(cols.length <= idxName) continue;
+                // استخدام تقسيم دقيق يتعامل مع الفاصلة المنقوطة
+                let cols = currentLine.split(';');
+                if(cols.length <= 1) continue;
 
-                let name = cols[idxName] ? cols[idxName].replace(/"/g, '').trim() : '';
+                // تنظيف اسم المنتج تماماً من علامات الاقتباس الخارجية والداخلية
+                let rawName = cols[idxNavn] ? cols[idxNavn].trim() : '';
+                if (rawName.startsWith('"') && rawName.endsWith('"')) {
+                    rawName = rawName.substring(1, rawName.length - 1);
+                }
+                let name = rawName.replace(/""/g, '"').trim();
                 if(!name) continue;
 
-                // إذا كان عمود الباركود فارغاً، نحاول سحب القيمة من عمود رقم السلعة (Varenummer)
-                let barcode = '';
-                if (idxBarcode !== -1 && cols[idxBarcode]) {
-                    barcode = cols[idxBarcode].replace(/"/g, '').trim();
-                }
-                if (!barcode && idxVarenummer !== -1 && cols[idxVarenummer]) {
-                    barcode = cols[idxVarenummer].replace(/"/g, '').trim();
-                }
+                // استخلاص الباركود ديناميكياً من حقل varenummer إذا كان طويلاً
+                let rawVarenummer = cols[idxVarenummer] ? cols[idxVarenummer].replace(/"/g, '').trim() : '';
+                let barcode = rawVarenummer;
 
                 let importedGroup = idxVaregruppe !== -1 && cols[idxVaregruppe] ? cols[idxVaregruppe].replace(/"/g, '').trim() : 'Tørrvarer';
-                let supplier = idxSupplier !== -1 && cols[idxSupplier] ? cols[idxSupplier].replace(/"/g, '').trim() : 'Afro kjøp as';
                 
-                // تنظيف ومعالجة الأرقام والأسعار لتفادي قيم NaN
+                let rawSupplier = idxSupplier !== -1 && cols[idxSupplier] ? cols[idxSupplier].trim() : 'Afro kjøp as';
+                if (rawSupplier.startsWith('"') && rawSupplier.endsWith('"')) {
+                    rawSupplier = rawSupplier.substring(1, rawSupplier.length - 1);
+                }
+                let supplier = rawSupplier.trim() || 'Afro kjøp as';
+                
+                // معالجة أسعار التكلفة والمبيعات الأوروبية (تحويل , إلى .) لمنع أخطاء NaN
                 let rawCost = idxCost !== -1 && cols[idxCost] ? cols[idxCost].replace(/"/g, '').replace(',', '.').trim() : '0';
                 let cost = parseFloat(rawCost) || 0;
 
                 let rawPrice = idxPrice !== -1 && cols[idxPrice] ? cols[idxPrice].replace(/"/g, '').replace(',', '.').trim() : '0';
                 let finalPrice = parseFloat(rawPrice) || 0;
                 
-                let rawMva = idxMva !== -1 && cols[idxMva] ? cols[idxMva].replace(/"/g, '').replace('%','').trim() : '15';
+                let rawMva = idxMva !== -1 && cols[idxMva] ? cols[idxMva].replace(/"/g, '').trim() : '15';
                 let mvaPercent = parseFloat(rawMva) || 15;
                 let mvaVal = mvaPercent === 25 ? 0.25 : (mvaPercent === 15 ? 0.15 : 0);
 
@@ -775,7 +760,7 @@
                     varegrupper.push(importedGroup);
                 }
 
-                // منع تكرار نفس المنتج داخل الكتالوج المحفوظ
+                // تجنب التكرار داخل الكتالوج
                 catalog = catalog.filter(p => p.name !== name && (barcode === "" || p.barcode !== barcode));
 
                 catalog.push({
