@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Bestilling & Vareliste App</title>
+    <title>BestillingApp</title>
+    <!-- تضمين مكتبة مسح الباركود عبر الكاميرا -->
+    <script src="https://unpkg.com/html5-qrcode"></script>
     <style>
         * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
         body { background-color: #f8fafc; margin: 0; padding: 10px; color: #1e293b; -webkit-tap-highlight-color: transparent; }
@@ -17,10 +19,10 @@
         .top-actions { display: flex; gap: 6px; margin-bottom: 16px; }
         .top-actions button, .file-label { flex: 1; padding: 8px; border: none; border-radius: 8px; font-size: 11px; font-weight: bold; cursor: pointer; color: white; text-align: center; display: inline-block; }
         .btn-lang { background: #3b82f6; }
-        .btn-import { background: #059669; }
+        .btn-import { background: #10b981; }
         .btn-export { background: #475569; }
         
-        h1 { font-size: 22px; font-weight: 800; text-align: center; margin: 0 0 2px 0; color: #0f172a; }
+        h1 { font-size: 24px; font-weight: 800; text-align: center; margin: 0 0 2px 0; color: #0f172a; }
         .subtitle { font-size: 11px; font-weight: 700; color: #10b981; text-align: center; margin-bottom: 16px; text-transform: uppercase; letter-spacing: 0.5px; }
         
         .page-section { display: none; }
@@ -28,9 +30,18 @@
         
         .form-group { background: #f1f5f9; padding: 10px; border-radius: 10px; margin-bottom: 8px; border: 1px solid #e2e8f0; text-align: left; position: relative; }
         label { font-size: 11px; font-weight: bold; color: #64748b; display: block; margin-bottom: 4px; }
+        
+        .input-with-btn { display: flex; gap: 6px; }
         input, select { width: 100%; padding: 8px 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 14px; background: white; color: #0f172a; }
         input:focus, select:focus { border-color: #10b981; outline: none; }
         
+        .scan-btn { background: #0284c7; color: white; border: none; padding: 0 12px; border-radius: 6px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 13px; }
+        
+        /* شاشة الكاميرا للمسح */
+        #scanner-container { display: none; background: #000; border-radius: 12px; overflow: hidden; margin-bottom: 12px; position: relative; }
+        #scanner-view { width: 100%; min-height: 250px; }
+        .close-scan-btn { position: absolute; top: 10px; right: 10px; background: #ef4444; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-weight: bold; z-index: 10; cursor: pointer; }
+
         /* قائمة اقتراحات البحث السريع للموبايل */
         .suggestions-list { position: absolute; top: 100%; left: 0; width: 100%; background: white; border: 1px solid #cbd5e1; border-radius: 0 0 8px 8px; max-height: 200px; overflow-y: auto; z-index: 100; box-shadow: 0 4px 12px rgba(0,0,0,0.1); display: none; padding: 0; margin: 0; list-style: none; }
         .suggestions-list li { padding: 10px; font-size: 13px; border-bottom: 1px solid #f1f5f9; cursor: pointer; text-align: left; }
@@ -52,8 +63,8 @@
         .product-card { background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 10px; margin-bottom: 8px; display: flex; gap: 10px; align-items: center; position: relative; }
         .prod-img { width: 50px; height: 50px; border-radius: 6px; object-fit: cover; background: #e2e8f0; border: 1px solid #cbd5e1; }
         .prod-info { flex: 1; min-width: 0; text-align: left; }
-        .prod-title { font-weight: 700; font-size: 13px; margin: 0; color: #0f172a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .prod-meta { font-size: 11px; color: #64748b; margin-top: 2px; }
+        .prod-title { font-weight: 700; font-size: 13px; margin: 0; color: #0f172a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: left; }
+        .prod-meta { font-size: 11px; color: #64748b; margin-top: 2px; text-align: left; }
         .prod-actions { display: flex; gap: 6px; margin-top: 6px; }
         .action-btn { border: none; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; cursor: pointer; color: white; }
         .btn-edit { background: #ea580c; }
@@ -79,20 +90,31 @@
         <button class="btn-export" onclick="exportBackup()" id="lblExportBtn">Backup 📤</button>
     </div>
 
-    <h1 id="appTitle">Pris & Bestilling</h1>
-    <div class="subtitle">Vareliste & Ordreliste System</div>
+    <h1>BestillingApp</h1>
+    <div class="subtitle" id="appSub">Vareliste & Ordreliste System</div>
 
+    <!-- منطقة الكاميرا والماسح الضوئي -->
+    <div id="scanner-container">
+        <button class="close-scan-btn" onclick="stopScanner()">X</button>
+        <div id="scanner-view"></div>
+    </div>
+
+    <!-- التبديل بين الشاشات للموبايل -->
     <div class="nav-tabs">
         <button class="tab-btn active" id="tabVarelisteBtn" onclick="switchTab('vareliste')">Vareliste (المنتجات)</button>
         <button class="tab-btn" id="tabOrdrelisteBtn" onclick="switchTab('ordreliste')">Ordreliste (الطلبيات) <span id="orderBadge">(0)</span></button>
     </div>
 
+    <!-- ================== شاشة إدارة البضائع والأسعار (VARELISTE) ================== -->
     <div id="sectionVareliste" class="page-section active">
         <input type="hidden" id="editId" value="">
         
         <div class="form-group">
-            <label id="lblProdName">Produktnavn / Strekkode</label>
-            <input type="text" id="prodName" placeholder="Søk eller skriv inn navn..." oninput="searchCatalogSuggestions(this)" autocomplete="off">
+            <label id="lblProdName">Produktnavn / Søk</label>
+            <div class="input-with-btn">
+                <input type="text" id="prodName" placeholder="Søk eller skriv inn navn..." oninput="searchCatalogSuggestions(this)" autocomplete="off">
+                <button class="scan-btn" onclick="startScanner('prodName')">Scan 📷</button>
+            </div>
             <ul id="suggestBox" class="suggestions-list"></ul>
         </div>
 
@@ -100,7 +122,10 @@
             <div class="col">
                 <div class="form-group">
                     <label id="lblBarcode">Strekkode</label>
-                    <input type="text" id="prodBarcode" placeholder="Barcode">
+                    <div class="input-with-btn">
+                        <input type="text" id="prodBarcode" placeholder="Barcode">
+                        <button class="scan-btn" onclick="startScanner('prodBarcode')">Scan 📷</button>
+                    </div>
                 </div>
             </div>
             <div class="col">
@@ -195,6 +220,7 @@
         </div>
     </div>
 
+    <!-- ================== شاشة سجل الطلبيات الحالية للموردين (ORDRELISTE) ================== -->
     <div id="sectionOrdreliste" class="page-section">
         <input type="text" id="searchOrderBar" class="search-box" placeholder="Søk i ordreliste..." oninput="renderOrderList()">
         
@@ -211,28 +237,30 @@
 </div>
 
 <script>
+    let html5QrcodeScanner = null;
+    let activeScanTarget = '';
+
     // كتالوج المنتجات الأساسي
-    let catalog = JSON.parse(localStorage.getItem('mr_intl_catalog')) || [
+    let catalog = JSON.parse(localStorage.getItem('mr_catalog_v3')) || [
         { id: 1, name: "Trs Dalchini Cinamon Whole 50g", barcode: "5017689012137", varegruppe: "Tørrvarer", cost: 0, qty: 1, margin: 1.5, mva: 0.25, supplier: "Norbygate as", img: "", link: "", finalPrice: 19.9 },
-        { id: 2, name: "ginger", barcode: "5017689002565", varegruppe: "Tørrvarer", cost: 15.47, qty: 1, margin: 1.5, mva: 0, supplier: "Norbygate as", img: "", link: "", finalPrice: 25 },
-        { id: 3, name: "Cola", barcode: "5578", varegruppe: "Drikke", cost: 12.36, qty: 1, margin: 1.5, mva: 0.15, supplier: "Afro kjøp as", img: "", link: "", finalPrice: 25 }
+        { id: 2, name: "ginger", barcode: "5017689002565", varegruppe: "Tørrvarer", cost: 15.47, qty: 1, margin: 1.5, mva: 0, supplier: "Norbygate as", img: "", link: "", finalPrice: 25 }
     ];
 
-    let orderList = JSON.parse(localStorage.getItem('mr_intl_orders_v2')) || [];
+    let orderList = JSON.parse(localStorage.getItem('mr_orders_v3')) || [];
     let currentLang = localStorage.getItem('mr_intl_lang') || 'no';
 
     const words = {
         no: {
-            title: "Pris & Bestilling", varelisteTab: "Vareliste (المنتجات)", ordrelisteTab: "Ordreliste (الطلبيات)",
-            prodName: "Produktnavn", barcode: "Strekkode", varegruppe: "Varegruppe", cost: "Innkjøpspris (Total)",
+            varelisteTab: "Vareliste (المنتجات)", ordrelisteTab: "Ordreliste (الطلبيات)",
+            prodName: "Produktnavn / Søk", barcode: "Strekkode", varegruppe: "Varegruppe", cost: "Innkjøpspris (Total)",
             qty: "Antall i eske", imgUrl: "Bilde URL", prodUrl: "Produkt URL", supplier: "Leverandør",
             saveBtn: "Lagre produkt (Enter ↵)", updateBtn: "Oppdater produkt", searchPlh: "Søk i vareliste...",
             c1: "Kost per enhet", c2: "Utsalgspris Eks MVA", c3: "Utsalgspris (Ink MVA):", c4: "Fortjeneste:",
             totalValgt: "Totalt valgt:"
         },
         ar: {
-            title: "قائمة المنتجات والطلبيات", varelisteTab: "شاشة البضائع والأسعار", ordrelisteTab: "سجل الطلبيات الحالي",
-            prodName: "اسم المنتج", barcode: "الباركود (Strekkode)", varegruppe: "المجموعة (Varegruppe)", cost: "سعر الشراء الإجمالي للفاتورة",
+            varelisteTab: "شاشة البضائع والأسعار", ordrelisteTab: "سجل الطلبيات الحالي",
+            prodName: "اسم المنتج أو حقل البحث سريع", barcode: "الباركود (Strekkode)", varegruppe: "المجموعة (Varegruppe)", cost: "سعر الشراء الإجمالي للفاتورة",
             qty: "الكمية داخل الكرتونة", imgUrl: "رابط صورة المنتج", prodUrl: "رابط صفحة المنتج", supplier: "Leverandør (المورد)",
             saveBtn: "إدخال وحفظ المنتج في الكتالوج", updateBtn: "تحديث وتعديل بيانات المنتج", searchPlh: "ابحث عن أي منتج هنا بالاسم أو الباركود...",
             c1: "سعر القطعة المفردة", c2: "سعر البيع قبل الضريبة", c3: "سعر البيع النهائي (مع الضريبة):", c4: "صافي الربح المتوقع:",
@@ -262,7 +290,6 @@
 
     function applyLanguageStrings() {
         const l = currentLang;
-        document.getElementById('appTitle').innerText = words[l].title;
         document.getElementById('tabVarelisteBtn').innerText = words[l].varelisteTab;
         document.getElementById('lblProdName').innerText = words[l].prodName;
         document.getElementById('lblBarcode').innerText = words[l].barcode;
@@ -311,6 +338,42 @@
         document.getElementById('resProfit').innerText = profit.toFixed(2) + " kr";
     }
 
+    function startScanner(targetInputId) {
+        activeScanTarget = targetInputId;
+        document.getElementById('scanner-container').style.display = 'block';
+        
+        if(html5QrcodeScanner === null) {
+            html5QrcodeScanner = new Html5Qrcode("scanner-view");
+        }
+        
+        html5QrcodeScanner.start(
+            { facingMode: "environment" },
+            { fps: 10, qrbox: { width: 250, height: 150 } },
+            (decodedText) => {
+                document.getElementById(activeScanTarget).value = decodedText;
+                stopScanner();
+                if(activeScanTarget === 'prodName' || activeScanTarget === 'prodBarcode') {
+                    // إذا مسحنا الباركود في خانة البحث نقوم بالبحث الفوري
+                    let match = catalog.find(p => p.barcode === decodedText);
+                    if(match) {
+                        loadToForm(match.id);
+                    } else {
+                        document.getElementById('prodBarcode').value = decodedText;
+                    }
+                }
+            },
+            (errorMessage) => { /* الفحص مستمر */ }
+        ).catch((err) => { alert("Kamerafeil: " + err); });
+    }
+
+    function stopScanner() {
+        if(html5QrcodeScanner) {
+            html5QrcodeScanner.stop().then(() => {
+                document.getElementById('scanner-container').style.display = 'none';
+            });
+        }
+    }
+
     function searchCatalogSuggestions(input) {
         const query = input.value.toLowerCase().trim();
         const box = document.getElementById('suggestBox');
@@ -323,21 +386,8 @@
                 const li = document.createElement('li');
                 li.innerText = `[${p.supplier || 'Ukjent'}] ${p.name}`;
                 li.onclick = () => {
-                    document.getElementById('editId').value = p.id;
-                    document.getElementById('prodName').value = p.name;
-                    document.getElementById('prodBarcode').value = p.barcode || '';
-                    document.getElementById('prodVaregruppe').value = p.varegruppe || 'Tørrvarer';
-                    document.getElementById('prodCost').value = p.cost || '';
-                    document.getElementById('prodQty').value = p.qty || 1;
-                    document.getElementById('prodMargin').value = p.margin || 1.5;
-                    document.getElementById('prodMva').value = p.mva || 0.15;
-                    document.getElementById('prodImgUrl').value = p.img || '';
-                    document.getElementById('prodLinkUrl').value = p.link || '';
-                    document.getElementById('prodSupplier').value = p.supplier || '';
-                    document.getElementById('resFinalPriceInput').value = (p.finalPrice || 0).toFixed(2);
+                    loadToForm(p.id);
                     box.style.display = 'none';
-                    runCalculations(false);
-                    applyLanguageStrings();
                 };
                 box.appendChild(li);
             });
@@ -374,7 +424,7 @@
             catalog.unshift(pData);
         }
 
-        localStorage.setItem('mr_catalog', JSON.stringify(catalog));
+        localStorage.setItem('mr_catalog_v3', JSON.stringify(catalog));
         
         // تصفير سريع للخانات
         document.getElementById('prodName').value = '';
@@ -400,7 +450,7 @@
                 supplier: p.supplier,
                 esker: 1
             });
-            localStorage.setItem('mr_intl_orders_v2', JSON.stringify(orderList));
+            localStorage.setItem('mr_orders_v3', JSON.stringify(orderList));
             document.getElementById('orderBadge').innerText = `(${orderList.length})`;
             alert(`${p.name} lagt til i ordreliste!`);
         } else {
@@ -411,7 +461,7 @@
     function deleteFromCatalog(id) {
         if(confirm("Slette fra vareliste?")) {
             catalog = catalog.filter(p => p.id !== id);
-            localStorage.setItem('mr_catalog', JSON.stringify(catalog));
+            localStorage.setItem('mr_catalog_v3', JSON.stringify(catalog));
             renderCatalogList();
         }
     }
@@ -433,7 +483,7 @@
                 ${imgEl}
                 <div class="prod-info">
                     <p class="prod-title">${p.name}</p>
-                    <div class="prod-meta">Leverandør: <b>${p.supplier}</b> | Gr: ${p.varegruppe}</div>
+                    <div class="prod-meta">Leverandør: <b>${p.supplier}</b> | BC: ${p.barcode || 'Ingen'}</div>
                     ${p.link ? `<div class="prod-meta"><a href="${p.link}" target="_blank" style="color:#3b82f6;">Se produktlenke 🔗</a></div>` : ''}
                     <div class="prod-actions">
                         <button class="action-btn btn-order" onclick="addToOrderList(${p.id})">+ Bestill🛒</button>
@@ -471,13 +521,13 @@
         const o = orderList.find(item => item.id === id);
         if(o) {
             o.esker = parseInt(val) || 1;
-            localStorage.setItem('mr_intl_orders_v2', JSON.stringify(orderList));
+            localStorage.setItem('mr_orders_v3', JSON.stringify(orderList));
         }
     }
 
     function removeFromOrder(id) {
         orderList = orderList.filter(o => o.id !== id);
-        localStorage.setItem('mr_intl_orders_v2', JSON.stringify(orderList));
+        localStorage.setItem('mr_orders_v3', JSON.stringify(orderList));
         document.getElementById('orderBadge').innerText = `(${orderList.length})`;
         renderOrderList();
     }
@@ -512,10 +562,7 @@
 
     function sendOrderViaWhatsApp() {
         if(orderList.length === 0) { alert("Ordrelisten er tom!"); return; }
-        
         let text = "*Varebestilling / الطلبية الجديدة:*\n\n";
-        
-        // تجميع المنتجات حسب الموردين تلقائياً
         const groups = {};
         orderList.forEach(o => {
             if(!groups[o.supplier]) groups[o.supplier] = [];
@@ -529,43 +576,62 @@
             });
             text += `\n`;
         }
-
         window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
     }
 
+    // فك تشفير وقراءة الملف الجديد الذي يستخدم الفاصلة المنقوطة (;)
     function handleCSVImport(e) {
         const file = e.target.files[0];
         if(!file) return;
         const reader = new FileReader();
         reader.onload = function(evt) {
             const lines = evt.target.result.split('\n');
-            // تخطي السطر الأول (العناوين) والبدء بالدمج
+            let addedCount = 0;
+            
             for(let i = 1; i < lines.length; i++) {
                 if(!lines[i].trim()) continue;
-                const cols = lines[i].split(',');
-                if(cols.length >= 3) {
+                
+                // التقسيم بالاعتماد على الفاصلة المنقوطة لمنع التداخل
+                const cols = lines[i].split(';');
+                if(cols.length >= 2) {
+                    const barcodeRaw = cols[0] ? cols[0].replace(/"/g, '').trim() : '';
+                    const nameRaw = cols[1] ? cols[1].replace(/"/g, '').trim() : '';
+                    
+                    if(!nameRaw) continue; // تخطي السطور الفارغة
+                    
+                    let costRaw = cols[4] ? parseFloat(cols[4].replace(',', '.')) : 0;
+                    let mvaPercent = cols[10] ? parseFloat(cols[10]) / 100 : 0.15;
+                    let finalPriceRaw = cols[12] ? parseFloat(cols[12].replace(',', '.')) : 0;
+                    
                     catalog.push({
                         id: Date.now() + Math.random(),
-                        name: cols[2].replace(/"/g, '').trim(),
-                        barcode: cols[1] ? cols[1].trim() : '',
-                        varegruppe: cols[3] ? cols[3].trim() : 'Tørrvarer',
-                        supplier: cols[4] ? cols[4].trim() : 'Ukjent',
-                        cost: 0, qty: 1, margin: 1.5, mva: 0.15, img: '', link: '', finalPrice: 0
+                        name: nameRaw,
+                        barcode: barcodeRaw,
+                        varegruppe: cols[8] ? cols[8].replace(/"/g, '').trim() : 'Tørrvarer',
+                        supplier: cols[9] ? cols[9].replace(/"/g, '').trim() : 'Afro kjøp as',
+                        cost: isNaN(costRaw) ? 0 : costRaw,
+                        qty: 1,
+                        margin: 1.5,
+                        mva: isNaN(mvaPercent) ? 0.15 : mvaPercent,
+                        img: '',
+                        link: '',
+                        finalPrice: isNaN(finalPriceRaw) ? 0 : finalPriceRaw
                     });
+                    addedCount++;
                 }
             }
-            localStorage.setItem('mr_catalog', JSON.stringify(catalog));
-            alert("تم استيراد الكتالوج بنجاح وتحديث الكشوفات!");
+            localStorage.setItem('mr_catalog_v3', JSON.stringify(catalog));
+            alert(currentLang === 'ar' ? `تم استيراد ${addedCount} منتج بنجاح وبشكل صحيح!` : `Importert ${addedCount} produkter suksessfullt!`);
             renderCatalogList();
         };
-        reader.readAsText(file);
+        reader.readAsText(file, "UTF-8");
     }
 
     function exportBackup() {
         const str = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(catalog));
         const dl = document.createElement('a');
         dl.setAttribute("href", str);
-        dl.setAttribute("download", "vareliste_backup.json");
+        dl.setAttribute("download", "BestillingApp_backup.json");
         document.body.appendChild(dl);
         dl.click();
         dl.remove();
