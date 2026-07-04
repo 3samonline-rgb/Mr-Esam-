@@ -692,19 +692,17 @@
         window.print();
     }
 
-    // الدالة الذكية والمطورة بالكامل لفك وتحليل ملفك بشكل دقيق وثابت
+    // الدالة الاحترافية والمعدلة خصيصاً لبنية ملف الـ CSV الفعلي
     function handleCSVImport(e) {
         const file = e.target.files[0];
         if(!file) return;
         const reader = new FileReader();
         reader.onload = function(evt) {
             const content = evt.target.result;
-            
-            // تقسيم الملف إلى أسطر
             const lines = content.split('\n');
             if (lines.length < 1) { alert("Filen er tom!"); return; }
 
-            // الترويسة الفعلية دائماً بالسطر الأول في بنيتك الجديدة
+            // الترويسة الفعلية بالسطر الأول
             let headers = lines[0].toLowerCase().split(';').map(h => h.replace(/"/g, '').trim());
             
             let idxVarenummer = headers.indexOf('varenummer');
@@ -717,42 +715,32 @@
 
             let count = 0;
 
+            // البدء بالمعالجة من السطر الثاني فوراً
             for(let i = 1; i < lines.length; i++) {
                 let currentLine = lines[i].trim();
                 if(!currentLine) continue;
                 
-                // استخدام تقسيم دقيق يتعامل مع الفاصلة المنقوطة
                 let cols = currentLine.split(';');
                 if(cols.length <= 1) continue;
 
-                // تنظيف اسم المنتج تماماً من علامات الاقتباس الخارجية والداخلية
-                let rawName = cols[idxNavn] ? cols[idxNavn].trim() : '';
-                if (rawName.startsWith('"') && rawName.endsWith('"')) {
-                    rawName = rawName.substring(1, rawName.length - 1);
-                }
-                let name = rawName.replace(/""/g, '"').trim();
+                // تنظيف اسم المنتج تماماً من أي علامات اقتباس محيطة
+                let name = cols[idxNavn] ? cols[idxNavn].replace(/^"|"$/g, '').trim() : '';
                 if(!name) continue;
 
-                // استخلاص الباركود ديناميكياً من حقل varenummer إذا كان طويلاً
-                let rawVarenummer = cols[idxVarenummer] ? cols[idxVarenummer].replace(/"/g, '').trim() : '';
-                let barcode = rawVarenummer;
+                // استخلاص الباركود (حقل varenummer بالملف يمثل الباركود الفعلي)
+                let barcode = cols[idxVarenummer] ? cols[idxVarenummer].replace(/"/g, '').trim() : '';
 
-                let importedGroup = idxVaregruppe !== -1 && cols[idxVaregruppe] ? cols[idxVaregruppe].replace(/"/g, '').trim() : 'Tørrvarer';
+                let importedGroup = (idxVaregruppe !== -1 && cols[idxVaregruppe]) ? cols[idxVaregruppe].replace(/"/g, '').trim() : 'Tørrvarer';
+                let supplier = (idxSupplier !== -1 && cols[idxSupplier]) ? cols[idxSupplier].replace(/^"|"$/g, '').trim() : 'Afro kjøp as';
                 
-                let rawSupplier = idxSupplier !== -1 && cols[idxSupplier] ? cols[idxSupplier].trim() : 'Afro kjøp as';
-                if (rawSupplier.startsWith('"') && rawSupplier.endsWith('"')) {
-                    rawSupplier = rawSupplier.substring(1, rawSupplier.length - 1);
-                }
-                let supplier = rawSupplier.trim() || 'Afro kjøp as';
-                
-                // معالجة أسعار التكلفة والمبيعات الأوروبية (تحويل , إلى .) لمنع أخطاء NaN
-                let rawCost = idxCost !== -1 && cols[idxCost] ? cols[idxCost].replace(/"/g, '').replace(',', '.').trim() : '0';
+                // معالجة الفاصلة النرويجية وعلامات الاقتباس في السعر والتكلفة
+                let rawCost = (idxCost !== -1 && cols[idxCost]) ? cols[idxCost].replace(/"/g, '').replace(',', '.').trim() : '0';
                 let cost = parseFloat(rawCost) || 0;
 
-                let rawPrice = idxPrice !== -1 && cols[idxPrice] ? cols[idxPrice].replace(/"/g, '').replace(',', '.').trim() : '0';
+                let rawPrice = (idxPrice !== -1 && cols[idxPrice]) ? cols[idxPrice].replace(/"/g, '').replace(',', '.').trim() : '0';
                 let finalPrice = parseFloat(rawPrice) || 0;
                 
-                let rawMva = idxMva !== -1 && cols[idxMva] ? cols[idxMva].replace(/"/g, '').trim() : '15';
+                let rawMva = (idxMva !== -1 && cols[idxMva]) ? cols[idxMva].replace(/"/g, '').trim() : '15';
                 let mvaPercent = parseFloat(rawMva) || 15;
                 let mvaVal = mvaPercent === 25 ? 0.25 : (mvaPercent === 15 ? 0.15 : 0);
 
