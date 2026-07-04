@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Mr intl - BestillingApp</title>
-    <!-- تضمين مكتبة مسح الباركود عبر الكاميرا -->
     <script src="https://unpkg.com/html5-qrcode"></script>
     <style>
         * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
@@ -98,7 +97,6 @@
             h1 { font-size: 26pt; margin-top: 0; text-align: center; }
             .subtitle { font-size: 13pt; color: #333 !important; margin-bottom: 20px; text-align: center; }
             
-            /* التحكم بإخفاء وإظهار بيانات الموظفين أو الزبائن */
             body.print-mode-kunder .print-only-info { display: none !important; }
             body.print-mode-ansatte .print-only-info { display: block !important; font-size: 10pt; color: #444; margin-top: 4px; }
         }
@@ -119,20 +117,17 @@
     <h1>Mr intl</h1>
     <div class="subtitle" id="appSub">BestillingApp System</div>
 
-    <!-- منطقة الكاميرا والماسح الضوئي -->
     <div id="scanner-container">
         <button class="close-scan-btn" onclick="stopScanner()">X</button>
         <div id="scanner-view"></div>
     </div>
 
-    <!-- شريط التنقل الثلاثي للموبايل -->
     <div class="nav-tabs">
         <button class="tab-btn active" id="tabVarelisteBtn" onclick="switchTab('vareliste')">Vareliste</button>
         <button class="tab-btn" id="tabOrdrelisteBtn" onclick="switchTab('ordreliste')">Ordreliste <span id="orderBadge">(0)</span></button>
         <button class="tab-btn" id="tabFakturaBtn" onclick="switchTab('faktura')">Fakturaliste</button>
     </div>
 
-    <!-- ================== شاشة إدارة البضائع والأسعار (VARELISTE) ================== -->
     <div id="sectionVareliste" class="page-section active">
         <input type="hidden" id="editId" value="">
         
@@ -237,14 +232,12 @@
 
         <button class="btn-main" id="btnSave" onclick="saveProductToCatalog()">Lagre produkt</button>
 
-        <!-- حقل البحث المستقل والمنفصل كلياً لمنع تعليق النظام -->
         <div style="margin-top: 10px;">
             <input type="text" id="searchCatalogBar" class="search-box" placeholder="🔍 ابحث هنا بالاسم أو الباركود..." oninput="renderCatalogList()">
             <div id="catalogContainer"></div>
         </div>
     </div>
 
-    <!-- ================== شاشة سجل الطلبيات الحالية (ORDRELISTE) ================== -->
     <div id="sectionOrdreliste" class="page-section">
         <input type="text" id="searchOrderBar" class="search-box" placeholder="Søk i ordreliste..." oninput="renderOrderList()">
         <div id="orderContainer"></div>
@@ -257,7 +250,6 @@
         </div>
     </div>
 
-    <!-- ================== شاشة الفواتير الاحترافية (FAKTURALISTE) ================== -->
     <div id="sectionFaktura" class="page-section">
         <div class="form-group">
             <label id="lblFakSupplier">Leverandørnavn</label>
@@ -293,14 +285,8 @@
     let html5QrcodeScanner = null;
     let activeScanTarget = '';
 
-    // المجموعات الأساسية التلقائية المستقرة
     let varegrupper = JSON.parse(localStorage.getItem('mr_varegrupper')) || ["Tørrvarer", "Drikke", "Kosmetikk", "Ferskvarer", "Grønnsaker", "Andre"];
-    
-    let catalog = JSON.parse(localStorage.getItem('mr_catalog_v4')) || [
-        { id: 1, name: "Trs Dalchini Cinamon Whole 50g", barcode: "5017689012137", varegruppe: "Tørrvarer", cost: 10, qty: 1, margin: 1.5, mva: 0.25, supplier: "Norbygate as", img: "", link: "", finalPrice: 19.9 },
-        { id: 2, name: "ginger", barcode: "5017689002565", varegruppe: "Grønnsaker", cost: 15.47, qty: 1, margin: 1.5, mva: 0, supplier: "Afro kjøp as", img: "", link: "", finalPrice: 25 }
-    ];
-
+    let catalog = JSON.parse(localStorage.getItem('mr_catalog_v4')) || [];
     let orderList = JSON.parse(localStorage.getItem('mr_orders_v4')) || [];
     let fakturaList = JSON.parse(localStorage.getItem('mr_faktura_v4')) || [];
     let currentLang = localStorage.getItem('mr_intl_lang') || 'no';
@@ -514,7 +500,6 @@
                 <div class="prod-info">
                     <p class="prod-title">${p.name}</p>
                     <div class="prod-meta">Leverandør: <b>${p.supplier}</b> | Gruppe: <b>${p.varegruppe}</b></div>
-                    <!-- معلومات إضافية تظهر للموظفين فقط أثناء الطباعة الداخلية -->
                     <div class="print-only-info">
                         BC: ${p.barcode || '-'} | Innkjøp: ${(p.cost/p.qty).toFixed(2)} kr | Margin: ${p.margin}
                     </div>
@@ -554,7 +539,6 @@
         document.getElementById('btnSave').innerText = words[l].updateBtn;
     }
 
-    // ميزة الإضافة الآلية للفاتورة بضغطة زر واحدة
     function autoSendToFakturaForm(id) {
         const p = catalog.find(item => item.id === id);
         if(!p) return;
@@ -698,7 +682,6 @@
         }
     }
 
-    // وظيفة التحكم بالطباعة وفصل الهويات
     function triggerPrint(mode) {
         document.body.classList.remove('print-mode-kunder', 'print-mode-ansatte');
         if(mode === 'kunder') {
@@ -709,36 +692,113 @@
         window.print();
     }
 
+    // الدالة الفائقة والذكية لمعالجة وتخطي الأسطر العشوائية وقراءة ملف الـ CSV الحقيقي بثبات
     function handleCSVImport(e) {
         const file = e.target.files[0];
         if(!file) return;
         const reader = new FileReader();
         reader.onload = function(evt) {
-            const lines = evt.target.result.split('\n');
-            for(let i = 1; i < lines.length; i++) {
-                if(!lines[i].trim()) continue;
-                const cols = lines[i].split(';');
-                if(cols.length >= 2) {
-                    let importedGroup = cols[8] ? cols[8].replace(/"/g, '').trim() : 'Tørrvarer';
-                    if(!varegrupper.includes(importedGroup)) {
-                        varegrupper.push(importedGroup);
-                    }
-                    catalog.push({
-                        id: Date.now() + Math.random(),
-                        name: cols[1].replace(/"/g, '').trim(),
-                        barcode: cols[0] ? cols[0].replace(/"/g, '').trim() : '',
-                        varegruppe: importedGroup,
-                        supplier: cols[9] ? cols[9].replace(/"/g, '').trim() : 'Afro kjøp as',
-                        cost: cols[4] ? parseFloat(cols[4].replace(',', '.')) : 0,
-                        qty: 1, margin: 1.5, mva: 0.15, img: '', link: '',
-                        finalPrice: cols[12] ? parseFloat(cols[12].replace(',', '.')) : 0
-                    });
+            const content = evt.target.result;
+            
+            // تحديد الفاصلة المستخدمة تلقائياً
+            let delimiter = ";";
+            if (!content.includes(";") && content.includes(",")) {
+                delimiter = ",";
+            }
+            
+            const lines = content.split('\n');
+            
+            // 1. البحث عن السطر الحقيقي الذي يحتوي على ترويسة الأعمدة
+            let headerRowIndex = -1;
+            for(let i = 0; i < lines.length; i++) {
+                let checkLine = lines[i].toLowerCase();
+                if(checkLine.includes('navn') || checkLine.includes('varenummer') || checkLine.includes('strekkode')) {
+                    headerRowIndex = i;
+                    break;
                 }
             }
+
+            // إذا لم يجد ترويسة واضحة، نفترض أنه السطر الأول
+            if (headerRowIndex === -1) headerRowIndex = 0;
+
+            let headers = lines[headerRowIndex].toLowerCase().split(delimiter).map(h => h.replace(/"/g, '').trim());
+            
+            // ربط الأعمدة بالفهارس بشكل ديناميكي كامل
+            let idxBarcode = headers.findIndex(h => h.includes('strekkode') || h.includes('barcode'));
+            let idxVarenummer = headers.findIndex(h => h.includes('varenummer'));
+            let idxName = headers.findIndex(h => h.includes('navn') || h.includes('name') || h.includes('produkt'));
+            let idxCost = headers.findIndex(h => h.includes('innkjoepspris') || h.includes('cost') || h.includes('kjøpspris'));
+            let idxVaregruppe = headers.findIndex(h => h.includes('varegruppe') || h.includes('group') || h.includes('kategori'));
+            let idxSupplier = headers.findIndex(h => h.includes('leverandoer') || h.includes('supplier'));
+            let idxMva = headers.findIndex(h => h.includes('mva_prosent') || h.includes('mva'));
+            let idxPrice = headers.findIndex(h => h.includes('pris_inkl_mva') || h.includes('utsalgpris') || h.includes('price'));
+
+            // تأمين الفهارس الأساسية في حال فقدانها
+            if(idxName === -1) idxName = 1;
+
+            let count = 0;
+            // نبدأ القراءة الفعلية من السطر الذي يلي الترويسة مباشرة
+            for(let i = headerRowIndex + 1; i < lines.length; i++) {
+                let currentLine = lines[i].trim();
+                if(!currentLine) continue;
+                
+                let cols = currentLine.split(delimiter);
+                if(cols.length <= idxName) continue;
+
+                let name = cols[idxName] ? cols[idxName].replace(/"/g, '').trim() : '';
+                if(!name) continue;
+
+                // إذا كان عمود الباركود فارغاً، نحاول سحب القيمة من عمود رقم السلعة (Varenummer)
+                let barcode = '';
+                if (idxBarcode !== -1 && cols[idxBarcode]) {
+                    barcode = cols[idxBarcode].replace(/"/g, '').trim();
+                }
+                if (!barcode && idxVarenummer !== -1 && cols[idxVarenummer]) {
+                    barcode = cols[idxVarenummer].replace(/"/g, '').trim();
+                }
+
+                let importedGroup = idxVaregruppe !== -1 && cols[idxVaregruppe] ? cols[idxVaregruppe].replace(/"/g, '').trim() : 'Tørrvarer';
+                let supplier = idxSupplier !== -1 && cols[idxSupplier] ? cols[idxSupplier].replace(/"/g, '').trim() : 'Afro kjøp as';
+                
+                // تنظيف ومعالجة الأرقام والأسعار لتفادي قيم NaN
+                let rawCost = idxCost !== -1 && cols[idxCost] ? cols[idxCost].replace(/"/g, '').replace(',', '.').trim() : '0';
+                let cost = parseFloat(rawCost) || 0;
+
+                let rawPrice = idxPrice !== -1 && cols[idxPrice] ? cols[idxPrice].replace(/"/g, '').replace(',', '.').trim() : '0';
+                let finalPrice = parseFloat(rawPrice) || 0;
+                
+                let rawMva = idxMva !== -1 && cols[idxMva] ? cols[idxMva].replace(/"/g, '').replace('%','').trim() : '15';
+                let mvaPercent = parseFloat(rawMva) || 15;
+                let mvaVal = mvaPercent === 25 ? 0.25 : (mvaPercent === 15 ? 0.15 : 0);
+
+                if(importedGroup && !varegrupper.includes(importedGroup)) {
+                    varegrupper.push(importedGroup);
+                }
+
+                // منع تكرار نفس المنتج داخل الكتالوج المحفوظ
+                catalog = catalog.filter(p => p.name !== name && (barcode === "" || p.barcode !== barcode));
+
+                catalog.push({
+                    id: Date.now() + Math.random(),
+                    name: name,
+                    barcode: barcode,
+                    varegruppe: importedGroup,
+                    supplier: supplier,
+                    cost: cost,
+                    qty: 1, 
+                    margin: 1.5, 
+                    mva: mvaVal, 
+                    img: '', 
+                    link: '',
+                    finalPrice: finalPrice > 0 ? finalPrice : (cost * 1.5 * (1 + mvaVal))
+                });
+                count++;
+            }
+            
             localStorage.setItem('mr_catalog_v4', JSON.stringify(catalog));
             localStorage.setItem('mr_varegrupper', JSON.stringify(varegrupper));
             applyLanguageStrings();
-            alert("Importert OK!");
+            alert(`Vellykket! Importert ${count} produkter.`);
         };
         reader.readAsText(file, "UTF-8");
     }
