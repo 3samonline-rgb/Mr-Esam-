@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>BestillingApp</title>
+    <title>Mr intl - BestillingApp</title>
     <!-- تضمين مكتبة مسح الباركود عبر الكاميرا -->
     <script src="https://unpkg.com/html5-qrcode"></script>
     <style>
@@ -11,19 +11,20 @@
         body { background-color: #f8fafc; margin: 0; padding: 10px; color: #1e293b; -webkit-tap-highlight-color: transparent; }
         .app-container { width: 100%; max-width: 480px; margin: auto; background: white; padding: 16px; border-radius: 24px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
         
-        /* شريط التنقل العلوي للموبايل */
+        /* شريط التنقل العلوي للموبايل الثلاثي */
         .nav-tabs { display: flex; background: #e2e8f0; padding: 4px; border-radius: 12px; margin-bottom: 16px; gap: 4px; }
-        .tab-btn { flex: 1; padding: 10px; border: none; background: transparent; font-weight: bold; font-size: 13px; border-radius: 8px; cursor: pointer; color: #475569; transition: 0.2s; }
+        .tab-btn { flex: 1; padding: 10px 4px; border: none; background: transparent; font-weight: bold; font-size: 11px; border-radius: 8px; cursor: pointer; color: #475569; transition: 0.2s; text-align: center; }
         .tab-btn.active { background: white; color: #0f172a; box-shadow: 0 2px 6px rgba(0,0,0,0.08); }
         
-        .top-actions { display: flex; gap: 6px; margin-bottom: 16px; }
-        .top-actions button, .file-label { flex: 1; padding: 8px; border: none; border-radius: 8px; font-size: 11px; font-weight: bold; cursor: pointer; color: white; text-align: center; display: inline-block; }
+        .top-actions { display: flex; gap: 6px; margin-bottom: 16px; flex-wrap: wrap; }
+        .top-actions button, .file-label { flex: 1; min-width: 80px; padding: 8px; border: none; border-radius: 8px; font-size: 11px; font-weight: bold; cursor: pointer; color: white; text-align: center; display: inline-block; }
         .btn-lang { background: #3b82f6; }
         .btn-import { background: #10b981; }
         .btn-export { background: #475569; }
+        .btn-print { background: #7c3aed; }
         
-        h1 { font-size: 24px; font-weight: 800; text-align: center; margin: 0 0 2px 0; color: #0f172a; }
-        .subtitle { font-size: 11px; font-weight: 700; color: #10b981; text-align: center; margin-bottom: 16px; text-transform: uppercase; letter-spacing: 0.5px; }
+        h1 { font-size: 26px; font-weight: 900; text-align: center; margin: 0 0 2px 0; color: #0f172a; letter-spacing: -0.5px; }
+        .subtitle { font-size: 12px; font-weight: 700; color: #10b981; text-align: center; margin-bottom: 16px; text-transform: uppercase; letter-spacing: 0.5px; }
         
         .page-section { display: none; }
         .page-section.active { display: block; }
@@ -36,13 +37,13 @@
         input:focus, select:focus { border-color: #10b981; outline: none; }
         
         .scan-btn { background: #0284c7; color: white; border: none; padding: 0 12px; border-radius: 6px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 13px; }
-        
+        .add-grp-btn { background: #475569; color: white; border: none; padding: 0 8px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 16px; }
+
         /* شاشة الكاميرا للمسح */
         #scanner-container { display: none; background: #000; border-radius: 12px; overflow: hidden; margin-bottom: 12px; position: relative; }
         #scanner-view { width: 100%; min-height: 250px; }
         .close-scan-btn { position: absolute; top: 10px; right: 10px; background: #ef4444; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-weight: bold; z-index: 10; cursor: pointer; }
 
-        /* قائمة اقتراحات البحث السريع للموبايل */
         .suggestions-list { position: absolute; top: 100%; left: 0; width: 100%; background: white; border: 1px solid #cbd5e1; border-radius: 0 0 8px 8px; max-height: 200px; overflow-y: auto; z-index: 100; box-shadow: 0 4px 12px rgba(0,0,0,0.1); display: none; padding: 0; margin: 0; list-style: none; }
         .suggestions-list li { padding: 10px; font-size: 13px; border-bottom: 1px solid #f1f5f9; cursor: pointer; text-align: left; }
         .suggestions-list li:hover { background: #f0fdf4; }
@@ -55,16 +56,14 @@
         .final-price-input { width: 100px; font-size: 16px; font-weight: 800; color: #16a34a; border: 1px solid #16a34a; text-align: right; padding: 2px 4px; border-radius: 4px; }
         
         .btn-main { width: 100%; background: #10b981; color: white; padding: 12px; border: none; border-radius: 8px; font-size: 14px; font-weight: bold; cursor: pointer; margin-top: 8px; }
-        .btn-main:active { transform: scale(0.98); }
         
         .search-box { width: 100%; padding: 10px; margin-bottom: 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 14px; }
         
-        /* كروت المنتجات */
-        .product-card { background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 10px; margin-bottom: 8px; display: flex; gap: 10px; align-items: center; position: relative; }
+        .product-card { background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 10px; margin-bottom: 8px; display: flex; gap: 10px; align-items: center; }
         .prod-img { width: 50px; height: 50px; border-radius: 6px; object-fit: cover; background: #e2e8f0; border: 1px solid #cbd5e1; }
         .prod-info { flex: 1; min-width: 0; text-align: left; }
-        .prod-title { font-weight: 700; font-size: 13px; margin: 0; color: #0f172a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: left; }
-        .prod-meta { font-size: 11px; color: #64748b; margin-top: 2px; text-align: left; }
+        .prod-title { font-weight: 700; font-size: 13px; margin: 0; color: #0f172a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .prod-meta { font-size: 11px; color: #64748b; margin-top: 2px; }
         .prod-actions { display: flex; gap: 6px; margin-top: 6px; }
         .action-btn { border: none; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; cursor: pointer; color: white; }
         .btn-edit { background: #ea580c; }
@@ -77,7 +76,20 @@
         .reorder-sticky-bar { background: #fffbeb; border-top: 2px solid #fef3c7; padding: 12px; margin-top: 15px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; }
         .btn-whatsapp-send { background: #25d366; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-size: 13px; font-weight: bold; cursor: pointer; }
         
+        /* تصميم جدول الفواتير الاحترافي */
+        .faktura-table { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 11px; background: white; border-radius: 8px; overflow: hidden; }
+        .faktura-table th, .faktura-table td { padding: 8px; text-align: left; border-bottom: 1px solid #e2e8f0; }
+        .faktura-table th { background: #475569; color: white; }
+        
+        .faktura-card { background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 12px; padding: 12px; margin-bottom: 12px; }
+        .faktura-header { display: flex; justify-content: space-between; font-weight: bold; border-bottom: 1px solid #e2e8f0; padding-bottom: 6px; margin-bottom: 6px; font-size: 12px; }
+
         #fileInput { display: none; }
+        @media print {
+            body { background: white; padding: 0; }
+            .app-container { box-shadow: none; max-width: 100%; }
+            .top-actions, .nav-tabs, .form-group, .calc-box, .btn-main, .search-box, .prod-actions, .reorder-sticky-bar { display: none !important; }
+        }
     </style>
 </head>
 <body>
@@ -85,13 +97,14 @@
 <div class="app-container">
     <div class="top-actions">
         <button class="btn-lang" onclick="toggleLanguage()">NO / AR</button>
-        <label class="btn-import" for="fileInput" id="lblImportBtn">Import CSV 📥</label>
+        <label class="btn-import" for="fileInput" id="lblImportBtn">Import CSV</label>
         <input type="file" id="fileInput" accept=".csv" onchange="handleCSVImport(event)">
-        <button class="btn-export" onclick="exportBackup()" id="lblExportBtn">Backup 📤</button>
+        <button class="btn-export" onclick="exportBackup()" id="lblExportBtn">Backup</button>
+        <button class="btn-print" onclick="window.print()" id="lblPrintBtn">Print 🖨️</button>
     </div>
 
-    <h1>BestillingApp</h1>
-    <div class="subtitle" id="appSub">Vareliste & Ordreliste System</div>
+    <h1>Mr intl</h1>
+    <div class="subtitle" id="appSub">BestillingApp System</div>
 
     <!-- منطقة الكاميرا والماسح الضوئي -->
     <div id="scanner-container">
@@ -99,10 +112,11 @@
         <div id="scanner-view"></div>
     </div>
 
-    <!-- التبديل بين الشاشات للموبايل -->
+    <!-- شريط التنقل الثلاثي الجديد للموبايل -->
     <div class="nav-tabs">
-        <button class="tab-btn active" id="tabVarelisteBtn" onclick="switchTab('vareliste')">Vareliste (المنتجات)</button>
-        <button class="tab-btn" id="tabOrdrelisteBtn" onclick="switchTab('ordreliste')">Ordreliste (الطلبيات) <span id="orderBadge">(0)</span></button>
+        <button class="tab-btn active" id="tabVarelisteBtn" onclick="switchTab('vareliste')">Vareliste</button>
+        <button class="tab-btn" id="tabOrdrelisteBtn" onclick="switchTab('ordreliste')">Ordreliste <span id="orderBadge">(0)</span></button>
+        <button class="tab-btn" id="tabFakturaBtn" onclick="switchTab('faktura')">Fakturaliste</button>
     </div>
 
     <!-- ================== شاشة إدارة البضائع والأسعار (VARELISTE) ================== -->
@@ -112,7 +126,7 @@
         <div class="form-group">
             <label id="lblProdName">Produktnavn / Søk</label>
             <div class="input-with-btn">
-                <input type="text" id="prodName" placeholder="Søk eller skriv inn navn..." oninput="searchCatalogSuggestions(this)" autocomplete="off">
+                <input type="text" id="prodName" placeholder="Søk eller skriv..." oninput="searchCatalogSuggestions(this)" autocomplete="off">
                 <button class="scan-btn" onclick="startScanner('prodName')">Scan 📷</button>
             </div>
             <ul id="suggestBox" class="suggestions-list"></ul>
@@ -124,20 +138,17 @@
                     <label id="lblBarcode">Strekkode</label>
                     <div class="input-with-btn">
                         <input type="text" id="prodBarcode" placeholder="Barcode">
-                        <button class="scan-btn" onclick="startScanner('prodBarcode')">Scan 📷</button>
+                        <button class="scan-btn" onclick="startScanner('prodBarcode')">Scan</button>
                     </div>
                 </div>
             </div>
             <div class="col">
                 <div class="form-group">
                     <label id="lblVaregruppe">Varegruppe</label>
-                    <select id="prodVaregruppe">
-                        <option value="Tørrvarer">Tørrvarer</option>
-                        <option value="Drikke">Drikke</option>
-                        <option value="Kosmetikk">Kosmetikk</option>
-                        <option value="Ferskvarer">Ferskvarer</option>
-                        <option value="Andre">Andre</option>
-                    </select>
+                    <div class="input-with-btn">
+                        <select id="prodVaregruppe"></select>
+                        <button class="add-grp-btn" onclick="addNewVaregruppeManual()">+</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -145,7 +156,7 @@
         <div class="row">
             <div class="col" style="flex: 1.5;">
                 <div class="form-group">
-                    <label id="lblCost">Innkjøpspris (Total Faktu.)</label>
+                    <label id="lblCost">Innkjøpspris (Total)</label>
                     <input type="number" step="any" id="prodCost" placeholder="0.00" oninput="runCalculations()">
                 </div>
             </div>
@@ -183,25 +194,25 @@
         <div class="row">
             <div class="col">
                 <div class="form-group">
-                    <label id="lblImgUrl">Bilde URL (رابط الصورة)</label>
+                    <label id="lblImgUrl">Bilde URL</label>
                     <input type="text" id="prodImgUrl" placeholder="https://...">
                 </div>
             </div>
             <div class="col">
                 <div class="form-group">
-                    <label id="lblProdUrl">Produkt URL (رابط المنتج)</label>
+                    <label id="lblProdUrl">Produkt URL</label>
                     <input type="text" id="prodLinkUrl" placeholder="https://...">
                 </div>
             </div>
         </div>
 
         <div class="form-group">
-            <label id="lblLeverandoer">Leverandør (المورد)</label>
+            <label id="lblLeverandoer">Leverandør</label>
             <input type="text" id="prodSupplier" placeholder="F.eks. Afro kjøp as">
         </div>
 
         <div class="calc-box">
-            <div class="calc-line"><span id="c1">Kost per enhet (Eks MVA)</span>:<span id="resUnitCost">0.00 kr</span></div>
+            <div class="calc-line"><span id="c1">Kost per enhet</span>:<span id="resUnitCost">0.00 kr</span></div>
             <div class="calc-line"><span id="c2">Utsalgspris Eks MVA</span>:<span id="resExMva">0.00 kr</span></div>
             <div class="calc-line" style="margin-top:5px; border-top:1px dashed #16a34a; padding-top:5px; align-items:center;">
                 <b id="c3">Utsalgspris (Ink MVA):</b>
@@ -212,27 +223,56 @@
             </div>
         </div>
 
-        <button class="btn-main" id="btnSave" onclick="saveProductToCatalog()">Lagre produkt (حفظ في الكتالوج)</button>
+        <button class="btn-main" id="btnSave" onclick="saveProductToCatalog()">Lagre produkt</button>
 
         <div style="margin-top: 20px;">
-            <input type="text" id="searchCatalogBar" class="search-box" placeholder="Søk i vareliste (الاسم أو الباركود)..." oninput="renderCatalogList()">
+            <input type="text" id="searchCatalogBar" class="search-box" placeholder="Søk..." oninput="renderCatalogList()">
             <div id="catalogContainer"></div>
         </div>
     </div>
 
-    <!-- ================== شاشة سجل الطلبيات الحالية للموردين (ORDRELISTE) ================== -->
+    <!-- ================== شاشة سجل الطلبيات الحالية (ORDRELISTE) ================== -->
     <div id="sectionOrdreliste" class="page-section">
         <input type="text" id="searchOrderBar" class="search-box" placeholder="Søk i ordreliste..." oninput="renderOrderList()">
-        
         <div id="orderContainer"></div>
-
         <div class="reorder-sticky-bar">
             <div>
                 <b id="lblTotalOrdre">Totalt valgt:</b> 
-                <span id="totalOrdreCount" style="color:#ea580c; font-weight:bold;">0 produkter</span>
+                <span id="totalOrdreCount" style="color:#ea580c; font-weight:bold;">0</span>
             </div>
-            <button class="btn-whatsapp-send" onclick="sendOrderViaWhatsApp()">Send til WhatsApp 💬</button>
+            <button class="btn-whatsapp-send" onclick="sendOrderViaWhatsApp()">Send 💬</button>
         </div>
+    </div>
+
+    <!-- ================== شاشة الفواتير الجديدة بالكامل (FAKTURALISTE) ================== -->
+    <div id="sectionFaktura" class="page-section">
+        <div class="form-group">
+            <label id="lblFakSupplier">Leverandørnavn (المورد)</label>
+            <input type="text" id="fakSupplier" placeholder="F.eks. Afro kjøp as">
+        </div>
+        <div class="row">
+            <div class="col">
+                <div class="form-group">
+                    <label id="lblFakNum">Fakturanummer (رقم الفاتورة)</label>
+                    <input type="text" id="fakNumber" placeholder="Fak #">
+                </div>
+            </div>
+            <div class="col">
+                <div class="form-group">
+                    <label id="lblFakDate">Dato (التاريخ)</label>
+                    <input type="date" id="fakDate">
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label id="lblFakItems">Legg til produkt fra katalogen (اختر صنف الفاتورة)</label>
+            <select id="fakItemSelect">
+                <option value="">-- Velg produkt --</option>
+            </select>
+        </div>
+        <button class="btn-main" style="background:#475569;" id="btnNewInvoice" onclick="createNewInvoice()">Opprett Faktura (إدخال الفاتورة للجدول)</button>
+        
+        <div style="margin-top: 20px;" id="fakturaRecordsContainer"></div>
     </div>
 </div>
 
@@ -240,31 +280,36 @@
     let html5QrcodeScanner = null;
     let activeScanTarget = '';
 
-    // كتالوج المنتجات الأساسي
-    let catalog = JSON.parse(localStorage.getItem('mr_catalog_v3')) || [
-        { id: 1, name: "Trs Dalchini Cinamon Whole 50g", barcode: "5017689012137", varegruppe: "Tørrvarer", cost: 0, qty: 1, margin: 1.5, mva: 0.25, supplier: "Norbygate as", img: "", link: "", finalPrice: 19.9 },
-        { id: 2, name: "ginger", barcode: "5017689002565", varegruppe: "Tørrvarer", cost: 15.47, qty: 1, margin: 1.5, mva: 0, supplier: "Norbygate as", img: "", link: "", finalPrice: 25 }
+    // قائمة المجموعات الأساسية مع دعم إضافة يدوي وإضافة خضار تلقائياً
+    let varegrupper = JSON.parse(localStorage.getItem('mr_varegrupper')) || ["Tørrvarer", "Drikke", "Kosmetikk", "Ferskvarer", "Grønnsaker", "Andre"];
+    
+    let catalog = JSON.parse(localStorage.getItem('mr_catalog_v4')) || [
+        { id: 1, name: "Trs Dalchini Cinamon Whole 50g", barcode: "5017689012137", varegruppe: "Tørrvarer", cost: 10, qty: 1, margin: 1.5, mva: 0.25, supplier: "Norbygate as", img: "", link: "", finalPrice: 19.9 },
+        { id: 2, name: "ginger", barcode: "5017689002565", varegruppe: "Grønnsaker", cost: 15.47, qty: 1, margin: 1.5, mva: 0, supplier: "Afro kjøp as", img: "", link: "", finalPrice: 25 }
     ];
 
-    let orderList = JSON.parse(localStorage.getItem('mr_orders_v3')) || [];
+    let orderList = JSON.parse(localStorage.getItem('mr_orders_v4')) || [];
+    let fakturaList = JSON.parse(localStorage.getItem('mr_faktura_v4')) || [];
     let currentLang = localStorage.getItem('mr_intl_lang') || 'no';
 
     const words = {
         no: {
-            varelisteTab: "Vareliste (المنتجات)", ordrelisteTab: "Ordreliste (الطلبيات)",
+            varelisteTab: "Vareliste", ordrelisteTab: "Ordreliste", fakturaTab: "Fakturaliste",
             prodName: "Produktnavn / Søk", barcode: "Strekkode", varegruppe: "Varegruppe", cost: "Innkjøpspris (Total)",
             qty: "Antall i eske", imgUrl: "Bilde URL", prodUrl: "Produkt URL", supplier: "Leverandør",
-            saveBtn: "Lagre produkt (Enter ↵)", updateBtn: "Oppdater produkt", searchPlh: "Søk i vareliste...",
-            c1: "Kost per enhet", c2: "Utsalgspris Eks MVA", c3: "Utsalgspris (Ink MVA):", c4: "Fortjeneste:",
-            totalValgt: "Totalt valgt:"
+            saveBtn: "Lagre produkt", updateBtn: "Oppdater produkt", searchPlh: "Søk i vareliste...",
+            c1: "Kost per enhet", c2: "Utsalgspris Eks MVA", c3: "Utsalgspris (Ink MVA):", c4: "Fortjeneste per enhet:",
+            totalValgt: "Totalt valgt:", sendBtn: "Send til WhatsApp 💬", 
+            lblFakSupplier: "Leverandørnavn", lblFakNum: "Fakturanummer", lblFakDate: "Dato", lblFakItems: "Velg produkt til faktura"
         },
         ar: {
-            varelisteTab: "شاشة البضائع والأسعار", ordrelisteTab: "سجل الطلبيات الحالي",
-            prodName: "اسم المنتج أو حقل البحث سريع", barcode: "الباركود (Strekkode)", varegruppe: "المجموعة (Varegruppe)", cost: "سعر الشراء الإجمالي للفاتورة",
-            qty: "الكمية داخل الكرتونة", imgUrl: "رابط صورة المنتج", prodUrl: "رابط صفحة المنتج", supplier: "Leverandør (المورد)",
-            saveBtn: "إدخال وحفظ المنتج في الكتالوج", updateBtn: "تحديث وتعديل بيانات المنتج", searchPlh: "ابحث عن أي منتج هنا بالاسم أو الباركود...",
-            c1: "سعر القطعة المفردة", c2: "سعر البيع قبل الضريبة", c3: "سعر البيع النهائي (مع الضريبة):", c4: "صافي الربح المتوقع:",
-            totalValgt: "إجمالي المنتجات المختارة:"
+            varelisteTab: "قائمة المنتجات", ordrelisteTab: "قائمة الطلبيات", fakturaTab: "قائمة الفواتير والأرباح",
+            prodName: "اسم المنتج أو البحث السريع", barcode: "الباركود", varegruppe: "المجموعة التموينية", cost: "سعر الشراء الإجمالي للفاتورة",
+            qty: "الكمية داخل الكرتونة", imgUrl: "رابط صورة المنتج", prodUrl: "رابط صفحة المنتج", supplier: "اسم المورد",
+            saveBtn: "حفظ في الكتالوج", updateBtn: "تعديل وحفظ البيانات", searchPlh: "ابحث بالاسم أو الباركود...",
+            c1: "التكلفة للقطعة المفردة", c2: "سعر البيع قبل الضريبة", c3: "سعر البيع النهائي (مع الضريبة):", c4: "صافي الفائدة والأرباح للقطعة:",
+            totalValgt: "إجمالي السلع المحددة:", sendBtn: "إرسال الكشف عبر الواتساب 💬",
+            lblFakSupplier: "اسم المورد صاحب الفاتورة", lblFakNum: "رقم الفاتورة", lblFakDate: "تاريخ الفاتورة", lblFakItems: "اختر الصنف المراد إدراجه بالفاتورة"
         }
     };
 
@@ -275,10 +320,15 @@
         if(tab === 'vareliste') {
             document.getElementById('sectionVareliste').classList.add('active');
             document.getElementById('tabVarelisteBtn').classList.add('active');
-        } else {
+        } else if(tab === 'ordreliste') {
             document.getElementById('sectionOrdreliste').classList.add('active');
             document.getElementById('tabOrdrelisteBtn').classList.add('active');
             renderOrderList();
+        } else {
+            document.getElementById('sectionFaktura').classList.add('active');
+            document.getElementById('tabFakturaBtn').classList.add('active');
+            populateFakturaSelect();
+            renderFakturaRecords();
         }
     }
 
@@ -288,9 +338,32 @@
         applyLanguageStrings();
     }
 
+    function updateVaregruppeDropdown() {
+        const select = document.getElementById('prodVaregruppe');
+        select.innerHTML = '';
+        varegrupper.forEach(g => {
+            const opt = document.createElement('option');
+            opt.value = g;
+            opt.innerText = g;
+            select.appendChild(opt);
+        });
+    }
+
+    function addNewVaregruppeManual() {
+        let msg = currentLang === 'ar' ? "أدخل اسم المجموعة الجديدة:" : "Skriv inn navnet på den nye varegruppen:";
+        let newGrp = prompt(msg);
+        if(newGrp && newGrp.trim()) {
+            varegrupper.push(newGrp.trim());
+            localStorage.setItem('mr_varegrupper', JSON.stringify(varegrupper));
+            updateVaregruppeDropdown();
+        }
+    }
+
     function applyLanguageStrings() {
         const l = currentLang;
         document.getElementById('tabVarelisteBtn').innerText = words[l].varelisteTab;
+        document.getElementById('tabOrdrelisteBtn').innerText = words[l].ordrelisteTab;
+        document.getElementById('tabFakturaBtn').innerText = words[l].fakturaTab;
         document.getElementById('lblProdName').innerText = words[l].prodName;
         document.getElementById('lblBarcode').innerText = words[l].barcode;
         document.getElementById('lblVaregruppe').innerText = words[l].varegruppe;
@@ -305,11 +378,18 @@
         document.getElementById('c3').innerText = words[l].c3;
         document.getElementById('c4').innerText = words[l].c4;
         document.getElementById('lblTotalOrdre').innerText = words[l].totalValgt;
+        document.querySelector('.btn-whatsapp-send').innerText = words[l].sendBtn;
         
+        document.getElementById('lblFakSupplier').innerText = words[l].lblFakSupplier;
+        document.getElementById('lblFakNum').innerText = words[l].lblFakNum;
+        document.getElementById('lblFakDate').innerText = words[l].lblFakDate;
+        document.getElementById('lblFakItems').innerText = words[l].lblFakItems;
+
         const isEdit = document.getElementById('editId').value;
         document.getElementById('btnSave').innerText = isEdit ? words[l].updateBtn : words[l].saveBtn;
         
         document.getElementById('orderBadge').innerText = `(${orderList.length})`;
+        updateVaregruppeDropdown();
         renderCatalogList();
     }
 
@@ -341,28 +421,19 @@
     function startScanner(targetInputId) {
         activeScanTarget = targetInputId;
         document.getElementById('scanner-container').style.display = 'block';
-        
         if(html5QrcodeScanner === null) {
             html5QrcodeScanner = new Html5Qrcode("scanner-view");
         }
-        
         html5QrcodeScanner.start(
             { facingMode: "environment" },
             { fps: 10, qrbox: { width: 250, height: 150 } },
             (decodedText) => {
                 document.getElementById(activeScanTarget).value = decodedText;
                 stopScanner();
-                if(activeScanTarget === 'prodName' || activeScanTarget === 'prodBarcode') {
-                    // إذا مسحنا الباركود في خانة البحث نقوم بالبحث الفوري
-                    let match = catalog.find(p => p.barcode === decodedText);
-                    if(match) {
-                        loadToForm(match.id);
-                    } else {
-                        document.getElementById('prodBarcode').value = decodedText;
-                    }
-                }
+                let match = catalog.find(p => p.barcode === decodedText);
+                if(match) loadToForm(match.id);
             },
-            (errorMessage) => { /* الفحص مستمر */ }
+            (err) => {}
         ).catch((err) => { alert("Kamerafeil: " + err); });
     }
 
@@ -384,7 +455,7 @@
         if(hits.length > 0) {
             hits.forEach(p => {
                 const li = document.createElement('li');
-                li.innerText = `[${p.supplier || 'Ukjent'}] ${p.name}`;
+                li.innerText = `[${p.supplier}] ${p.name}`;
                 li.onclick = () => {
                     loadToForm(p.id);
                     box.style.display = 'none';
@@ -399,7 +470,7 @@
 
     function saveProductToCatalog() {
         const name = document.getElementById('prodName').value.trim();
-        if(!name) { alert("Skriv produktnavn!"); return; }
+        if(!name) return;
 
         const editId = document.getElementById('editId').value;
         const pData = {
@@ -413,7 +484,7 @@
             mva: parseFloat(document.getElementById('prodMva').value) || 0,
             img: document.getElementById('prodImgUrl').value.trim(),
             link: document.getElementById('prodLinkUrl').value.trim(),
-            supplier: document.getElementById('prodSupplier').value.trim() || "Ukjent",
+            supplier: document.getElementById('prodSupplier').value.trim() || "Afro kjøp as",
             finalPrice: parseFloat(document.getElementById('resFinalPriceInput').value) || 0
         };
 
@@ -424,9 +495,8 @@
             catalog.unshift(pData);
         }
 
-        localStorage.setItem('mr_catalog_v3', JSON.stringify(catalog));
+        localStorage.setItem('mr_catalog_v4', JSON.stringify(catalog));
         
-        // تصفير سريع للخانات
         document.getElementById('prodName').value = '';
         document.getElementById('prodBarcode').value = '';
         document.getElementById('prodCost').value = '';
@@ -435,35 +505,6 @@
         document.getElementById('prodLinkUrl').value = '';
         
         applyLanguageStrings();
-    }
-
-    function addToOrderList(id) {
-        const p = catalog.find(item => item.id === id);
-        if(!p) return;
-        
-        const exists = orderList.find(o => o.catalogId === id);
-        if(!exists) {
-            orderList.push({
-                id: Date.now() + Math.random(),
-                catalogId: p.id,
-                name: p.name,
-                supplier: p.supplier,
-                esker: 1
-            });
-            localStorage.setItem('mr_orders_v3', JSON.stringify(orderList));
-            document.getElementById('orderBadge').innerText = `(${orderList.length})`;
-            alert(`${p.name} lagt til i ordreliste!`);
-        } else {
-            alert("Produktet ligger allerede i ordrelisten.");
-        }
-    }
-
-    function deleteFromCatalog(id) {
-        if(confirm("Slette fra vareliste?")) {
-            catalog = catalog.filter(p => p.id !== id);
-            localStorage.setItem('mr_catalog_v3', JSON.stringify(catalog));
-            renderCatalogList();
-        }
     }
 
     function renderCatalogList() {
@@ -476,7 +517,6 @@
         filtered.forEach(p => {
             const card = document.createElement('div');
             card.className = 'product-card';
-            
             const imgEl = p.img ? `<img src="${p.img}" class="prod-img">` : `<div class="prod-img" style="display:flex;align-items:center;justify-content:center;font-size:18px;">📦</div>`;
             
             card.innerHTML = `
@@ -484,9 +524,8 @@
                 <div class="prod-info">
                     <p class="prod-title">${p.name}</p>
                     <div class="prod-meta">Leverandør: <b>${p.supplier}</b> | BC: ${p.barcode || 'Ingen'}</div>
-                    ${p.link ? `<div class="prod-meta"><a href="${p.link}" target="_blank" style="color:#3b82f6;">Se produktlenke 🔗</a></div>` : ''}
                     <div class="prod-actions">
-                        <button class="action-btn btn-order" onclick="addToOrderList(${p.id})">+ Bestill🛒</button>
+                        <button class="action-btn btn-order" onclick="addToOrderList(${p.id})">+ Bestill</button>
                         <button class="action-btn btn-edit" onclick="loadToForm(${p.id})">Endre</button>
                         <button class="action-btn btn-del" onclick="deleteFromCatalog(${p.id})">X</button>
                     </div>
@@ -503,126 +542,171 @@
         document.getElementById('editId').value = p.id;
         document.getElementById('prodName').value = p.name;
         document.getElementById('prodBarcode').value = p.barcode || '';
-        document.getElementById('prodVaregruppe').value = p.varegruppe || 'Tørrvarer';
-        document.getElementById('prodCost').value = p.cost || '';
-        document.getElementById('prodQty').value = p.qty || 1;
-        document.getElementById('prodMargin').value = p.margin || 1.5;
-        document.getElementById('prodMva').value = p.mva || 0.15;
-        document.getElementById('prodImgUrl').value = p.img || '';
-        document.getElementById('prodLinkUrl').value = p.link || '';
-        document.getElementById('prodSupplier').value = p.supplier || '';
+        document.getElementById('prodVaregruppe').value = p.varegruppe;
+        document.getElementById('prodCost').value = p.cost;
+        document.getElementById('prodQty').value = p.qty;
+        document.getElementById('prodMargin').value = p.margin;
+        document.getElementById('prodMva').value = p.mva;
+        document.getElementById('prodImgUrl').value = p.img;
+        document.getElementById('prodLinkUrl').value = p.link;
+        document.getElementById('prodSupplier').value = p.supplier;
         document.getElementById('resFinalPriceInput').value = (p.finalPrice || 0).toFixed(2);
         window.scrollTo({top: 0, behavior: 'smooth'});
         runCalculations(false);
         applyLanguageStrings();
     }
 
-    function changeOrderQty(id, val) {
-        const o = orderList.find(item => item.id === id);
-        if(o) {
-            o.esker = parseInt(val) || 1;
-            localStorage.setItem('mr_orders_v3', JSON.stringify(orderList));
+    function addToOrderList(id) {
+        const p = catalog.find(item => item.id === id);
+        if(!p) return;
+        if(!orderList.find(o => o.catalogId === id)) {
+            orderList.push({ id: Date.now(), catalogId: p.id, name: p.name, supplier: p.supplier, esker: 1 });
+            localStorage.setItem('mr_orders_v4', JSON.stringify(orderList));
+            document.getElementById('orderBadge').innerText = `(${orderList.length})`;
         }
-    }
-
-    function removeFromOrder(id) {
-        orderList = orderList.filter(o => o.id !== id);
-        localStorage.setItem('mr_orders_v3', JSON.stringify(orderList));
-        document.getElementById('orderBadge').innerText = `(${orderList.length})`;
-        renderOrderList();
     }
 
     function renderOrderList() {
         const container = document.getElementById('orderContainer');
-        const query = document.getElementById('searchOrderBar').value.toLowerCase();
         container.innerHTML = '';
+        document.getElementById('totalOrdreCount').innerText = orderList.length;
 
-        const filtered = orderList.filter(o => o.name.toLowerCase().includes(query) || o.supplier.toLowerCase().includes(query));
-        document.getElementById('totalOrdreCount').innerText = `${filtered.length} produkter`;
-
-        filtered.forEach(o => {
+        orderList.forEach(o => {
             const card = document.createElement('div');
             card.className = 'product-card';
             card.innerHTML = `
                 <div class="prod-info">
                     <p class="prod-title">${o.name}</p>
-                    <div class="prod-meta">Leverandør: <b style="color:#ea580c">${o.supplier}</b></div>
+                    <div class="prod-meta">Leverandør: <b>${o.supplier}</b></div>
                     <div class="prod-meta" style="margin-top:5px;">
-                        Antall kasser/esker: 
-                        <input type="number" class="order-qty-input" value="${o.esker}" min="1" oninput="changeOrderQty(${o.id}, this.value)">
+                        Esker: <input type="number" class="order-qty-input" value="${o.esker}" min="1" oninput="o.esker=parseInt(this.value);localStorage.setItem('mr_orders_v4', JSON.stringify(orderList));">
                     </div>
                 </div>
-                <div>
-                    <button class="action-btn btn-del" onclick="removeFromOrder(${o.id})">Fjern</button>
-                </div>
+                <button class="action-btn btn-del" onclick="orderList=orderList.filter(item=>item.id!==${o.id});localStorage.setItem('mr_orders_v4', JSON.stringify(orderList));renderOrderList();applyLanguageStrings();">X</button>
             `;
             container.appendChild(card);
         });
     }
 
     function sendOrderViaWhatsApp() {
-        if(orderList.length === 0) { alert("Ordrelisten er tom!"); return; }
-        let text = "*Varebestilling / الطلبية الجديدة:*\n\n";
-        const groups = {};
-        orderList.forEach(o => {
-            if(!groups[o.supplier]) groups[o.supplier] = [];
-            groups[o.supplier].push(o);
-        });
-
-        for(const sup in groups) {
-            text += `*Leverandør: ${sup}*\n`;
-            groups[sup].forEach((o, i) => {
-                text += `${i+1}. ${o.name} -> (*${o.esker}* esker)\n`;
-            });
-            text += `\n`;
-        }
+        let text = "*Varebestilling:*\n\n";
+        orderList.forEach((o, i) => { text += `${i+1}. ${o.name} (${o.supplier}) -> *${o.esker}* esker\n`; });
         window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
     }
 
-    // فك تشفير وقراءة الملف الجديد الذي يستخدم الفاصلة المنقوطة (;)
+    // ================== منطق شاشة الفواتير الاحترافي ==================
+    function populateFakturaSelect() {
+        const select = document.getElementById('fakItemSelect');
+        select.innerHTML = '<option value="">-- Velg produkt --</option>';
+        catalog.forEach(p => {
+            const opt = document.createElement('option');
+            opt.value = p.id;
+            opt.innerText = p.name;
+            select.appendChild(opt);
+        });
+    }
+
+    function createNewInvoice() {
+        const sup = document.getElementById('fakSupplier').value.trim();
+        const num = document.getElementById('fakNumber').value.trim();
+        const date = document.getElementById('fakDate').value;
+        const itemId = document.getElementById('fakItemSelect').value;
+
+        if(!sup || !num || !itemId) { alert("Vennligst fyll ut alle felter!"); return; }
+        const prod = catalog.find(p => p.id == itemId);
+
+        const unitCost = prod.cost / prod.qty;
+        const calculatedExMva = prod.finalPrice / (1 + prod.mva);
+        const profitPerUnit = calculatedExMva - unitCost;
+        const totalProfitInvoice = profitPerUnit * prod.qty;
+
+        const newFak = {
+            id: Date.now(),
+            supplier: sup,
+            number: num,
+            date: date || new Date().toISOString().split('T')[0],
+            prodName: prod.name,
+            totalCost: prod.cost,
+            totalProfit: totalProfitInvoice
+        };
+
+        fakturaList.unshift(newFak);
+        localStorage.setItem('mr_faktura_v4', JSON.stringify(fakturaList));
+        renderFakturaRecords();
+    }
+
+    function renderFakturaRecords() {
+        const container = document.getElementById('fakturaRecordsContainer');
+        container.innerHTML = '';
+
+        if(fakturaList.length === 0) return;
+
+        fakturaList.forEach(f => {
+            const div = document.createElement('div');
+            div.className = 'faktura-card';
+            div.innerHTML = `
+                <div class="faktura-header">
+                    <span>Mottatt: ${f.supplier}</span>
+                    <span style="color:#7c3aed;">Fak# ${f.number}</span>
+                </div>
+                <div style="font-size:11px; color:#64748b; margin-bottom:6px;">Dato: ${f.date}</div>
+                <table class="faktura-table">
+                    <thead>
+                        <tr>
+                            <th>Produkt</th>
+                            <th>Kost</th>
+                            <th>Inntekt/Verdi</th>
+                            <th>Frist/Verdi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>${f.prodName}</td>
+                            <td>${f.totalCost.toFixed(2)} kr</td>
+                            <td>${(f.totalCost + f.totalProfit).toFixed(2)} kr</td>
+                            <td style="color:#16a34a; font-weight:bold;">+${f.totalProfit.toFixed(2)} kr</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <button class="action-btn btn-del" style="margin-top:8px; padding:2px 6px;" onclick="fakturaList=fakturaList.filter(item=>item.id!==${f.id});localStorage.setItem('mr_faktura_v4', JSON.stringify(fakturaList));renderFakturaRecords();">Slett faktura</button>
+            `;
+            container.appendChild(div);
+        });
+    }
+
+    function deleteFromCatalog(id) {
+        if(confirm("Slette?")) {
+            catalog = catalog.filter(p => p.id !== id);
+            localStorage.setItem('mr_catalog_v4', JSON.stringify(catalog));
+            renderCatalogList();
+        }
+    }
+
     function handleCSVImport(e) {
         const file = e.target.files[0];
         if(!file) return;
         const reader = new FileReader();
         reader.onload = function(evt) {
             const lines = evt.target.result.split('\n');
-            let addedCount = 0;
-            
             for(let i = 1; i < lines.length; i++) {
                 if(!lines[i].trim()) continue;
-                
-                // التقسيم بالاعتماد على الفاصلة المنقوطة لمنع التداخل
                 const cols = lines[i].split(';');
                 if(cols.length >= 2) {
-                    const barcodeRaw = cols[0] ? cols[0].replace(/"/g, '').trim() : '';
-                    const nameRaw = cols[1] ? cols[1].replace(/"/g, '').trim() : '';
-                    
-                    if(!nameRaw) continue; // تخطي السطور الفارغة
-                    
-                    let costRaw = cols[4] ? parseFloat(cols[4].replace(',', '.')) : 0;
-                    let mvaPercent = cols[10] ? parseFloat(cols[10]) / 100 : 0.15;
-                    let finalPriceRaw = cols[12] ? parseFloat(cols[12].replace(',', '.')) : 0;
-                    
                     catalog.push({
                         id: Date.now() + Math.random(),
-                        name: nameRaw,
-                        barcode: barcodeRaw,
+                        name: cols[1].replace(/"/g, '').trim(),
+                        barcode: cols[0] ? cols[0].replace(/"/g, '').trim() : '',
                         varegruppe: cols[8] ? cols[8].replace(/"/g, '').trim() : 'Tørrvarer',
                         supplier: cols[9] ? cols[9].replace(/"/g, '').trim() : 'Afro kjøp as',
-                        cost: isNaN(costRaw) ? 0 : costRaw,
-                        qty: 1,
-                        margin: 1.5,
-                        mva: isNaN(mvaPercent) ? 0.15 : mvaPercent,
-                        img: '',
-                        link: '',
-                        finalPrice: isNaN(finalPriceRaw) ? 0 : finalPriceRaw
+                        cost: cols[4] ? parseFloat(cols[4].replace(',', '.')) : 0,
+                        qty: 1, margin: 1.5, mva: 0.15, img: '', link: '',
+                        finalPrice: cols[12] ? parseFloat(cols[12].replace(',', '.')) : 0
                     });
-                    addedCount++;
                 }
             }
-            localStorage.setItem('mr_catalog_v3', JSON.stringify(catalog));
-            alert(currentLang === 'ar' ? `تم استيراد ${addedCount} منتج بنجاح وبشكل صحيح!` : `Importert ${addedCount} produkter suksessfullt!`);
+            localStorage.setItem('mr_catalog_v4', JSON.stringify(catalog));
             renderCatalogList();
+            alert("Importert OK!");
         };
         reader.readAsText(file, "UTF-8");
     }
@@ -631,17 +715,11 @@
         const str = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(catalog));
         const dl = document.createElement('a');
         dl.setAttribute("href", str);
-        dl.setAttribute("download", "BestillingApp_backup.json");
+        dl.setAttribute("download", "MrIntl_backup.json");
         document.body.appendChild(dl);
         dl.click();
         dl.remove();
     }
-
-    document.addEventListener("click", function(e) {
-        if(e.target.id !== 'prodName') {
-            document.getElementById('suggestBox').style.display = 'none';
-        }
-    });
 
     applyLanguageStrings();
 </script>
