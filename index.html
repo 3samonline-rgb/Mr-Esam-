@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Mr intl - BestillingApp v8</title>
+    <title>Mr intl - BestillingApp v8.1</title>
+    <!-- مكتبة الكاميرا ومسح الباركود -->
     <script src="https://unpkg.com/html5-qrcode"></script>
     <style>
         * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
@@ -52,7 +53,10 @@
         
         .calc-box { background: #f0fdf4; border: 1px dashed #16a34a; border-radius: 10px; padding: 10px; margin-top: 8px; }
         .calc-line { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 4px; font-weight: 500; }
-        .final-price-input { width: 100px; font-size: 16px; font-weight: 800; color: #16a34a; border: 1px solid #16a34a; text-align: right; padding: 2px 4px; border-radius: 4px; }
+        body[dir="rtl"] .calc-line { direction: rtl; }
+        body[dir="ltr"] .calc-line { direction: ltr; }
+        
+        .final-price-input { width: 100px; font-size: 16px; font-weight: 800; color: #16a34a; border: 1px solid #16a34a; text-align: right; padding: 2px 4px; border-radius: 4px; direction: ltr !important; }
         
         .btn-main { width: 100%; background: #10b981; color: white; padding: 12px; border: none; border-radius: 8px; font-size: 14px; font-weight: bold; cursor: pointer; margin-top: 8px; }
         
@@ -66,24 +70,24 @@
         body[dir="rtl"] .group-header-title { text-align: right; border-right: 4px solid #10b981; border-left: none; }
         body[dir="ltr"] .group-header-title { text-align: left; border-left: 4px solid #10b981; border-right: none; }
         
-        /* بطاقات عرض المنتجات - اتجاه دائم LTR لسلامة الأرقام اللاتينية والأسعار */
+        /* حماية كارت المنتج من الانقلاب التلقائي - ثابت دائماً LTR */
         .product-card { background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 12px; margin-bottom: 8px; display: flex; flex-direction: column; gap: 8px; direction: ltr !important; text-align: left !important; }
-        .prod-main-row { display: flex; gap: 12px; align-items: center; width: 100%; }
+        .prod-main-row { display: flex; gap: 12px; align-items: center; width: 100%; direction: ltr !important; }
         .prod-img { width: 55px; height: 55px; border-radius: 8px; object-fit: cover; background: #f1f5f9; border: 1px solid #cbd5e1; flex-shrink: 0; display: block; }
-        .prod-info { flex: 1; min-width: 0; text-align: left !important; }
-        .prod-title { font-weight: 700; font-size: 14px; margin: 0; color: #0f172a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .prod-meta { font-size: 11px; color: #64748b; margin-top: 2px; }
-        .prod-price-tag { text-align: right; font-weight: 800; font-size: 16px; color: #16a34a; white-space: nowrap; }
+        .prod-info { flex: 1; min-width: 0; text-align: left !important; direction: ltr !important; }
+        .prod-title { font-weight: 700; font-size: 14px; margin: 0; color: #0f172a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: left !important; }
+        .prod-meta { font-size: 11px; color: #64748b; margin-top: 2px; text-align: left !important; }
+        .prod-price-tag { text-align: right !important; font-weight: 800; font-size: 16px; color: #16a34a; white-space: nowrap; margin-left: auto; direction: ltr !important; }
         
-        /* أزرار الإجراءات للتحكم بالمنتج */
-        .prod-actions-row { display: flex; gap: 4px; width: 100%; border-top: 1px solid #f1f5f9; padding-top: 8px; }
+        /* أزرار الإجراءات للتحكم بالمنتج - ثابتة دائماً LTR لعدم التداخل */
+        .prod-actions-row { display: flex; gap: 4px; width: 100%; border-top: 1px solid #f1f5f9; padding-top: 8px; direction: ltr !important; }
         .action-btn { flex: 1; border: none; padding: 8px 4px; border-radius: 6px; font-size: 10px; font-weight: bold; cursor: pointer; color: white; text-align: center; white-space: nowrap; }
         .btn-order { background: #0284c7; }
         .btn-add-fak { background: #475569; }
         .btn-edit { background: #ea580c; }
         .btn-del { background: #ef4444; max-width: 35px; }
         
-        .order-qty-input { width: 50px; padding: 2px; font-size: 12px; text-align: center; border: 1px solid #cbd5e1; border-radius: 4px; display: inline-block; margin-left: 4px; }
+        .order-qty-input { width: 50px; padding: 2px; font-size: 12px; text-align: center; border: 1px solid #cbd5e1; border-radius: 4px; display: inline-block; margin-left: 4px; direction: ltr !important; }
         
         .reorder-sticky-bar { background: #fffbeb; border-top: 2px solid #fef3c7; padding: 12px; margin-top: 15px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; }
         .btn-whatsapp-send { background: #25d366; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-size: 13px; font-weight: bold; cursor: pointer; }
@@ -138,6 +142,7 @@
         <button class="tab-btn" id="tabFakturaBtn" onclick="switchTab('faktura')">Fakturaliste</button>
     </div>
 
+    <!-- ================== صفحة المنتجات والكتالوج ================== -->
     <div id="sectionVareliste" class="page-section active">
         <input type="hidden" id="editId" value="">
         
@@ -252,6 +257,7 @@
 
         <button class="btn-main" id="btnSave" onclick="saveProductToCatalog()">Lagre produkt</button>
 
+        <!-- حقل البحث وكاميرا السعر السريع -->
         <div class="search-wrapper">
             <input type="text" id="searchCatalogBar" class="search-box" placeholder="🔍 Søk..." oninput="renderCatalogList()">
             <button class="search-cam-btn" onclick="startScanner('searchCatalogBar', true)" title="Scan to find price">📷</button>
@@ -259,6 +265,7 @@
         <div id="catalogContainer"></div>
     </div>
 
+    <!-- ================== قائمة الطلبيات (ORDRELISTE) ================== -->
     <div id="sectionOrdreliste" class="page-section">
         <input type="text" id="searchOrderBar" class="search-box" placeholder="Søk i ordreliste..." oninput="renderOrderList()">
         <div id="orderContainer"></div>
@@ -271,6 +278,7 @@
         </div>
     </div>
 
+    <!-- ================== نظام الفواتير الذكي (FAKTURALISTE) ================== -->
     <div id="sectionFaktura" class="page-section">
         <div class="form-group">
             <label id="lblFakSupplier">Leverandørnavn</label>
@@ -340,10 +348,10 @@
             lblFakSupplier: "Leverandørnavn", lblFakNum: "Fakturanummer", lblFakDate: "Dato", lblFakItems: "Mottatt produkt",
             lblFakRecQty: "Mottatt antall (Kasser/Stk)", lblFakActualCost: "Faktisk innkjøpspris (Total)",
             btnNewInvoice: "Bekreft og legg til i faktura", searchOrderPlh: "Søk i ordreliste...",
-            btnScan: "Scan 📷", promptGroup: "Skriv inn navnet på den nye varegruppen:", alertEmpty: "Vennligست fyll ut alle felter!",
+            btnScan: "Scan 📷", promptGroup: "Skriv inn navnet på den nye varegruppen:", alertEmpty: "Vennligst fyll ut alle felter!",
             alertFileEmpty: "Filen er tom!", alertSuccess: "Vellykket! Importert {count} produkter.", confirmDelete: "Slette?",
             thProd: "Produkt", thCost: "Kost", thIncome: "Inntekt/Verdi", thProfit: "Gevinst", btnDelFak: "Slett",
-            lblOrderBtn: "+ الطلبية", lblInvoiceBtn: "📄+ الفاتورة", lblEditBtn: "تعديل", lblDeleteBtn: "X",
+            lblOrderBtn: "الطلبية +", lblInvoiceBtn: "📄 الفاتورة +", lblEditBtn: "تعديل", lblDeleteBtn: "X",
             selectPlh: "-- Velg produkt --", textLeverandoer: "Leverandør", textGruppe: "Gruppe", textAntall: "Antall:"
         },
         ar: {
@@ -361,7 +369,7 @@
             btnScan: "مسح 📷", promptGroup: "أدخل اسم المجموعة التموينية الجديدة:", alertEmpty: "يرجى ملء جميع الحقول المطلوبة!",
             alertFileEmpty: "الملف فارغ تماماً!", alertSuccess: "تم بنجاح! استيراد {count} منتج إلى النظام.", confirmDelete: "هل أنت متأكد من الحذف؟",
             thProd: "المنتج", thCost: "التكلفة الإجمالية", thIncome: "القيمة الإجمالية للبيع", thProfit: "صافي الربح", btnDelFak: "حذف الفاتورة",
-            lblOrderBtn: "+ طلبية", lblInvoiceBtn: "📄+ الفاتورة", lblEditBtn: "تعديل", lblDeleteBtn: "X",
+            lblOrderBtn: "الطلبية +", lblInvoiceBtn: "📄 الفاتورة +", lblEditBtn: "تعديل", lblDeleteBtn: "X",
             selectPlh: "-- اختر المنتج --", textLeverandoer: "المورد", textGruppe: "المجموعة", textAntall: "الكمية:"
         }
     };
@@ -386,7 +394,6 @@
         }
     }
 
-    // إصلاح اتجاه وثنائية اللغة لتتغير فوراً وبشكل جذري
     function toggleLanguage() {
         currentLang = currentLang === 'no' ? 'ar' : 'no';
         localStorage.setItem('mr_v7_lang', currentLang);
@@ -396,7 +403,6 @@
     function applyLanguageStrings() {
         const l = currentLang;
         
-        // تغيير اتجاه جسم التطبيق بالكامل
         if (l === 'ar') {
             document.body.setAttribute('dir', 'rtl');
             document.getElementById('searchCatalogBar').style.textAlign = "right";
@@ -457,7 +463,7 @@
         document.getElementById('orderBadge').innerText = `(${orderList.length})`;
         
         updateVaregruppeDropdown();
-        renderCatalogList(); // إعادة البناء التلقائي الفوري للمنتجات
+        renderCatalogList(); 
         renderOrderList();
         populateFakturaSelect();
         renderFakturaRecords();
@@ -557,7 +563,7 @@
             qty: parseInt(document.getElementById('prodQty').value) || 1,
             margin: parseFloat(document.getElementById('prodMargin').value) || 1.5,
             mva: parseFloat(document.getElementById('prodMva').value) || 0,
-            img: imgUrlStr, // حفظ الرابط المباشر
+            img: imgUrlStr, 
             link: document.getElementById('prodLinkUrl').value.trim(),
             supplier: document.getElementById('prodSupplier').value.trim() || "Afro kjøp as",
             supplierUrl: document.getElementById('prodSupplierUrl').value.trim(),
@@ -584,16 +590,15 @@
         applyLanguageStrings();
     }
 
-    // إصلاح العرض التلقائي والفوري للمنتجات وإظهار الصور المباشرة
+    // تعديل كرت المنتج ليكون محمي من الانقلاب التلقائي وإظهار الصورة مباشرة
     function renderCatalogList() {
         const container = document.getElementById('catalogContainer');
         const query = document.getElementById('searchCatalogBar').value.toLowerCase().trim();
         container.innerHTML = '';
         const l = currentLang;
 
-        // تصفية المنتجات بناءً على البحث، أو إظهار الكل إذا كان الحقل فارغاً
         const filtered = catalog.filter(p => {
-            if (!query) return true; // إظهار فوري للمنتجات
+            if (!query) return true; 
             return p.name.toLowerCase().includes(query) || 
                    (p.barcode && p.barcode.includes(query)) ||
                    (p.supplier && p.supplier.toLowerCase().includes(query));
@@ -612,7 +617,6 @@
                 const card = document.createElement('div');
                 card.className = 'product-card';
                 
-                // التأكد من تهيئة وقراءة الصورة الملصقة بشكل صحيح
                 let imgHtml = '';
                 if(p.img && p.img.length > 5) {
                     imgHtml = `<img src="${p.img}" class="prod-img" onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\'prod-img\' style=\'display:flex;align-items:center;justify-content:center;font-size:18px;\'>📦</div>';">`;
@@ -929,13 +933,12 @@
         const str = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(catalog));
         const dl = document.createElement('a');
         dl.setAttribute("href", str);
-        dl.setAttribute("download", "MrIntl_v8_backup.json");
+        dl.setAttribute("download", "MrIntl_v8.1_backup.json");
         document.body.appendChild(dl);
         dl.click();
         dl.remove();
     }
 
-    // تشغيل تلقائي وتطبيق التنسيق
     applyLanguageStrings();
 </script>
 
