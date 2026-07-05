@@ -55,12 +55,16 @@
         
         .search-box { width: 100%; padding: 12px; margin: 15px 0 10px 0; border: 2px solid #10b981; border-radius: 10px; font-size: 15px; font-weight: bold; background: #fff; }
         
-        .product-card { background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 10px; margin-bottom: 8px; display: flex; gap: 10px; align-items: center; }
+        /* ترويسة المجموعة أثناء البحث والفلترة */
+        .group-header-title { background: #f1f5f9; border-left: 4px solid #10b981; padding: 6px 10px; margin: 12px 0 6px 0; font-weight: 800; font-size: 14px; color: #334155; text-align: left; }
+        
+        /* بطاقات كتالوج المنتجات - دائماً LTR لمنع مشاكل النصوص اللاتينية والأسعار */
+        .product-card { background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 10px; margin-bottom: 8px; display: flex; gap: 10px; align-items: center; direction: ltr !important; text-align: left !important; }
         .prod-img { width: 50px; height: 50px; border-radius: 6px; object-fit: cover; background: #e2e8f0; border: 1px solid #cbd5e1; }
-        .prod-info { flex: 1; min-width: 0; text-align: left; }
-        .prod-title { font-weight: 700; font-size: 13px; margin: 0; color: #0f172a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .prod-meta { font-size: 11px; color: #64748b; margin-top: 2px; }
-        .prod-actions { display: flex; gap: 4px; margin-top: 6px; flex-wrap: wrap; }
+        .prod-info { flex: 1; min-width: 0; text-align: left !important; }
+        .prod-title { font-weight: 700; font-size: 13px; margin: 0; color: #0f172a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: left !important; }
+        .prod-meta { font-size: 11px; color: #64748b; margin-top: 2px; text-align: left !important; }
+        .prod-actions { display: flex; gap: 4px; margin-top: 6px; flex-wrap: wrap; justify-content: flex-start; }
         .action-btn { border: none; padding: 4px 6px; border-radius: 4px; font-size: 10px; font-weight: bold; cursor: pointer; color: white; }
         .btn-edit { background: #ea580c; }
         .btn-del { background: #ef4444; }
@@ -82,21 +86,17 @@
         .faktura-header { display: flex; justify-content: space-between; font-weight: bold; border-bottom: 1px solid #e2e8f0; padding-bottom: 6px; margin-bottom: 6px; font-size: 12px; }
 
         #fileInput { display: none; }
-
-        /* الحقول المخفية المخصصة للطباعة الداخلية والخارجية */
         .print-only-info { display: none; }
 
-        /* إعدادات طباعة الكشوفات المخصصة لـ A4 ورقة كاملة ونظيفة */
         @media print {
             @page { size: A4; margin: 12mm; }
             body { background: white; padding: 0; color: #000; font-size: 11pt; }
             .app-container { box-shadow: none; max-width: 100%; width: 100%; padding: 0; }
             .top-actions, .nav-tabs, .form-group, .calc-box, .btn-main, .search-box, .prod-actions, .reorder-sticky-bar, .btn-del, .scan-btn, .add-grp-btn { display: none !important; }
-            .product-card { border: none; border-bottom: 1px solid #ddd; padding: 10px 0; page-break-inside: avoid; display: flex !important; justify-content: space-between; align-items: center; }
+            .product-card { border: none; border-bottom: 1px solid #ddd; padding: 10px 0; page-break-inside: avoid; display: flex !important; justify-content: space-between; align-items: center; direction: ltr !important; }
             .prod-price-tag { color: #000 !important; font-size: 14pt; font-weight: bold; }
             h1 { font-size: 26pt; margin-top: 0; text-align: center; }
             .subtitle { font-size: 13pt; color: #333 !important; margin-bottom: 20px; text-align: center; }
-            
             body.print-mode-kunder .print-only-info { display: none !important; }
             body.print-mode-ansatte .print-only-info { display: block !important; font-size: 10pt; color: #444; margin-top: 4px; }
         }
@@ -135,7 +135,7 @@
             <label id="lblProdName">Produktnavn</label>
             <div class="input-with-btn">
                 <input type="text" id="prodName" placeholder="Skriv produktnavn..." autocomplete="off">
-                <button class="scan-btn" onclick="startScanner('prodName')">Scan 📷</button>
+                <button class="scan-btn" id="btnScan1" onclick="startScanner('prodName')">Scan 📷</button>
             </div>
         </div>
 
@@ -145,7 +145,7 @@
                     <label id="lblBarcode">Strekkode</label>
                     <div class="input-with-btn">
                         <input type="text" id="prodBarcode" placeholder="Barcode">
-                        <button class="scan-btn" onclick="startScanner('prodBarcode')">Scan</button>
+                        <button class="scan-btn" id="btnScan2" onclick="startScanner('prodBarcode')">Scan</button>
                     </div>
                 </div>
             </div>
@@ -178,7 +178,7 @@
         <div class="row">
             <div class="col">
                 <div class="form-group">
-                    <label>Margin</label>
+                    <label id="lblMargin">Margin</label>
                     <select id="prodMargin" onchange="runCalculations()">
                         <option value="1.3">1.3</option><option value="1.4">1.4</option>
                         <option value="1.5" selected>1.5</option><option value="1.6">1.6</option>
@@ -188,7 +188,7 @@
             </div>
             <div class="col">
                 <div class="form-group">
-                    <label>MVA</label>
+                    <label id="lblMva">MVA</label>
                     <select id="prodMva" onchange="runCalculations()">
                         <option value="0.25">25%</option>
                         <option value="0.15" selected>15%</option>
@@ -233,7 +233,7 @@
         <button class="btn-main" id="btnSave" onclick="saveProductToCatalog()">Lagre produkt</button>
 
         <div style="margin-top: 10px;">
-            <input type="text" id="searchCatalogBar" class="search-box" placeholder="🔍 ابحث هنا بالاسم أو الباركود..." oninput="renderCatalogList()">
+            <input type="text" id="searchCatalogBar" class="search-box" placeholder="🔍 Søk..." oninput="renderCatalogList()">
             <div id="catalogContainer"></div>
         </div>
     </div>
@@ -246,7 +246,7 @@
                 <b id="lblTotalOrdre">Totalt valgt:</b> 
                 <span id="totalOrdreCount" style="color:#ea580c; font-weight:bold;">0</span>
             </div>
-            <button class="btn-whatsapp-send" onclick="sendOrderViaWhatsApp()">Send 💬</button>
+            <button class="btn-whatsapp-send" id="btnWhatsappSend" onclick="sendOrderViaWhatsApp()">Send 💬</button>
         </div>
     </div>
 
@@ -270,10 +270,24 @@
             </div>
         </div>
         <div class="form-group">
-            <label id="lblFakItems">المنتج المختار حالياً</label>
-            <select id="fakItemSelect">
-                <option value="">-- كشف فارغ، اضغط إضافة للفاتورة من الأسفل --</option>
+            <label id="lblFakItems">Produkt valgt for bekreftelse</label>
+            <select id="fakItemSelect" onchange="syncFakturaFieldsFromSelect()">
+                <option value="">-- Velg --</option>
             </select>
+        </div>
+        <div class="row">
+            <div class="col">
+                <div class="form-group">
+                    <label id="lblFakRecQty">Mottatt antall (Kasser/Stk)</label>
+                    <input type="number" id="fakReceivedQty" value="1">
+                </div>
+            </div>
+            <div class="col">
+                <div class="form-group">
+                    <label id="lblFakActualCost">Faktisk Innkjøpspris (Total)</label>
+                    <input type="number" step="any" id="fakActualCost" placeholder="0.00">
+                </div>
+            </div>
         </div>
         <button class="btn-main" style="background:#475569;" id="btnNewInvoice" onclick="createNewInvoice()">Opprett Faktura</button>
         
@@ -293,22 +307,40 @@
 
     const words = {
         no: {
+            appSub: "BestillingApp System",
+            lblImportBtn: "Import CSV", lblExportBtn: "Backup", lblPrintKunderBtn: "Prisliste 🖨️", lblPrintAnsatteBtn: "Ansatte 🖨️",
             varelisteTab: "Vareliste", ordrelisteTab: "Ordreliste", fakturaTab: "Fakturaliste",
             prodName: "Produktnavn", barcode: "Strekkode", varegruppe: "Varegruppe", cost: "Innkjøpspris (Total)",
-            qty: "Antall i eske", imgUrl: "Bilde URL", prodUrl: "Produkt URL", supplier: "Leverandør",
+            qty: "Antall i eske", margin: "Margin", mva: "MVA", imgUrl: "Bilde URL", prodUrl: "Produkt URL", supplier: "Leverandør",
             saveBtn: "Lagre produkt", updateBtn: "Oppdater produkt", searchPlh: "🔍 Søk etter navn eller strekkode...",
             c1: "Kost per enhet", c2: "Utsalgspris Eks MVA", c3: "Utsalgspris (Ink MVA):", c4: "Fortjeneste per enhet:",
             totalValgt: "Totalt valgt:", sendBtn: "Send til WhatsApp 💬", 
-            lblFakSupplier: "Leverandørnavn", lblFakNum: "Fakturanummer", lblFakDate: "Dato", lblFakItems: "Mottatt produkt"
+            lblFakSupplier: "Leverandørnavn", lblFakNum: "Fakturanummer", lblFakDate: "Dato", lblFakItems: "Mottatt produkt",
+            lblFakRecQty: "Mottatt antall (Kasser/Stk)", lblFakActualCost: "Faktisk innkjøpspris (Total)",
+            btnNewInvoice: "Bekreft og legg til i faktura", searchOrderPlh: "Søk i ordreliste...",
+            btnScan: "Scan 📷", promptGroup: "Skriv inn navnet på den nye varegruppen:", alertEmpty: "Vennligst fyll ut alle felter!",
+            alertFileEmpty: "Filen er tom!", alertSuccess: "Vellykket! Importert {count} produkter.", confirmDelete: "Slette?",
+            thProd: "Produkt", thCost: "Kost", thIncome: "Inntekt/Verdi", thProfit: "Gevinst", btnDelFak: "Slett faktura",
+            lblOrderBtn: "+ Bestill", lblInvoiceBtn: "📄+ Faktura", lblEditBtn: "Endre", lblDeleteBtn: "X",
+            selectPlh: "-- Velg produkt --", textLeverandoer: "Leverandør", textGruppe: "Gruppe", textAntall: "Antall:"
         },
         ar: {
-            varelisteTab: "قائمة المنتجات", ordrelisteTab: "قائمة الطلبيات", fakturaTab: "الفواتير والأرباح",
+            appSub: "نظام تطبيق الطلبيات وإدارة المتجر",
+            lblImportBtn: "استيراد ملف CSV", lblExportBtn: "نسخة احتياطية", lblPrintKunderBtn: "قائمة الأسعار 🖨️", lblPrintAnsatteBtn: "كشف الموظفين 🖨️",
+            varelisteTab: "قائمة المنتجات", ordrelisteTab: "قائمة الطلبيات", fakturaTab: "تأكيد واستلام الفواتير",
             prodName: "اسم المنتج", barcode: "الباركود", varegruppe: "المجموعة التموينية", cost: "سعر الشراء الإجمالي للفاتورة",
-            qty: "الكمية داخل الكرتونة", imgUrl: "رابط صورة المنتج", prodUrl: "رابط صفحة المنتج", supplier: "اسم Mva / المورد",
+            qty: "الكمية داخل الكرتونة", margin: "نسبة الربح (Margin)", mva: "الضريبة MVA", imgUrl: "رابط صورة المنتج", prodUrl: "رابط صفحة المنتج", supplier: "اسم المورد",
             saveBtn: "حفظ في الكتالوج", updateBtn: "تعديل وحفظ البيانات", searchPlh: "🔍 ابحث هنا بالاسم أو الباركود...",
             c1: "التكلفة للقطعة المفردة", c2: "سعر البيع قبل الضريبة", c3: "سعر البيع النهائي (مع الضريبة):", c4: "صافي الأرباح للقطعة:",
             totalValgt: "إجمالي السلع المحددة:", sendBtn: "إرسال الكشف عبر الواتساب 💬",
-            lblFakSupplier: "اسم المورد صاحب الفاتورة", lblFakNum: "رقم الفاتورة", lblFakDate: "تاريخ الفاتورة", lblFakItems: "المنتج المستهدف بالفاتورة"
+            lblFakSupplier: "اسم المورد صاحب الفاتورة", lblFakNum: "رقم الفاتورة", lblFakDate: "تاريخ الفاتورة", lblFakItems: "المنتج المستهدف بالفاتورة",
+            lblFakRecQty: "الكمية المستلمة فعلياً", lblFakActualCost: "تكلفة الشراء الفعلية للفاتورة",
+            btnNewInvoice: "تأكيد استلام المنتج وإضافته للفاتورة", searchOrderPlh: "البحث في قائمة الطلبيات المحددة...",
+            btnScan: "مسح 📷", promptGroup: "أدخل اسم المجموعة التموينية الجديدة:", alertEmpty: "يرجى ملء جميع الحقول المطلوبة!",
+            alertFileEmpty: "الملف فارغ تماماً!", alertSuccess: "تم بنجاح! استيراد {count} منتج إلى النظام.", confirmDelete: "هل أنت متأكد من الحذف؟",
+            thProd: "المنتج", thCost: "التكلفة الإجمالية", thIncome: "القيمة الإجمالية للبيع", thProfit: "صافي الربح", btnDelFak: "حذف الفاتورة",
+            lblOrderBtn: "+ طلبية", lblInvoiceBtn: "📄+ الفاتورة", lblEditBtn: "تعديل", lblDeleteBtn: "X",
+            selectPlh: "-- اختر المنتج --", textLeverandoer: "المورد", textGruppe: "المجموعة", textAntall: "الكمية:"
         }
     };
 
@@ -349,8 +381,7 @@
     }
 
     function addNewVaregruppeManual() {
-        let msg = currentLang === 'ar' ? "أدخل اسم المجموعة الجديدة:" : "Skriv inn navnet på den nye varegruppen:";
-        let newGrp = prompt(msg);
+        let newGrp = prompt(words[currentLang].promptGroup);
         if(newGrp && newGrp.trim()) {
             varegrupper.push(newGrp.trim());
             localStorage.setItem('mr_varegrupper', JSON.stringify(varegrupper));
@@ -360,36 +391,70 @@
 
     function applyLanguageStrings() {
         const l = currentLang;
+        
+        if (l === 'ar') {
+            document.body.style.direction = "rtl";
+            document.getElementById('searchCatalogBar').style.textAlign = "right";
+            document.getElementById('searchOrderBar').style.textAlign = "right";
+        } else {
+            document.body.style.direction = "ltr";
+            document.getElementById('searchCatalogBar').style.textAlign = "left";
+            document.getElementById('searchOrderBar').style.textAlign = "left";
+        }
+
+        document.getElementById('appSub').innerText = words[l].appSub;
+        document.getElementById('lblImportBtn').innerText = words[l].lblImportBtn;
+        document.getElementById('lblExportBtn').innerText = words[l].lblExportBtn;
+        document.getElementById('lblPrintKunderBtn').innerText = words[l].lblPrintKunderBtn;
+        document.getElementById('lblPrintAnsatteBtn').innerText = words[l].lblPrintAnsatteBtn;
+
         document.getElementById('tabVarelisteBtn').innerText = words[l].varelisteTab;
         document.getElementById('tabOrdrelisteBtn').innerText = words[l].ordrelisteTab;
         document.getElementById('tabFakturaBtn').innerText = words[l].fakturaTab;
+        
         document.getElementById('lblProdName').innerText = words[l].prodName;
         document.getElementById('lblBarcode').innerText = words[l].barcode;
         document.getElementById('lblVaregruppe').innerText = words[l].varegruppe;
         document.getElementById('lblCost').innerText = words[l].cost;
         document.getElementById('lblQty').innerText = words[l].qty;
+        document.getElementById('lblMargin').innerText = words[l].margin;
+        document.getElementById('lblMva').innerText = words[l].mva;
         document.getElementById('lblImgUrl').innerText = words[l].imgUrl;
         document.getElementById('lblProdUrl').innerText = words[l].prodUrl;
         document.getElementById('lblLeverandoer').innerText = words[l].supplier;
+        
+        document.getElementById('btnScan1').innerText = words[l].btnScan;
+        document.getElementById('btnScan2').innerText = words[l].btnScan;
+        
         document.getElementById('searchCatalogBar').placeholder = words[l].searchPlh;
+        document.getElementById('searchOrderBar').placeholder = words[l].searchOrderPlh;
+        
         document.getElementById('c1').innerText = words[l].c1;
         document.getElementById('c2').innerText = words[l].c2;
         document.getElementById('c3').innerText = words[l].c3;
         document.getElementById('c4').innerText = words[l].c4;
+        
         document.getElementById('lblTotalOrdre').innerText = words[l].totalValgt;
-        document.querySelector('.btn-whatsapp-send').innerText = words[l].sendBtn;
+        document.getElementById('btnWhatsappSend').innerText = words[l].sendBtn;
         
         document.getElementById('lblFakSupplier').innerText = words[l].lblFakSupplier;
         document.getElementById('lblFakNum').innerText = words[l].lblFakNum;
         document.getElementById('lblFakDate').innerText = words[l].lblFakDate;
         document.getElementById('lblFakItems').innerText = words[l].lblFakItems;
+        document.getElementById('lblFakRecQty').innerText = words[l].lblFakRecQty;
+        document.getElementById('lblFakActualCost').innerText = words[l].lblFakActualCost;
+        document.getElementById('btnNewInvoice').innerText = words[l].btnNewInvoice;
 
         const isEdit = document.getElementById('editId').value;
         document.getElementById('btnSave').innerText = isEdit ? words[l].updateBtn : words[l].saveBtn;
         
         document.getElementById('orderBadge').innerText = `(${orderList.length})`;
+        
         updateVaregruppeDropdown();
         renderCatalogList();
+        renderOrderList();
+        populateFakturaSelect();
+        renderFakturaRecords();
     }
 
     function runCalculations(autoFinal = true) {
@@ -483,36 +548,51 @@
         applyLanguageStrings();
     }
 
+    // تعديل منطق البحث: يظهر اسم المجموعة كعنوان أولاً ثم تسرد البضائع المفلترة تحتها
     function renderCatalogList() {
         const container = document.getElementById('catalogContainer');
         const query = document.getElementById('searchCatalogBar').value.toLowerCase().trim();
         container.innerHTML = '';
+        const l = currentLang;
 
         const filtered = catalog.filter(p => p.name.toLowerCase().includes(query) || (p.barcode && p.barcode.includes(query)));
         
-        filtered.forEach(p => {
-            const card = document.createElement('div');
-            card.className = 'product-card';
-            const imgEl = p.img ? `<img src="${p.img}" class="prod-img">` : `<div class="prod-img" style="display:flex;align-items:center;justify-content:center;font-size:18px;">📦</div>`;
-            
-            card.innerHTML = `
-                ${imgEl}
-                <div class="prod-info">
-                    <p class="prod-title">${p.name}</p>
-                    <div class="prod-meta">Leverandør: <b>${p.supplier}</b> | Gruppe: <b>${p.varegruppe}</b></div>
-                    <div class="print-only-info">
-                        BC: ${p.barcode || '-'} | Innkjøp: ${(p.cost/p.qty).toFixed(2)} kr | Margin: ${p.margin}
+        // استخراج المجموعات الفريدة الموجودة في النتائج المفلترة فقط
+        let uniqueGroupsInResult = [...new Set(filtered.map(p => p.varegruppe))];
+
+        uniqueGroupsInResult.forEach(grp => {
+            // إنشاء عنوان رئيسي للمجموعة التموينية
+            const header = document.createElement('div');
+            header.className = 'group-header-title';
+            header.innerText = grp;
+            container.appendChild(header);
+
+            // تجميع السلع التابعة لهذه المجموعة
+            let groupProducts = filtered.filter(p => p.varegruppe === grp);
+            groupProducts.forEach(p => {
+                const card = document.createElement('div');
+                card.className = 'product-card';
+                const imgEl = p.img ? `<img src="${p.img}" class="prod-img">` : `<div class="prod-img" style="display:flex;align-items:center;justify-content:center;font-size:18px;">📦</div>`;
+                
+                card.innerHTML = `
+                    ${imgEl}
+                    <div class="prod-info">
+                        <p class="prod-title">${p.name}</p>
+                        <div class="prod-meta">${words[l].textLeverandoer}: <b>${p.supplier}</b> | ${words[l].textGruppe}: <b>${p.varegruppe}</b></div>
+                        <div class="print-only-info">
+                            BC: ${p.barcode || '-'} | Innkjøp: ${(p.cost/p.qty).toFixed(2)} kr | Margin: ${p.margin}
+                        </div>
+                        <div class="prod-actions">
+                            <button class="action-btn btn-order" onclick="addToOrderList(${p.id})">${words[l].lblOrderBtn}</button>
+                            <button class="action-btn btn-add-fak" onclick="autoSendToFakturaForm(${p.id})">${words[l].lblInvoiceBtn}</button>
+                            <button class="action-btn btn-edit" onclick="loadToForm(${p.id})">${words[l].lblEditBtn}</button>
+                            <button class="action-btn btn-del" onclick="deleteFromCatalog(${p.id})">${words[l].lblDeleteBtn}</button>
+                        </div>
                     </div>
-                    <div class="prod-actions">
-                        <button class="action-btn btn-order" onclick="addToOrderList(${p.id})">+ Bestill</button>
-                        <button class="action-btn btn-add-fak" onclick="autoSendToFakturaForm(${p.id})">📄+ الفاتورة</button>
-                        <button class="action-btn btn-edit" onclick="loadToForm(${p.id})">Endre</button>
-                        <button class="action-btn btn-del" onclick="deleteFromCatalog(${p.id})">X</button>
-                    </div>
-                </div>
-                <div class="prod-price-tag">${(p.finalPrice || 0).toFixed(2)} kr</div>
-            `;
-            container.appendChild(card);
+                    <div class="prod-price-tag">${(p.finalPrice || 0).toFixed(2)} kr</div>
+                `;
+                container.appendChild(card);
+            });
         });
     }
 
@@ -539,17 +619,30 @@
         document.getElementById('btnSave').innerText = words[l].updateBtn;
     }
 
+    // إصلاح الخلل: ملء القائمة بالكامل وتحديد السلعة تلقائياً ومزامنة البيانات المطلوبة
     function autoSendToFakturaForm(id) {
         const p = catalog.find(item => item.id === id);
         if(!p) return;
         
         switchTab('faktura');
-        document.getElementById('fakSupplier').value = p.supplier;
+        populateFakturaSelect(); // تعبئة الكومبو بوكس بكل السلع أولاً
         
-        const select = document.getElementById('fakItemSelect');
-        select.innerHTML = `<option value="${p.id}" selected>${p.name}</option>`;
+        document.getElementById('fakSupplier').value = p.supplier;
+        document.getElementById('fakItemSelect').value = p.id;
+        document.getElementById('fakReceivedQty').value = "1";
+        document.getElementById('fakActualCost').value = p.cost; 
         
         window.scrollTo({top: 0, behavior: 'smooth'});
+    }
+
+    function syncFakturaFieldsFromSelect() {
+        const itemId = document.getElementById('fakItemSelect').value;
+        if(!itemId) return;
+        const p = catalog.find(item => item.id == itemId);
+        if(p) {
+            document.getElementById('fakSupplier').value = p.supplier;
+            document.getElementById('fakActualCost').value = p.cost;
+        }
     }
 
     function addToOrderList(id) {
@@ -566,6 +659,7 @@
         const container = document.getElementById('orderContainer');
         container.innerHTML = '';
         document.getElementById('totalOrdreCount').innerText = orderList.length;
+        const l = currentLang;
 
         orderList.forEach(o => {
             const card = document.createElement('div');
@@ -573,12 +667,12 @@
             card.innerHTML = `
                 <div class="prod-info">
                     <p class="prod-title">${o.name}</p>
-                    <div class="prod-meta">Leverandør: <b>${o.supplier}</b></div>
+                    <div class="prod-meta">${words[l].textLeverandoer}: <b>${o.supplier}</b></div>
                     <div class="prod-meta" style="margin-top:5px;">
-                        Antall: <input type="number" class="order-qty-input" value="${o.antall}" min="1" oninput="o.antall=parseInt(this.value);localStorage.setItem('mr_orders_v4', JSON.stringify(orderList));">
+                        ${words[l].textAntall} <input type="number" class="order-qty-input" value="${o.antall}" min="1" oninput="o.antall=parseInt(this.value);localStorage.setItem('mr_orders_v4', JSON.stringify(orderList));">
                     </div>
                 </div>
-                <button class="action-btn btn-del" onclick="orderList=orderList.filter(item=>item.id!==${o.id});localStorage.setItem('mr_orders_v4', JSON.stringify(orderList));renderOrderList();applyLanguageStrings();">X</button>
+                <button class="action-btn btn-del" onclick="orderList=orderList.filter(item=>item.id!==${o.id});localStorage.setItem('mr_orders_v4', JSON.stringify(orderList));renderOrderList();applyLanguageStrings();">${words[l].lblDeleteBtn}</button>
             `;
             container.appendChild(card);
         });
@@ -592,29 +686,37 @@
 
     function populateFakturaSelect() {
         const select = document.getElementById('fakItemSelect');
-        if(select.value !== "") return; 
-        select.innerHTML = '<option value="">-- Velg produkt --</option>';
+        const currentVal = select.value;
+        select.innerHTML = `<option value="">${words[currentLang].selectPlh}</option>`;
         catalog.forEach(p => {
             const opt = document.createElement('option');
             opt.value = p.id;
             opt.innerText = p.name;
             select.appendChild(opt);
         });
+        if(currentVal) select.value = currentVal;
     }
 
+    // تعديل الحسابات لحفظ الفاتورة بناءً على التكلفة والكميات الفعلية المؤكدة عند الاستلام
     function createNewInvoice() {
         const sup = document.getElementById('fakSupplier').value.trim();
         const num = document.getElementById('fakNumber').value.trim();
         const date = document.getElementById('fakDate').value;
         const itemId = document.getElementById('fakItemSelect').value;
+        const recQty = parseInt(document.getElementById('fakReceivedQty').value) || 1;
+        const actualCost = parseFloat(document.getElementById('fakActualCost').value) || 0;
 
-        if(!sup || !num || !itemId) { alert("Vennligst fyll ut alle felter!"); return; }
+        if(!sup || !num || !itemId) { alert(words[currentLang].alertEmpty); return; }
         const prod = catalog.find(p => p.id == itemId);
 
-        const unitCost = prod.cost / prod.qty;
+        // حسابات الربح الحقيقي بناءً على مدخلات الفاتورة الحالية المؤكدة
+        const unitCost = actualCost / prod.qty;
         const calculatedExMva = prod.finalPrice / (1 + prod.mva);
         const profitPerUnit = calculatedExMva - unitCost;
-        const totalProfitInvoice = profitPerUnit * prod.qty;
+        
+        // إجمالي الربح = ربح القطعة المفردة × عدد القطع الإجمالي في الكراتين المستلمة
+        const totalProfitInvoice = profitPerUnit * (prod.qty * recQty);
+        const totalCostInvoice = actualCost * recQty;
 
         const newFak = {
             id: Date.now(),
@@ -622,7 +724,7 @@
             number: num,
             date: date || new Date().toISOString().split('T')[0],
             prodName: prod.name,
-            totalCost: prod.cost,
+            totalCost: totalCostInvoice,
             totalProfit: totalProfitInvoice
         };
 
@@ -630,14 +732,16 @@
         localStorage.setItem('mr_faktura_v4', JSON.stringify(fakturaList));
         
         document.getElementById('fakNumber').value = '';
-        document.getElementById('fakItemSelect').innerHTML = '<option value="">-- Velg produkt --</option>';
-        populateFakturaSelect();
+        document.getElementById('fakReceivedQty').value = '1';
+        document.getElementById('fakActualCost').value = '';
+        document.getElementById('fakItemSelect').value = '';
         renderFakturaRecords();
     }
 
     function renderFakturaRecords() {
         const container = document.getElementById('fakturaRecordsContainer');
         container.innerHTML = '';
+        const l = currentLang;
 
         if(fakturaList.length === 0) return;
 
@@ -646,17 +750,17 @@
             div.className = 'faktura-card';
             div.innerHTML = `
                 <div class="faktura-header">
-                    <span>Mottatt: ${f.supplier}</span>
+                    <span>${words[l].textLeverandoer}: ${f.supplier}</span>
                     <span style="color:#7c3aed;">Fak# ${f.number}</span>
                 </div>
                 <div style="font-size:11px; color:#64748b; margin-bottom:6px;">Dato: ${f.date}</div>
                 <table class="faktura-table">
                     <thead>
                         <tr>
-                            <th>Produkt</th>
-                            <th>Kost</th>
-                            <th>Inntekt/Verdi</th>
-                            <th>Gevinst</th>
+                            <th>${words[l].thProd}</th>
+                            <th>${words[l].thCost}</th>
+                            <th>${words[l].thIncome}</th>
+                            <th>${words[l].thProfit}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -668,14 +772,14 @@
                         </tr>
                     </tbody>
                 </table>
-                <button class="action-btn btn-del" style="margin-top:8px; padding:2px 6px;" onclick="fakturaList=fakturaList.filter(item=>item.id!==${f.id});localStorage.setItem('mr_faktura_v4', JSON.stringify(fakturaList));renderFakturaRecords();">Slett faktura</button>
+                <button class="action-btn btn-del" style="margin-top:8px; padding:2px 6px;" onclick="fakturaList=fakturaList.filter(item=>item.id!==${f.id});localStorage.setItem('mr_faktura_v4', JSON.stringify(fakturaList));renderFakturaRecords();">${words[l].btnDelFak}</button>
             `;
             container.appendChild(div);
         });
     }
 
     function deleteFromCatalog(id) {
-        if(confirm("Slette?")) {
+        if(confirm(words[currentLang].confirmDelete)) {
             catalog = catalog.filter(p => p.id !== id);
             localStorage.setItem('mr_catalog_v4', JSON.stringify(catalog));
             renderCatalogList();
@@ -692,19 +796,15 @@
         window.print();
     }
 
-    // الدالة الذكية والمطورة بالكامل لفك وتحليل ملفك بعد إزالة مشكلة السطور المخفية والرموز
     function handleCSVImport(e) {
         const file = e.target.files[0];
         if(!file) return;
         const reader = new FileReader();
         reader.onload = function(evt) {
             const content = evt.target.result;
-            
-            // تقسيم الملف إلى أسطر بشكل آمن يزيل الرموز المخفية \r
             const lines = content.split(/\r?\n/);
-            if (lines.length < 1) { alert("Filen er tom!"); return; }
+            if (lines.length < 1) { alert(words[currentLang].alertFileEmpty); return; }
 
-            // استخراج الترويسة من السطر الأول
             let headers = lines[0].toLowerCase().split(';').map(h => h.replace(/"/g, '').trim());
             
             let idxVarenummer = headers.indexOf('varenummer');
@@ -724,7 +824,6 @@
                 let cols = currentLine.split(';');
                 if(cols.length <= 1) continue;
 
-                // تنظيف الأسماء تماماً من علامات الاقتباس المحيطة
                 let name = cols[idxNavn] ? cols[idxNavn].replace(/^"|"$/g, '').trim() : '';
                 if(!name) continue;
 
@@ -732,7 +831,6 @@
                 let importedGroup = (idxVaregruppe !== -1 && cols[idxVaregruppe]) ? cols[idxVaregruppe].replace(/"/g, '').trim() : 'Tørrvarer';
                 let supplier = (idxSupplier !== -1 && cols[idxSupplier]) ? cols[idxSupplier].replace(/^"|"$/g, '').trim() : 'Afro kjøp as';
                 
-                // تنظيف فوري ومقاوم للفاصلة العشرية النرويجية
                 let rawCost = (idxCost !== -1 && cols[idxCost]) ? cols[idxCost].replace(/"/g, '').replace(',', '.').trim() : '0';
                 let cost = parseFloat(rawCost) || 0;
 
@@ -747,7 +845,6 @@
                     varegrupper.push(importedGroup);
                 }
 
-                // تجنب التكرار داخل الكتالوج
                 catalog = catalog.filter(p => p.name !== name && (barcode === "" || p.barcode !== barcode));
 
                 catalog.push({
@@ -770,7 +867,9 @@
             localStorage.setItem('mr_catalog_v4', JSON.stringify(catalog));
             localStorage.setItem('mr_varegrupper', JSON.stringify(varegrupper));
             applyLanguageStrings();
-            alert(`Vellykket! Importert ${count} produkter.`);
+            
+            let successMsg = words[currentLang].alertSuccess.replace("{count}", count);
+            alert(successMsg);
         };
         reader.readAsText(file, "UTF-8");
     }
