@@ -692,17 +692,19 @@
         window.print();
     }
 
-    // الدالة الاحترافية والمعدلة خصيصاً لبنية ملف الـ CSV الفعلي
+    // الدالة الذكية والمطورة بالكامل لفك وتحليل ملفك بعد إزالة مشكلة السطور المخفية والرموز
     function handleCSVImport(e) {
         const file = e.target.files[0];
         if(!file) return;
         const reader = new FileReader();
         reader.onload = function(evt) {
             const content = evt.target.result;
-            const lines = content.split('\n');
+            
+            // تقسيم الملف إلى أسطر بشكل آمن يزيل الرموز المخفية \r
+            const lines = content.split(/\r?\n/);
             if (lines.length < 1) { alert("Filen er tom!"); return; }
 
-            // الترويسة الفعلية بالسطر الأول
+            // استخراج الترويسة من السطر الأول
             let headers = lines[0].toLowerCase().split(';').map(h => h.replace(/"/g, '').trim());
             
             let idxVarenummer = headers.indexOf('varenummer');
@@ -715,7 +717,6 @@
 
             let count = 0;
 
-            // البدء بالمعالجة من السطر الثاني فوراً
             for(let i = 1; i < lines.length; i++) {
                 let currentLine = lines[i].trim();
                 if(!currentLine) continue;
@@ -723,17 +724,15 @@
                 let cols = currentLine.split(';');
                 if(cols.length <= 1) continue;
 
-                // تنظيف اسم المنتج تماماً من أي علامات اقتباس محيطة
+                // تنظيف الأسماء تماماً من علامات الاقتباس المحيطة
                 let name = cols[idxNavn] ? cols[idxNavn].replace(/^"|"$/g, '').trim() : '';
                 if(!name) continue;
 
-                // استخلاص الباركود (حقل varenummer بالملف يمثل الباركود الفعلي)
                 let barcode = cols[idxVarenummer] ? cols[idxVarenummer].replace(/"/g, '').trim() : '';
-
                 let importedGroup = (idxVaregruppe !== -1 && cols[idxVaregruppe]) ? cols[idxVaregruppe].replace(/"/g, '').trim() : 'Tørrvarer';
                 let supplier = (idxSupplier !== -1 && cols[idxSupplier]) ? cols[idxSupplier].replace(/^"|"$/g, '').trim() : 'Afro kjøp as';
                 
-                // معالجة الفاصلة النرويجية وعلامات الاقتباس في السعر والتكلفة
+                // تنظيف فوري ومقاوم للفاصلة العشرية النرويجية
                 let rawCost = (idxCost !== -1 && cols[idxCost]) ? cols[idxCost].replace(/"/g, '').replace(',', '.').trim() : '0';
                 let cost = parseFloat(rawCost) || 0;
 
