@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Mr intl - BestillingApp v7</title>
+    <title>Mr intl - BestillingApp v8</title>
     <script src="https://unpkg.com/html5-qrcode"></script>
     <style>
         * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-        body { background-color: #f8fafc; margin: 0; padding: 10px; color: #1e293b; -webkit-tap-highlight-color: transparent; }
+        body { background-color: #f8fafc; margin: 0; padding: 10px; color: #1e293b; -webkit-tap-highlight-color: transparent; transition: direction 0.3s ease; }
         .app-container { width: 100%; max-width: 480px; margin: auto; background: white; padding: 16px; border-radius: 24px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
         
         /* شريط التبديل العلوي */
@@ -30,7 +30,10 @@
         .page-section { display: none; }
         .page-section.active { display: block; }
         
-        .form-group { background: #f1f5f9; padding: 10px; border-radius: 10px; margin-bottom: 8px; border: 1px solid #e2e8f0; text-align: left; position: relative; }
+        .form-group { background: #f1f5f9; padding: 10px; border-radius: 10px; margin-bottom: 8px; border: 1px solid #e2e8f0; position: relative; }
+        body[dir="rtl"] .form-group { text-align: right; }
+        body[dir="ltr"] .form-group { text-align: left; }
+        
         label { font-size: 11px; font-weight: bold; color: #64748b; display: block; margin-bottom: 4px; }
         
         .input-with-btn { display: flex; gap: 6px; }
@@ -53,18 +56,20 @@
         
         .btn-main { width: 100%; background: #10b981; color: white; padding: 12px; border: none; border-radius: 8px; font-size: 14px; font-weight: bold; cursor: pointer; margin-top: 8px; }
         
-        /* شريط البحث مع زر الكاميرا للأسعار السريعة */
+        /* شريط البحث المطور */
         .search-wrapper { display: flex; gap: 6px; margin: 15px 0 10px 0; }
         .search-box { flex: 1; padding: 12px; border: 2px solid #10b981; border-radius: 10px; font-size: 15px; font-weight: bold; background: #fff; }
         .search-cam-btn { background: #10b981; color: white; border: none; padding: 0 14px; border-radius: 10px; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
 
         /* ترويسة المجموعات التموينية */
-        .group-header-title { background: #e2e8f0; border-left: 4px solid #10b981; padding: 8px 12px; margin: 16px 0 8px 0; font-weight: 800; font-size: 14px; color: #1e293b; text-align: left; border-radius: 6px; }
+        .group-header-title { background: #e2e8f0; padding: 8px 12px; margin: 16px 0 8px 0; font-weight: 800; font-size: 14px; color: #1e293b; border-radius: 6px; }
+        body[dir="rtl"] .group-header-title { text-align: right; border-right: 4px solid #10b981; border-left: none; }
+        body[dir="ltr"] .group-header-title { text-align: left; border-left: 4px solid #10b981; border-right: none; }
         
-        /* بطاقات عرض المنتجات - مثبتة LTR لسلامة الحروف والأرقام اللاتينية */
+        /* بطاقات عرض المنتجات - اتجاه دائم LTR لسلامة الأرقام اللاتينية والأسعار */
         .product-card { background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 12px; margin-bottom: 8px; display: flex; flex-direction: column; gap: 8px; direction: ltr !important; text-align: left !important; }
         .prod-main-row { display: flex; gap: 12px; align-items: center; width: 100%; }
-        .prod-img { width: 55px; height: 55px; border-radius: 8px; object-fit: cover; background: #f1f5f9; border: 1px solid #cbd5e1; flex-shrink: 0; }
+        .prod-img { width: 55px; height: 55px; border-radius: 8px; object-fit: cover; background: #f1f5f9; border: 1px solid #cbd5e1; flex-shrink: 0; display: block; }
         .prod-info { flex: 1; min-width: 0; text-align: left !important; }
         .prod-title { font-weight: 700; font-size: 14px; margin: 0; color: #0f172a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .prod-meta { font-size: 11px; color: #64748b; margin-top: 2px; }
@@ -316,7 +321,6 @@
     let activeScanTarget = '';
     let isPriceLookupMode = false;
 
-    // تم تعديل المفاتيح للتأكد من استقرار حفظ وعرض البيانات بشكل فوري وتجنب التداخل
     let varegrupper = JSON.parse(localStorage.getItem('mr_v7_groups')) || ["Tørrvarer", "Drikke", "Kosmetikk", "Ferskvarer", "Grønnsaker", "Andre"];
     let catalog = JSON.parse(localStorage.getItem('mr_v7_catalog')) || [];
     let orderList = JSON.parse(localStorage.getItem('mr_v7_orders')) || [];
@@ -336,7 +340,7 @@
             lblFakSupplier: "Leverandørnavn", lblFakNum: "Fakturanummer", lblFakDate: "Dato", lblFakItems: "Mottatt produkt",
             lblFakRecQty: "Mottatt antall (Kasser/Stk)", lblFakActualCost: "Faktisk innkjøpspris (Total)",
             btnNewInvoice: "Bekreft og legg til i faktura", searchOrderPlh: "Søk i ordreliste...",
-            btnScan: "Scan 📷", promptGroup: "Skriv inn navnet på den nye varegruppen:", alertEmpty: "Vennligst fyll ut alle felter!",
+            btnScan: "Scan 📷", promptGroup: "Skriv inn navnet på den nye varegruppen:", alertEmpty: "Vennligست fyll ut alle felter!",
             alertFileEmpty: "Filen er tom!", alertSuccess: "Vellykket! Importert {count} produkter.", confirmDelete: "Slette?",
             thProd: "Produkt", thCost: "Kost", thIncome: "Inntekt/Verdi", thProfit: "Gevinst", btnDelFak: "Slett",
             lblOrderBtn: "+ الطلبية", lblInvoiceBtn: "📄+ الفاتورة", lblEditBtn: "تعديل", lblDeleteBtn: "X",
@@ -382,41 +386,23 @@
         }
     }
 
+    // إصلاح اتجاه وثنائية اللغة لتتغير فوراً وبشكل جذري
     function toggleLanguage() {
         currentLang = currentLang === 'no' ? 'ar' : 'no';
         localStorage.setItem('mr_v7_lang', currentLang);
         applyLanguageStrings();
     }
 
-    function updateVaregruppeDropdown() {
-        const select = document.getElementById('prodVaregruppe');
-        select.innerHTML = '';
-        varegrupper.forEach(g => {
-            const opt = document.createElement('option');
-            opt.value = g;
-            opt.innerText = g;
-            select.appendChild(opt);
-        });
-    }
-
-    function addNewVaregruppeManual() {
-        let newGrp = prompt(words[currentLang].promptGroup);
-        if(newGrp && newGrp.trim()) {
-            varegrupper.push(newGrp.trim());
-            localStorage.setItem('mr_v7_groups', JSON.stringify(varegrupper));
-            updateVaregruppeDropdown();
-        }
-    }
-
     function applyLanguageStrings() {
         const l = currentLang;
         
+        // تغيير اتجاه جسم التطبيق بالكامل
         if (l === 'ar') {
-            document.body.style.direction = "rtl";
+            document.body.setAttribute('dir', 'rtl');
             document.getElementById('searchCatalogBar').style.textAlign = "right";
             document.getElementById('searchOrderBar').style.textAlign = "right";
         } else {
-            document.body.style.direction = "ltr";
+            document.body.setAttribute('dir', 'ltr');
             document.getElementById('searchCatalogBar').style.textAlign = "left";
             document.getElementById('searchOrderBar').style.textAlign = "left";
         }
@@ -471,10 +457,30 @@
         document.getElementById('orderBadge').innerText = `(${orderList.length})`;
         
         updateVaregruppeDropdown();
-        renderCatalogList();
+        renderCatalogList(); // إعادة البناء التلقائي الفوري للمنتجات
         renderOrderList();
         populateFakturaSelect();
         renderFakturaRecords();
+    }
+
+    function updateVaregruppeDropdown() {
+        const select = document.getElementById('prodVaregruppe');
+        select.innerHTML = '';
+        varegrupper.forEach(g => {
+            const opt = document.createElement('option');
+            opt.value = g;
+            opt.innerText = g;
+            select.appendChild(opt);
+        });
+    }
+
+    function addNewVaregruppeManual() {
+        let newGrp = prompt(words[currentLang].promptGroup);
+        if(newGrp && newGrp.trim()) {
+            varegrupper.push(newGrp.trim());
+            localStorage.setItem('mr_v7_groups', JSON.stringify(varegrupper));
+            updateVaregruppeDropdown();
+        }
     }
 
     function runCalculations(autoFinal = true) {
@@ -540,6 +546,8 @@
         if(!name) return;
 
         const editId = document.getElementById('editId').value;
+        const imgUrlStr = document.getElementById('prodImgUrl').value.trim();
+
         const pData = {
             id: editId ? parseInt(editId) : Date.now(),
             name: name,
@@ -549,7 +557,7 @@
             qty: parseInt(document.getElementById('prodQty').value) || 1,
             margin: parseFloat(document.getElementById('prodMargin').value) || 1.5,
             mva: parseFloat(document.getElementById('prodMva').value) || 0,
-            img: document.getElementById('prodImgUrl').value.trim(),
+            img: imgUrlStr, // حفظ الرابط المباشر
             link: document.getElementById('prodLinkUrl').value.trim(),
             supplier: document.getElementById('prodSupplier').value.trim() || "Afro kjøp as",
             supplierUrl: document.getElementById('prodSupplierUrl').value.trim(),
@@ -576,19 +584,20 @@
         applyLanguageStrings();
     }
 
-    // وظيفة العرض التلقائي والفوري مع معالجة حقول المورد
+    // إصلاح العرض التلقائي والفوري للمنتجات وإظهار الصور المباشرة
     function renderCatalogList() {
         const container = document.getElementById('catalogContainer');
         const query = document.getElementById('searchCatalogBar').value.toLowerCase().trim();
         container.innerHTML = '';
         const l = currentLang;
 
-        // فلترة شاملة بالاسم أو الباركود أو اسم المورد
-        const filtered = catalog.filter(p => 
-            p.name.toLowerCase().includes(query) || 
-            (p.barcode && p.barcode.includes(query)) ||
-            (p.supplier && p.supplier.toLowerCase().includes(query))
-        );
+        // تصفية المنتجات بناءً على البحث، أو إظهار الكل إذا كان الحقل فارغاً
+        const filtered = catalog.filter(p => {
+            if (!query) return true; // إظهار فوري للمنتجات
+            return p.name.toLowerCase().includes(query) || 
+                   (p.barcode && p.barcode.includes(query)) ||
+                   (p.supplier && p.supplier.toLowerCase().includes(query));
+        });
         
         let uniqueGroupsInResult = [...new Set(filtered.map(p => p.varegruppe))];
 
@@ -603,11 +612,17 @@
                 const card = document.createElement('div');
                 card.className = 'product-card';
                 
-                const imgEl = p.img ? `<img src="${p.img}" class="prod-img" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'50\' height=\'50\'><rect width=\'50\' height=\'50\' fill=\'%23e2e8f0\'/><text x=\'50%27\' y=\'50%27\' dominant-baseline=\'middle\' text-anchor=\'middle\' font-size=\'14\'>📦</text></svg>'">` : `<div class="prod-img" style="display:flex;align-items:center;justify-content:center;font-size:18px;">📦</div>`;
+                // التأكد من تهيئة وقراءة الصورة الملصقة بشكل صحيح
+                let imgHtml = '';
+                if(p.img && p.img.length > 5) {
+                    imgHtml = `<img src="${p.img}" class="prod-img" onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\'prod-img\' style=\'display:flex;align-items:center;justify-content:center;font-size:18px;\'>📦</div>';">`;
+                } else {
+                    imgHtml = `<div class="prod-img" style="display:flex;align-items:center;justify-content:center;font-size:18px;">📦</div>`;
+                }
                 
                 card.innerHTML = `
                     <div class="prod-main-row">
-                        ${imgEl}
+                        ${imgHtml}
                         <div class="prod-info">
                             <p class="prod-title">${p.name}</p>
                             <div class="prod-meta">
@@ -643,8 +658,8 @@
         document.getElementById('prodQty').value = p.qty;
         document.getElementById('prodMargin').value = p.margin;
         document.getElementById('prodMva').value = p.mva;
-        document.getElementById('prodImgUrl').value = p.img;
-        document.getElementById('prodLinkUrl').value = p.link;
+        document.getElementById('prodImgUrl').value = p.img || '';
+        document.getElementById('prodLinkUrl').value = p.link || '';
         document.getElementById('prodSupplier').value = p.supplier;
         document.getElementById('prodSupplierUrl').value = p.supplierUrl || '';
         document.getElementById('resFinalPriceInput').value = (p.finalPrice || 0).toFixed(2);
@@ -831,7 +846,6 @@
         window.print();
     }
 
-    // الدالة المطورة لدمج كامل الملف الحالي واستخراج حقول المورد والضرائب الفورية
     function handleCSVImport(e) {
         const file = e.target.files[0];
         if(!file) return;
@@ -841,7 +855,6 @@
             const lines = content.split(/\r?\n/);
             if (lines.length <= 1) { alert(words[currentLang].alertFileEmpty); return; }
 
-            // تحديد رأس السطر الفعلي للملف المرفق
             let headers = lines[0].toLowerCase().split(';').map(h => h.replace(/"/g, '').trim());
             
             let idxVarenummer = headers.indexOf('varenummer');
@@ -882,7 +895,6 @@
                     varegrupper.push(importedGroup);
                 }
 
-                // تجنب التكرار داخل النظام
                 catalog = catalog.filter(p => p.name !== name && (barcode === "" || p.barcode !== barcode));
 
                 catalog.push({
@@ -917,13 +929,13 @@
         const str = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(catalog));
         const dl = document.createElement('a');
         dl.setAttribute("href", str);
-        dl.setAttribute("download", "MrIntl_v7_backup.json");
+        dl.setAttribute("download", "MrIntl_v8_backup.json");
         document.body.appendChild(dl);
         dl.click();
         dl.remove();
     }
 
-    // التشغيل الفوري وتطبيق الإعدادات
+    // تشغيل تلقائي وتطبيق التنسيق
     applyLanguageStrings();
 </script>
 
