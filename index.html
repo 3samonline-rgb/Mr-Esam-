@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Mr intl - BestillingApp v9.0</title>
+    <title>SmartGrocer - By Mr intl</title>
     <script src="https://unpkg.com/html5-qrcode"></script>
     <style>
         * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
@@ -15,22 +15,23 @@
         .tab-btn { flex: 1; padding: 10px 4px; border: none; background: transparent; font-weight: bold; font-size: 11px; border-radius: 8px; cursor: pointer; color: #475569; transition: 0.2s; text-align: center; }
         .tab-btn.active { background: white; color: #0f172a; box-shadow: 0 2px 6px rgba(0,0,0,0.08); }
         
-        /* أزرار الإجراءات العلوية */
+        /* أزرار الإجراءات العلوية الموحدة بالكامل */
         .top-actions { display: flex; gap: 6px; margin-bottom: 16px; flex-wrap: wrap; }
-        .top-actions button, .file-label { flex: 1; min-width: 75px; padding: 8px 4px; border: none; border-radius: 8px; font-size: 10px; font-weight: bold; cursor: pointer; color: white; text-align: center; display: inline-block; }
+        .top-actions button, .file-label { flex: 1; min-width: 80px; height: 36px; padding: 0 4px; border: none; border-radius: 8px; font-size: 10px; font-weight: bold; cursor: pointer; color: white; text-align: center; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
         .btn-import { background: #10b981; }
         .btn-export { background: #475569; }
         .btn-print-kunder { background: #7c3aed; }
         .btn-print-ansatte { background: #db2777; }
         
-        h1 { font-size: 26px; font-weight: 900; text-align: center; margin: 0 0 2px 0; color: #0f172a; letter-spacing: -0.5px; }
-        .subtitle { font-size: 12px; font-weight: 700; color: #10b981; text-align: center; margin-bottom: 16px; text-transform: uppercase; letter-spacing: 0.5px; }
+        /* الاسم الاحترافي الجديد والتوقيع الشخصي */
+        .brand-title { font-size: 28px; font-weight: 900; text-align: center; margin: 0; color: #0f172a; letter-spacing: -0.5px; }
+        .brand-signature { font-size: 13px; font-weight: 800; color: #10b981; text-align: center; margin: 0 0 4px 0; text-transform: uppercase; letter-spacing: 1px; }
+        .subtitle { font-size: 11px; font-weight: 600; color: #64748b; text-align: center; margin-bottom: 16px; }
         
         .page-section { display: none; }
         .page-section.active { display: block; }
         
         .form-group { background: #f1f5f9; padding: 10px; border-radius: 10px; margin-bottom: 8px; border: 1px solid #e2e8f0; }
-        
         label { font-size: 11px; font-weight: bold; color: #64748b; display: block; margin-bottom: 4px; }
         
         .input-with-btn { display: flex; gap: 6px; }
@@ -49,7 +50,6 @@
         
         .calc-box { background: #f0fdf4; border: 1px dashed #16a34a; border-radius: 10px; padding: 10px; margin-top: 8px; }
         .calc-line { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 4px; font-weight: 500; }
-        
         .final-price-input { width: 100px; font-size: 16px; font-weight: 800; color: #16a34a; border: 1px solid #16a34a; text-align: right; padding: 2px 4px; border-radius: 4px; direction: ltr !important; }
         
         .btn-main { width: 100%; background: #10b981; color: white; padding: 12px; border: none; border-radius: 8px; font-size: 14px; font-weight: bold; cursor: pointer; margin-top: 8px; }
@@ -57,7 +57,7 @@
         /* ترويسة المجموعات التموينية */
         .group-header-title { background: #e2e8f0; padding: 8px 12px; margin: 16px 0 8px 0; font-weight: 800; font-size: 14px; color: #1e293b; border-radius: 6px; }
         
-        /* كارت المنتج - محمي ومثبت الاتجاه دائماً لمنع التداخل */
+        /* كارت المنتج المطور والآمن */
         .product-card { background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 12px; margin-bottom: 8px; display: flex; flex-direction: column; gap: 8px; direction: ltr !important; text-align: left !important; }
         .prod-main-row { display: flex; gap: 12px; align-items: center; width: 100%; direction: ltr !important; text-align: left !important; }
         .prod-img { width: 55px; height: 55px; border-radius: 8px; object-fit: cover; background: #f1f5f9; border: 1px solid #cbd5e1; flex-shrink: 0; display: block; }
@@ -74,28 +74,26 @@
         .btn-del { background: #ef4444; max-width: 35px; }
         
         .order-qty-input { width: 50px; padding: 2px; font-size: 12px; text-align: center; border: 1px solid #cbd5e1; border-radius: 4px; display: inline-block; margin-left: 4px; direction: ltr !important; }
-        
         .reorder-sticky-bar { background: #fffbeb; border-top: 2px solid #fef3c7; padding: 12px; margin-top: 15px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; }
         .btn-whatsapp-send { background: #25d366; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-size: 13px; font-weight: bold; cursor: pointer; }
         
         .faktura-table { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 11px; background: white; border-radius: 8px; overflow: hidden; }
         .faktura-table th, .faktura-table td { padding: 8px; text-align: left; border-bottom: 1px solid #e2e8f0; }
         .faktura-table th { background: #475569; color: white; }
-        
         .faktura-card { background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 12px; padding: 12px; margin-bottom: 12px; }
         .faktura-header { display: flex; justify-content: space-between; font-weight: bold; border-bottom: 1px solid #e2e8f0; padding-bottom: 6px; margin-bottom: 6px; font-size: 12px; }
 
         #fileInput { display: none; }
         .print-only-info { display: none; }
 
-        /* 📌 شريط التحكم السفلي الثابت للتحكم بيد واحدة */
+        /* 📌 شريط التحكم السفلي الثابت */
         .bottom-control-bar { position: fixed; bottom: 0; left: 0; right: 0; background: #ffffff; box-shadow: 0 -4px 20px rgba(0,0,0,0.1); padding: 12px; border-top-left-radius: 20px; border-top-right-radius: 20px; z-index: 9999; display: flex; gap: 8px; align-items: center; max-width: 480px; margin: auto; }
         .search-wrapper-bottom { flex: 1; display: flex; gap: 6px; }
         .search-box-bottom { flex: 1; padding: 12px; border: 2px solid #10b981; border-radius: 10px; font-size: 15px; font-weight: bold; background: #fff; }
         .search-cam-btn-bottom { background: #10b981; color: white; border: none; padding: 0 14px; border-radius: 10px; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
         .btn-lang-bottom { background: #3b82f6; color: white; border: none; padding: 12px; border-radius: 10px; font-size: 12px; font-weight: bold; cursor: pointer; white-space: nowrap; height: 100%; }
 
-        /* 📌 شاشة منفصلة لعرض السعر (Popup) */
+        /* 📌 شاشة عرض السعر المنفصلة (Popup) */
         .price-popup-overlay { display: none; position: fixed; top:0; left:0; right:0; bottom:0; background: rgba(0,0,0,0.7); z-index: 100000; align-items: center; justify-content: center; padding: 20px; }
         .price-popup-box { background: white; width: 100%; max-width: 400px; border-radius: 24px; padding: 24px; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.2); animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         @keyframes popIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
@@ -104,6 +102,12 @@
         .popup-price-big { font-size: 48px; font-weight: 900; color: #16a34a; background: #f0fdf4; padding: 15px; border-radius: 16px; border: 2px solid #16a34a; margin-bottom: 20px; display: inline-block; width: 100%; }
         .popup-close-btn { background: #0f172a; color: white; border: none; width: 100%; padding: 14px; border-radius: 12px; font-size: 16px; font-weight: bold; cursor: pointer; }
 
+        /* ترويسة وعناصر ورقة أسعار اليوم المخصصة للموظفين */
+        .dagens-item-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #e2e8f0; }
+        .dagens-item-name { font-weight: 700; font-size: 15px; }
+        .dagens-item-price { font-weight: 800; color: #16a34a; font-size: 16px; }
+
+        /* وضعيّة الطباعة الاحترافية */
         @media print {
             @page { size: A4; margin: 12mm; }
             body { background: white; padding: 0; color: #000; font-size: 11pt; }
@@ -111,10 +115,16 @@
             .top-actions, .nav-tabs, .form-group, .calc-box, .btn-main, .bottom-control-bar, .prod-actions-row, .reorder-sticky-bar, .scan-btn, .add-grp-btn, .price-popup-overlay { display: none !important; }
             .product-card { border: none; border-bottom: 1px solid #ddd; padding: 10px 0; page-break-inside: avoid; display: flex !important; justify-content: space-between; align-items: center; direction: ltr !important; }
             .prod-price-tag { color: #000 !important; font-size: 14pt; font-weight: bold; }
-            h1 { font-size: 26pt; margin-top: 0; text-align: center; }
-            .subtitle { font-size: 13pt; color: #333 !important; margin-bottom: 20px; text-align: center; }
-            body.print-mode-kunder .print-only-info { display: none !important; }
-            body.print-mode-ansatte .print-only-info { display: block !important; font-size: 10pt; color: #444; margin-top: 4px; }
+            .brand-title { font-size: 26pt; text-align: center; }
+            .brand-signature { font-size: 14pt; text-align: center; color: #000 !important; }
+            .subtitle { font-size: 12pt; text-align: center; margin-bottom: 20px; }
+            
+            /* إخفاء كافة بيانات الشراء والتكلفة للموظفين */
+            body.print-mode-ansatte .print-only-info, 
+            body.print-mode-ansatte .prod-meta,
+            body.print-mode-ansatte .prod-img { display: none !important; }
+            body.print-mode-ansatte .prod-title { font-size: 16pt; font-weight: bold; }
+            body.print-mode-ansatte .prod-price-tag { font-size: 18pt; font-weight: 900; }
         }
     </style>
 </head>
@@ -122,14 +132,16 @@
 
 <div class="app-container">
     <div class="top-actions">
-        <label class="btn-import" for="fileInput" id="lblImportBtn">Import CSV</label>
+        <label class="file-label btn-import" for="fileInput" id="lblImportBtn">Import CSV</label>
         <input type="file" id="fileInput" accept=".csv" onchange="handleCSVImport(event)">
-        <button class="btn-export" onclick="exportBackup()" id="lblExportBtn">Backup</button>
+        
+        <button class="btn-export" onclick="exportBackup()" id="lblExportBtn">Eksporter</button>
         <button class="btn-print-kunder" onclick="triggerPrint('kunder')" id="lblPrintKunderBtn">Prisliste 🖨️</button>
         <button class="btn-print-ansatte" onclick="triggerPrint('ansatte')" id="lblPrintAnsatteBtn">Ansatte 🖨️</button>
     </div>
 
-    <h1>Mr intl</h1>
+    <div class="brand-title">SmartGrocer</div>
+    <div class="brand-signature">By Mr intl</div>
     <div class="subtitle" id="appSub">BestillingApp System</div>
 
     <div id="scanner-container">
@@ -139,6 +151,7 @@
 
     <div class="nav-tabs">
         <button class="tab-btn active" id="tabVarelisteBtn" onclick="switchTab('vareliste')">Vareliste</button>
+        <button class="tab-btn" id="tabDagensBtn" onclick="switchTab('dagens')">Dagens Priser 🥦</button>
         <button class="tab-btn" id="tabOrdrelisteBtn" onclick="switchTab('ordreliste')">Ordreliste <span id="orderBadge">(0)</span></button>
         <button class="tab-btn" id="tabFakturaBtn" onclick="switchTab('faktura')">Fakturaliste</button>
     </div>
@@ -260,6 +273,20 @@
         <div id="catalogContainer" style="margin-top: 15px;"></div>
     </div>
 
+    <div id="sectionDagens" class="page-section">
+        <div class="form-group">
+            <label id="lblDagName">Produktnavn (Frukt/Grønt/Annet)</label>
+            <input type="text" id="dagName" placeholder="F.eks. Bananer, Agurk...">
+        </div>
+        <div class="form-group">
+            <label id="lblDagPrice">Utsalgspris per kg/stk</label>
+            <input type="number" step="any" id="dagPrice" placeholder="0.00 kr">
+        </div>
+        <button class="btn-main" style="background:#7c3aed;" onclick="addDagensPriceItem()">Legg til i Dagens liste</button>
+        
+        <div id="dagensContainer" style="margin-top:20px; background:white; padding:12px; border-radius:12px; border:1px solid #e2e8f0;"></div>
+    </div>
+
     <div id="sectionOrdreliste" class="page-section">
         <div id="orderContainer"></div>
         <div class="reorder-sticky-bar">
@@ -338,16 +365,17 @@
     let activeScanTarget = '';
     let isPriceLookupMode = false;
 
-    let varegrupper = JSON.parse(localStorage.getItem('mr_v7_groups')) || ["Tørrvarer", "Drikke", "Kosmetikk", "Ferskvarer", "Grønnsaker", "Andre"];
+    let varegrupper = JSON.parse(localStorage.getItem('mr_v7_groups')) || ["Frukt og grønt", "Kjølevarer", "Frysevarer", "Tørrvarer", "Drikke", "Non-Food"];
     let catalog = JSON.parse(localStorage.getItem('mr_v7_catalog')) || [];
     let orderList = JSON.parse(localStorage.getItem('mr_v7_orders')) || [];
     let fakturaList = JSON.parse(localStorage.getItem('mr_v7_faktura')) || [];
+    let dagensList = JSON.parse(localStorage.getItem('mr_v7_dagens')) || [];
     let currentLang = localStorage.getItem('mr_v7_lang') || 'no';
 
     const words = {
         no: {
-            appSub: "BestillingApp System",
-            lblImportBtn: "Import CSV", lblExportBtn: "Backup", lblPrintKunderBtn: "Prisliste 🖨️", lblPrintAnsatteBtn: "Ansatte 🖨️",
+            appSub: "SmartGrocer System",
+            lblImportBtn: "Import CSV", lblExportBtn: "Eksporter", lblPrintKunderBtn: "Prisliste 🖨️", lblPrintAnsatteBtn: "Ansatte 🖨️",
             varelisteTab: "Vareliste", ordrelisteTab: "Ordreliste", fakturaTab: "Fakturaliste",
             prodName: "Produktnavn", barcode: "Strekkode", varegruppe: "Varegruppe", cost: "Innkjøpspris (Total)",
             qty: "Antall i eske", margin: "Margin", mva: "MVA", imgUrl: "Bilde URL", prodUrl: "Produkt URL", supplier: "Leverandør",
@@ -357,15 +385,15 @@
             lblFakSupplier: "Leverandørnavn", lblFakNum: "Fakturanummer", lblFakDate: "Dato", lblFakItems: "Mottatt produkt",
             lblFakRecQty: "Mottatt antall (Kasser/Stk)", lblFakActualCost: "Faktisk innkjøpspris (Total)",
             btnNewInvoice: "Bekreft og legg til i faktura",
-            btnScan: "Scan 📷", promptGroup: "Skriv inn navnet på den nye varegruppen:", alertEmpty: "Vennligست fyll ut alle felter!",
+            btnScan: "Scan 📷", promptGroup: "Skriv inn navnet på den nye varegruppen:", alertEmpty: "Vennligst fyll ut alle felter!",
             alertFileEmpty: "Filen er tom!", alertSuccess: "Vellykket! Importert {count} produkter.", confirmDelete: "Slette?",
             thProd: "Produkt", thCost: "Kost", thIncome: "Inntekt/Verdi", thProfit: "Gevinst", btnDelFak: "Slett",
             lblOrderBtn: "+ Ordre", lblInvoiceBtn: "📄 Faktura +", lblEditBtn: "Edit", lblDeleteBtn: "X",
             selectPlh: "-- Velg produkt --", textLeverandoer: "Leverandør", textGruppe: "Gruppe", textAntall: "Antall:"
         },
         ar: {
-            appSub: "نظام تطبيق الطلبيات وإدارة المتجر",
-            lblImportBtn: "استيراد ملف CSV", lblExportBtn: "نسخة احتياطية", lblPrintKunderBtn: "قائمة الأسعار 🖨️", lblPrintAnsatteBtn: "كشف الموظفين 🖨️",
+            appSub: "نظام إدارة المتجر الذكي",
+            lblImportBtn: "استيراد ملف CSV", lblExportBtn: "تصدير البيانات", lblPrintKunderBtn: "قائمة الأسعار 🖨️", lblPrintAnsatteBtn: "كشف الموظفين 🖨️",
             varelisteTab: "قائمة المنتجات", ordrelisteTab: "قائمة الطلبيات", fakturaTab: "تأكيد واستلام الفواتير",
             prodName: "اسم المنتج", barcode: "الباركود", varegruppe: "المجموعة التموينية", cost: "سعر الشراء الإجمالي",
             qty: "الكمية داخل الكرتونة", margin: "نسبة الربح (Margin)", mva: "الضريبة MVA", imgUrl: "رابط صورة المنتج", prodUrl: "رابط صفحة المنتج", supplier: "اسم المورد",
@@ -391,6 +419,10 @@
             document.getElementById('sectionVareliste').classList.add('active');
             document.getElementById('tabVarelisteBtn').classList.add('active');
             renderCatalogList();
+        } else if(tab === 'dagens') {
+            document.getElementById('sectionDagens').classList.add('active');
+            document.querySelectorAll('.tab-btn')[1].classList.add('active');
+            renderDagensPrices();
         } else if(tab === 'ordreliste') {
             document.getElementById('sectionOrdreliste').classList.add('active');
             document.getElementById('tabOrdrelisteBtn').classList.add('active');
@@ -475,6 +507,7 @@
         renderOrderList();
         populateFakturaSelect();
         renderFakturaRecords();
+        renderDagensPrices();
     }
 
     function showPricePopup(name, barcode, price) {
@@ -547,7 +580,7 @@
         }
         html5QrcodeScanner.start(
             { facingMode: "environment" },
-            { fps: 20, qrbox: { width: 280, height: 160 }, aspectRatio: 1.777778 },
+            { fps: 25, qrbox: { width: 280, height: 160 }, aspectRatio: 1.777778 },
             (decodedText) => {
                 stopScanner();
                 if(isPriceLookupMode) {
@@ -617,6 +650,7 @@
         document.getElementById('prodQty').value = '1';
         document.getElementById('prodImgUrl').value = '';
         document.getElementById('prodLinkUrl').value = '';
+        document.getElementById('prodSupplier').value = '';
         document.getElementById('prodSupplierUrl').value = '';
         
         applyLanguageStrings();
@@ -635,7 +669,7 @@
         const l = currentLang;
 
         const filteredProducts = catalog.filter(p => {
-            if (!query) return true; 
+            if (!query) return true; // تظهر جميع المنتجات فوراً عند بدء التشغيل دون الحاجة للبحث
             return p.name.toLowerCase().includes(query) || 
                    (p.barcode && p.barcode.includes(query)) ||
                    (p.supplier && p.supplier.toLowerCase().includes(query));
@@ -643,13 +677,22 @@
         
         let activeGroups = [...new Set(filteredProducts.map(p => p.varegruppe))];
 
+        // في حال عدم وجود فلتر، نعرض كافة مجموعات المتجر الأساسية لضمان عدم اختفائها
+        if(activeGroups.length === 0 && !query) {
+            activeGroups = varegrupper;
+        }
+
         activeGroups.forEach(grp => {
+            let groupProducts = filteredProducts.filter(p => p.varegruppe === grp);
+            
+            // لا نعرض المجموعات الفارغة إلا إذا كنا في وضع بدء التشغيل (بدون استعلام بحث) ليبقى المظهر نظيفاً
+            if(groupProducts.length === 0 && query) return;
+
             const header = document.createElement('div');
             header.className = 'group-header-title';
             header.innerText = grp;
             container.appendChild(header);
 
-            let groupProducts = filteredProducts.filter(p => p.varegruppe === grp);
             groupProducts.forEach(p => {
                 const card = document.createElement('div');
                 card.className = 'product-card';
@@ -661,7 +704,6 @@
                     imgHtml = `<div class="prod-img" style="display:flex;align-items:center;justify-content:center;font-size:18px;">📦</div>`;
                 }
                 
-                // تجهيز روابط المنتج والمورد بشكل آمن لضمان ظهورها دائماً
                 let linkVareHtml = (p.link && p.link.trim().length > 5) ? `| <a href="${p.link.trim()}" target="_blank" style="color:#2563eb;font-weight:bold;text-decoration:underline;">🔗 Vare</a>` : '';
                 let linkSupHtml = (p.supplierUrl && p.supplierUrl.trim().length > 5) ? `| <a href="${p.supplierUrl.trim()}" target="_blank" style="color:#10b981;font-weight:bold;text-decoration:underline;">🌐 Leverandør</a>` : '';
 
@@ -692,6 +734,7 @@
         });
     }
 
+    // إصلاح دالة التعديل بالكامل لجلب كافة الحقول دون استثناء
     function loadToForm(id) {
         const p = catalog.find(item => item.id === id);
         if(!p) return;
@@ -714,6 +757,42 @@
         
         const l = currentLang;
         document.getElementById('btnSave').innerText = words[l].updateBtn;
+    }
+
+    /* 🥦 دوال خاصية أسعار اليوم والطباعة للموظفين */
+    function addDagensPriceItem() {
+        const name = document.getElementById('dagName').value.trim();
+        const price = parseFloat(document.getElementById('dagPrice').value) || 0;
+        if(!name || price <= 0) return;
+
+        dagensList.push({ id: Date.now(), name: name, price: price });
+        localStorage.setItem('mr_v7_dagens', JSON.stringify(dagensList));
+        
+        document.getElementById('dagName').value = '';
+        document.getElementById('dagPrice').value = '';
+        renderDagensPrices();
+    }
+
+    function renderDagensPrices() {
+        const container = document.getElementById('dagensContainer');
+        if(!container) return;
+        container.innerHTML = '';
+        if(dagensList.length === 0) {
+            container.innerHTML = '<p style="text-align:center;color:#64748b;font-size:12px;">Ingen varer lagt til i dag.</p>';
+            return;
+        }
+        dagensList.forEach(item => {
+            const row = document.createElement('div');
+            row.className = 'dagens-item-row';
+            row.innerHTML = `
+                <span class="dagens-item-name">${item.name}</span>
+                <div>
+                    <span class="dagens-item-price">${item.price.toFixed(2)} kr</span>
+                    <button style="background:none;border:none;color:#ef4444;font-weight:bold;margin-left:10px;cursor:pointer;" onclick="dagensList=dagensList.filter(i=>i.id!==${item.id});localStorage.setItem('mr_v7_dagens',JSON.stringify(dagensList));renderDagensPrices();">X</button>
+                </div>
+            `;
+            container.appendChild(row);
+        });
     }
 
     function autoSendToFakturaForm(id) {
@@ -984,12 +1063,13 @@
         const str = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(catalog));
         const dl = document.createElement('a');
         dl.setAttribute("href", str);
-        dl.setAttribute("download", "MrIntl_v9.0_backup.json");
+        dl.setAttribute("download", "SmartGrocer_Backup.json");
         document.body.appendChild(dl);
         dl.click();
         dl.remove();
     }
 
+    // لتشغيل عرض المنتجات والمجموعات تلقائياً عند فتح الصفحة فوراً
     applyLanguageStrings();
 </script>
 
