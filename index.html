@@ -5,212 +5,351 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SmartButikk BY MR INTL</title>
     <style>
-        /* تنسيقات عامة وتوافق مع الأجهزة المحمولة */
+        /* التنسيق الأساسي المعتاد لتطبيقك */
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             background-color: #f5f7fb;
             margin: 0;
-            padding: 10px;
-            direction: ltr; /* التنسيق من اليسار لليمين ليناسب اللغة النرويجية */
+            padding: 15px;
+            direction: ltr; /* من اليسار لليمين للنرويجية */
         }
         
         .header {
             text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
-        
         .header h1 {
             color: #0f172a;
             margin: 0;
             font-size: 28px;
             font-weight: 800;
         }
-        
         .brand {
             color: #10b981;
             font-size: 14px;
             font-weight: 700;
             letter-spacing: 1px;
-            margin-top: 2px;
         }
 
-        /* إخفاء العناصر أثناء الطباعة */
-        @media print {
-            .no-print, .slett-btn, .delete-x, button, .tabs {
-                display: none !important;
-            }
-            body {
-                background: white;
-                padding: 0;
-            }
-            .print-container {
-                box-shadow: none;
-                border: none;
-            }
+        /* شريط التبويب العلوي الأصلي (Tabs) */
+        .tabs {
+            display: flex;
+            justify-content: space-between;
+            background: #e2e8f0;
+            padding: 5px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+        .tab-btn {
+            flex: 1;
+            padding: 10px 5px;
+            text-align: center;
+            background: none;
+            border: none;
+            font-weight: bold;
+            font-size: 12px;
+            color: #64748b;
+            cursor: pointer;
+        }
+        .tab-btn.active {
+            background: white;
+            color: #0f172a;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
 
-        /* لوحة أزرار الأكشن السريعة للمنتج */
-        .action-panel {
+        /* الكروت والخانات الاصلية للتطبيق */
+        .card {
+            background: white;
+            border-radius: 16px;
+            padding: 15px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+            margin-bottom: 15px;
+        }
+        .input-group {
+            margin-bottom: 12px;
+        }
+        .input-row {
+            display: flex;
+            gap: 10px;
+        }
+        label {
+            display: block;
+            font-weight: 700;
+            color: #334155;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+        .input-field {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-size: 16px; /* يمنع الزووم المزعج في الآيفون */
+            background-color: white;
+        }
+        
+        .scan-btn {
+            background: #0284c7;
+            color: white;
+            border: none;
+            padding: 0 15px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        /* لوحة الأكشن السريعة أسفل المنتج */
+        .action-grid {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
+            grid-template-columns: 1fr 1fr;
             gap: 10px;
             margin-top: 15px;
         }
-
-        .btn {
+        .action-btn {
             padding: 12px;
             border: none;
             border-radius: 8px;
             font-weight: bold;
-            cursor: pointer;
             font-size: 14px;
+            cursor: pointer;
             text-align: center;
         }
+        .btn-save { background: #10b981; color: white; }
+        .btn-edit { background: #3b82f6; color: white; }
+        .btn-today { background: #f59e0b; color: white; }
+        .btn-invoice { background: #8b5cf6; color: white; }
 
-        .btn-save { background-color: #10b981; color: white; }
-        .btn-edit { background-color: #3b82f6; color: white; }
-        .btn-today { background-color: #f59e0b; color: white; }
-        .btn-invoice { background-color: #8b5cf6; color: white; }
-        
-        .input-field {
-            width: 100%;
+        /* قائمة المنتجات المضافة */
+        .product-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             padding: 10px;
-            border: 1px solid #cbd5e1;
-            border-radius: 8px;
-            box-sizing: border-box;
-            font-size: 16px; /* يمنع الزووم التلقائي المزعج في الآيفون */
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        /* 🖨️ كود إخفاء أزرار الحذف والـ X عند الطباعة تماماً */
+        @media print {
+            .no-print, .slett-btn, .delete-x, button, .tabs, .action-grid, .scan-btn {
+                display: none !important;
+            }
+            body { background: white; padding: 0; }
+            .card { box-shadow: none; border: none; padding: 0; }
         }
     </style>
 </head>
 <body>
 
-    <!-- الهيدر بالاسم النرويجي الجديد والبراند الخاص بك -->
+    <!-- الاسم النرويجي المحدث مع بصمتك الاحترافية -->
     <div class="header">
         <h1>SmartButikk</h1>
         <div class="brand">BY MR INTL</div>
         <p style="color: #64748b; margin: 5px 0; font-size: 12px;">SmartButikk System</p>
     </div>
 
-    <!-- خانة إضافة وتعديل المنتجات المحدثة -->
-    <div class="card" id="productForm">
-        <h3 id="formTitle">Registrer Produkt</h3>
-        
-        <label>Produktnavn</label>
-        <input type="text" id="prodNavn" class="input-field" placeholder="Skriv produktnavn...">
+    <!-- شريط التبويب الأصلي بالكامل -->
+    <div class="tabs no-print">
+        <button class="tab-btn active" onclick="switchTab('vareliste')">Vareliste</button>
+        <button class="tab-btn" onclick="switchTab('dagens')">Dagens Priser 🥦</button>
+        <button class="tab-btn" onclick="switchTab('ordre')">Ordreliste</button>
+        <button class="tab-btn" onclick="switchTab('faktura')">Fakturaliste</button>
+    </div>
 
-        <!-- تم فصل المجموعات لتظهر دائماً بشكل مستقل -->
-        <label style="margin-top: 10px; display: block;">Varegruppe</label>
-        <select id="prodGruppe" class="input-field">
-            <option value="Tørrvarer">Tørrvarer</option>
-            <option value="Drikke">Drikke</option>
-            <option value="Kosmetikk">Kosmetikk</option>
-            <option value="Ferskvarer">Ferskvarer</option>
-            <option value="Grønnsaker">Grønnsaker</option>
-            <option value="Krydder">Krydder</option>
-            <option value="Kjølevarer">Kjølevarer</option>
-            <option value="Andre">Andre</option>
-        </select>
+    <!-- القسم الرئيسي: إدارة المنتجات -->
+    <div id="varelisteSeksjon" class="tab-content">
+        <div class="card">
+            <div class="input-group">
+                <label>Produktnavn</label>
+                <div class="input-row">
+                    <input type="text" id="prodNavn" class="input-field" placeholder="Skriv produktnavn...">
+                    <button class="scan-btn">Scan 📷</button>
+                </div>
+            </div>
 
-        <label style="margin-top: 10px; display: block;">Innkjøpspris</label>
-        <!-- إجبار الكيبورد الرقمي بالكامل مع الفاصلة العشرية للآيفون -->
-        <input type="number" id="innPris" class="input-field" inputmode="decimal" pattern="[0-9]*" placeholder="0.00">
+            <!-- المجموعات تظهر هنا بشكل مستقل وبدون أي مشاكل -->
+            <div class="input-group">
+                <label>Varegruppe</label>
+                <select id="prodGruppe" class="input-field">
+                    <option value="Tørrvarer">Tørrvarer</option>
+                    <option value="Drikke">Drikke</option>
+                    <option value="Kosmetikk">Kosmetikk</option>
+                    <option value="Ferskvarer">Ferskvarer</option>
+                    <option value="Grønnsaker">Grønnsaker</option>
+                    <option value="Krydder">Krydder</option>
+                    <option value="Kjølevarer">Kjølevarer</option>
+                    <option value="Andre">Andre</option>
+                </select>
+            </div>
 
-        <!-- لوحة التحكم والاختصارات الجديدة للمنتج -->
-        <div class="action-panel">
-            <button class="btn btn-save" onclick="lagreProdukt()">Lagre (حفظ)</button>
-            <button class="btn btn-edit" onclick="aktiverRedigering()">Endre (تعديل)</button>
-            <button class="btn btn-today" onclick="sendTilDagensPriser()">+ Dagens Pris</button>
-            <button class="btn btn-invoice" onclick="sendTilFaktura()">+ Faktura</button>
+            <div class="input-group">
+                <label>Innkjøpspris (Total)</label>
+                <input type="number" id="innPris" class="input-field" inputmode="decimal" pattern="[0-9]*" placeholder="0.00">
+            </div>
+
+            <div class="input-group">
+                <label>Margin</label>
+                <input type="number" id="prodMargin" class="input-field" inputmode="decimal" pattern="[0-9]*" value="1.5">
+            </div>
+
+            <!-- لوحة تحكم لتسجيل، تعديل، وحفظ وإرسال المنتجات سرياً -->
+            <div class="action-grid no-print">
+                <button class="action-btn btn-save" onclick="lagreProdukt()">Lagre (حفظ)</button>
+                <button class="action-btn btn-edit" onclick="startRedigering()">Endre (تعديل)</button>
+                <button class="action-btn btn-today" onclick="hurtigDagensPris()">+ Dagens Pris</button>
+                <button class="action-btn btn-invoice" onclick="hurtigFaktura()">+ Faktura</button>
+            </div>
+        </div>
+
+        <!-- عرض قائمة المنتجات الحالية المضافة -->
+        <div class="card">
+            <h3>Registrerte Produkter</h3>
+            <div id="visningsListe">
+                <!-- المنتجات المضافة تظهر هنا وبجانبها زر تعديل وحذف (يختفي عند الطباعة) -->
+            </div>
         </div>
     </div>
 
-    <hr class="no-print">
-
     <!-- قسم أسعار اليوم المطور -->
-    <div class="card" id="dagensPriserSeksjon">
-        <h3>Dagens Priser 🥦</h3>
-        
-        <!-- اختيار المنتج من القائمة المسجلة مباشرة بدلاً من الكتابة يدعس -->
-        <label>Velg Produkt fra liste</label>
-        <select id="dagensProdValg" class="input-field">
-            <!-- يتم تعبئتها برمجياً من الـ Vareliste -->
-        </select>
+    <div id="dagensSeksjon" class="tab-content" style="display:none;">
+        <div class="card">
+            <h3>Dagens Priser 🥦</h3>
+            
+            <!-- اختيار منتج مخزن مسبقاً من القائمة المنسدلة مباشرة بدلاً من الكتابة -->
+            <div class="input-group">
+                <label>Velg Produkt fra liste</label>
+                <select id="dagensProdValg" class="input-field">
+                    <!-- يتم تعبئتها تلقائياً عبر الجافاسكريبت -->
+                </select>
+            </div>
 
-        <label style="margin-top: 10px; display: block;">Dagens Pris (kr)</label>
-        <input type="number" id="dagensPrisInp" class="input-field" inputmode="decimal" placeholder="0.00">
+            <div class="input-group">
+                <label>Dagens Pris (kr)</label>
+                <input type="number" id="dagensPrisInp" class="input-field" inputmode="decimal" pattern="[0-9]*" placeholder="0.00">
+            </div>
+            
+            <button class="action-btn btn-save no-print" style="width:100%" onclick="leggTilIDagensListe()">Legg til i priser</button>
+        </div>
     </div>
 
     <script>
-        // مصفوفة المنتجات الأساسية المخزنة
+        // مصفوفة البيانات الأساسية
         let produkter = JSON.parse(localStorage.getItem('produkter')) || [];
-        let redigererIndex = null;
+        let valgtIndex = null;
 
-        // دالة تحديث قائمة الاختيارات في صفحة "أسعار اليوم" تلقائياً
-        function oppdaterDagensPriserDropdown() {
+        // التبديل بين التبويبات الأصلية للتطبيق
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.style.display = 'none');
+            
+            if(tabName === 'vareliste') {
+                document.getElementById('varelisteSeksjon').style.display = 'block';
+            } else if(tabName === 'dagens') {
+                document.getElementById('dagensSeksjon').style.display = 'block';
+                oppdaterDagensDropdown();
+            }
+            event.currentTarget.classList.add('active');
+        }
+
+        // تحديث القائمة المنسدلة لأسعار اليوم تلقائياً من المنتجات المخزنة
+        function oppdaterDagensDropdown() {
             const dropdown = document.getElementById('dagensProdValg');
             dropdown.innerHTML = '';
-            
             if(produkter.length === 0) {
-                dropdown.innerHTML = '<option value="">Ingen produkter registrert</option>';
+                dropdown.innerHTML = '<option>Ingen produkter registrert</option>';
                 return;
             }
-
             produkter.forEach(p => {
-                let option = document.createElement('option');
-                option.value = p.navn;
-                option.textContent = p.navn;
-                dropdown.appendChild(option);
+                let opt = document.createElement('option');
+                opt.value = p.navn;
+                opt.textContent = p.navn;
+                dropdown.appendChild(opt);
             });
         }
 
-        // دالة حفظ وتعديل المنتج لحل مشكلة عدم ظهور التعديلات
+        // دالة حفظ وإضافة منتج جديد وحل مشكلة التعديل السابقة
         function lagreProdukt() {
             const navn = document.getElementById('prodNavn').value;
             const gruppe = document.getElementById('prodGruppe').value;
             const pris = document.getElementById('innPris').value;
+            const margin = document.getElementById('prodMargin').value;
 
-            if(!navn) {
-                alert('Vennligst skriv produktnavn');
-                return;
-            }
+            if(!navn) return alert('Skriv produktnavn først!');
 
-            const produktData = { navn, gruppe, pris };
+            const prodObj = { navn, gruppe, pris, margin };
 
-            if(redigererIndex !== null) {
-                // تحديث المنتج الحالي (حل مشكلة التعديل)
-                produkter[redigererIndex] = produktData;
-                redigererIndex = null;
-                document.getElementById('formTitle').textContent = "Registrer Produkt";
+            if(valgtIndex !== null) {
+                // حفظ التعديل على منتج موجود (إصلاح مشكلة التحرير)
+                produkter[valgtIndex] = prodObj;
+                valgtIndex = null;
+                alert('Produktet er oppdatert!');
             } else {
-                // إضافة منتج جديد
-                produkter.push(produktData);
+                // إضافة جديد
+                produkter.push(prodObj);
+                alert('Produktet er lagret!');
             }
 
             localStorage.setItem('produkter', JSON.stringify(produkter));
-            alert('Lagret!');
-            
-            // إعادة التصفير والتحديث فوراً
+            tømSkjema();
+            visProdukter();
+        }
+
+        // تفعيل وضع التعديل عند اختيار منتج
+        function setProduktForRedigering(index) {
+            valgtIndex = index;
+            const p = produkter[index];
+            document.getElementById('prodNavn').value = p.navn;
+            document.getElementById('prodGruppe').value = p.gruppe;
+            document.getElementById('innPris').value = p.pris;
+            document.getElementById('prodMargin').value = p.margin;
+        }
+
+        function visProdukter() {
+            const liste = document.getElementById('visningsListe');
+            liste.innerHTML = '';
+            produkter.forEach((p, idx) => {
+                liste.innerHTML += `
+                    <div class="product-item">
+                        <div><strong>${p.navn}</strong> - ${p.gruppe} (${p.pris} kr)</div>
+                        <div class="no-print">
+                            <button onclick="setProduktForRedigering(${idx})" style="background:#3b82f6; color:white; border:none; padding:5px 10px; border-radius:4px;">تعديل</button>
+                            <button class="slett-btn" onclick="slettProdukt(${idx})" style="background:#ef4444; color:white; border:none; padding:5px 10px; border-radius:4px; margin-left:5px;">Slett</button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function slettProdukt(idx) {
+            if(confirm('Vil du slette dette produktet?')) {
+                produkter.splice(idx, 1);
+                localStorage.setItem('produkter', JSON.stringify(produkter));
+                visProdukter();
+            }
+        }
+
+        function tømSkjema() {
             document.getElementById('prodNavn').value = '';
             document.getElementById('innPris').value = '';
-            oppdaterDagensPriserDropdown();
         }
 
-        // تشغيل التحديثات عند فتح التطبيق
-        window.onload = function() {
-            oppdaterDagensPriserDropdown();
-        };
-
-        // الاختصارات الإضافية لربط الميزات ببعضها
-        function sendTilDagensPriser() {
+        // أزرار الاختصارات السريعة لأسعار اليوم والفواتير
+        function hurtigDagensPris() {
             const navn = document.getElementById('prodNavn').value;
-            if(!navn) return alert('Velg eller skriv et produkt først');
+            if(!navn) return alert('Velg eller skriv et produkt først!');
+            switchTab('dagens');
             document.getElementById('dagensProdValg').value = navn;
-            alert(`${navn} er lagt til i Dagens Priser panel!`);
         }
 
-        function sendTilFaktura() {
+        function hurtigFaktura() {
             alert('Lagt til i Fakturaliste!');
         }
+
+        window.onload = function() {
+            visProdukter();
+        };
     </script>
 </body>
 </html>
