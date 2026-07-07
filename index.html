@@ -15,7 +15,7 @@
         .tab-btn { flex: 1; padding: 10px 4px; border: none; background: transparent; font-weight: bold; font-size: 11px; border-radius: 8px; cursor: pointer; color: #475569; transition: 0.2s; text-align: center; }
         .tab-btn.active { background: white; color: #0f172a; box-shadow: 0 2px 6px rgba(0,0,0,0.08); }
         
-        /* أزرار الإجراءات العلوية الموحدة بالكامل */
+        /* أزرار الإجراءات العلوية */
         .top-actions { display: flex; gap: 6px; margin-bottom: 16px; flex-wrap: wrap; }
         .top-actions button, .file-label { flex: 1; min-width: 80px; height: 36px; padding: 0 4px; border: none; border-radius: 8px; font-size: 10px; font-weight: bold; cursor: pointer; color: white; text-align: center; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
         .btn-import { background: #10b981; }
@@ -23,7 +23,7 @@
         .btn-print-kunder { background: #7c3aed; }
         .btn-print-ansatte { background: #db2777; }
         
-        /* الاسم الاحترافي الجديد والتوقيع الشخصي */
+        /* الهوية واللمسة الشخصية */
         .brand-title { font-size: 28px; font-weight: 900; text-align: center; margin: 0; color: #0f172a; letter-spacing: -0.5px; }
         .brand-signature { font-size: 13px; font-weight: 800; color: #10b981; text-align: center; margin: 0 0 4px 0; text-transform: uppercase; letter-spacing: 1px; }
         .subtitle { font-size: 11px; font-weight: 600; color: #64748b; text-align: center; margin-bottom: 16px; }
@@ -31,11 +31,11 @@
         .page-section { display: none; }
         .page-section.active { display: block; }
         
-        .form-group { background: #f1f5f9; padding: 10px; border-radius: 10px; margin-bottom: 8px; border: 1px solid #e2e8f0; }
+        .form-group { background: #f1f5f9; padding: 10px; border-radius: 10px; margin-bottom: 8px; border: 1px solid #e2e8f0; text-align: left; }
         label { font-size: 11px; font-weight: bold; color: #64748b; display: block; margin-bottom: 4px; }
         
         .input-with-btn { display: flex; gap: 6px; }
-        input, select { width: 100%; padding: 8px 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 14px; background: white; color: #0f172a; }
+        input, select { width: 100%; padding: 8px 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 14px; background: white; color: #0f172a; text-align: left; direction: ltr; }
         input:focus, select:focus { border-color: #10b981; outline: none; }
         
         .scan-btn { background: #0284c7; color: white; border: none; padding: 0 12px; border-radius: 6px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 13px; }
@@ -48,16 +48,16 @@
         .row { display: flex; gap: 8px; margin-bottom: 4px; }
         .col { flex: 1; }
         
-        .calc-box { background: #f0fdf4; border: 1px dashed #16a34a; border-radius: 10px; padding: 10px; margin-top: 8px; }
-        .calc-line { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 4px; font-weight: 500; }
+        .calc-box { background: #f0fdf4; border: 1px dashed #16a34a; border-radius: 10px; padding: 10px; margin-top: 8px; text-align: left; }
+        .calc-line { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 4px; font-weight: 500; direction: ltr; }
         .final-price-input { width: 100px; font-size: 16px; font-weight: 800; color: #16a34a; border: 1px solid #16a34a; text-align: right; padding: 2px 4px; border-radius: 4px; direction: ltr !important; }
         
         .btn-main { width: 100%; background: #10b981; color: white; padding: 12px; border: none; border-radius: 8px; font-size: 14px; font-weight: bold; cursor: pointer; margin-top: 8px; }
         
         /* ترويسة المجموعات التموينية */
-        .group-header-title { background: #e2e8f0; padding: 8px 12px; margin: 16px 0 8px 0; font-weight: 800; font-size: 14px; color: #1e293b; border-radius: 6px; }
+        .group-header-title { background: #e2e8f0; padding: 8px 12px; margin: 16px 0 8px 0; font-weight: 800; font-size: 14px; color: #1e293b; border-radius: 6px; text-align: left; }
         
-        /* كارت المنتج المطور والآمن */
+        /* كارت المنتج النرويجي الثابت اليسار */
         .product-card { background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 12px; margin-bottom: 8px; display: flex; flex-direction: column; gap: 8px; direction: ltr !important; text-align: left !important; }
         .prod-main-row { display: flex; gap: 12px; align-items: center; width: 100%; direction: ltr !important; text-align: left !important; }
         .prod-img { width: 55px; height: 55px; border-radius: 8px; object-fit: cover; background: #f1f5f9; border: 1px solid #cbd5e1; flex-shrink: 0; display: block; }
@@ -75,40 +75,40 @@
         .btn-del { background: #ef4444; max-width: 35px; }
         
         .order-qty-input { width: 50px; padding: 2px; font-size: 12px; text-align: center; border: 1px solid #cbd5e1; border-radius: 4px; display: inline-block; margin-left: 4px; direction: ltr !important; }
-        .reorder-sticky-bar { background: #fffbeb; border-top: 2px solid #fef3c7; padding: 12px; margin-top: 15px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; }
+        .reorder-sticky-bar { background: #fffbeb; border-top: 2px solid #fef3c7; padding: 12px; margin-top: 15px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; direction: ltr; }
         .btn-whatsapp-send { background: #25d366; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-size: 13px; font-weight: bold; cursor: pointer; }
         
-        .faktura-table { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 11px; background: white; border-radius: 8px; overflow: hidden; }
+        .faktura-table { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 11px; background: white; border-radius: 8px; overflow: hidden; direction: ltr; }
         .faktura-table th, .faktura-table td { padding: 8px; text-align: left; border-bottom: 1px solid #e2e8f0; }
         .faktura-table th { background: #475569; color: white; }
-        .faktura-card { background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 12px; padding: 12px; margin-bottom: 12px; }
-        .faktura-header { display: flex; justify-content: space-between; font-weight: bold; border-bottom: 1px solid #e2e8f0; padding-bottom: 6px; margin-bottom: 6px; font-size: 12px; }
+        .faktura-card { background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 12px; padding: 12px; margin-bottom: 12px; text-align: left; }
+        .faktura-header { display: flex; justify-content: space-between; font-weight: bold; border-bottom: 1px solid #e2e8f0; padding-bottom: 6px; margin-bottom: 6px; font-size: 12px; direction: ltr; }
 
         #fileInput { display: none; }
         .print-only-info { display: none; }
 
-        /* 📌 شريط التحكم السفلي الثابت */
-        .bottom-control-bar { position: fixed; bottom: 0; left: 0; right: 0; background: #ffffff; box-shadow: 0 -4px 20px rgba(0,0,0,0.1); padding: 12px; border-top-left-radius: 20px; border-top-right-radius: 20px; z-index: 9999; display: flex; gap: 8px; align-items: center; max-width: 480px; margin: auto; }
-        .search-wrapper-bottom { flex: 1; display: flex; gap: 6px; }
-        .search-box-bottom { flex: 1; padding: 12px; border: 2px solid #10b981; border-radius: 10px; font-size: 15px; font-weight: bold; background: #fff; }
+        /* شريط التحكم السفلي الثابت */
+        .bottom-control-bar { position: fixed; bottom: 0; left: 0; right: 0; background: #ffffff; box-shadow: 0 -4px 20px rgba(0,0,0,0.1); padding: 12px; border-top-left-radius: 20px; border-top-right-radius: 20px; z-index: 9999; display: flex; gap: 8px; align-items: center; max-width: 480px; margin: auto; direction: ltr !important; }
+        .search-wrapper-bottom { flex: 1; display: flex; gap: 6px; direction: ltr !important; }
+        .search-box-bottom { flex: 1; padding: 12px; border: 2px solid #10b981; border-radius: 10px; font-size: 15px; font-weight: bold; background: #fff; text-align: left !important; direction: ltr !important; }
         .search-cam-btn-bottom { background: #10b981; color: white; border: none; padding: 0 14px; border-radius: 10px; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
         .btn-lang-bottom { background: #3b82f6; color: white; border: none; padding: 12px; border-radius: 10px; font-size: 12px; font-weight: bold; cursor: pointer; white-space: nowrap; height: 100%; }
 
-        /* 📌 شاشة عرض السعر المنفصلة (Popup) */
+        /* شاشة عرض السعر المنفصلة (Popup) */
         .price-popup-overlay { display: none; position: fixed; top:0; left:0; right:0; bottom:0; background: rgba(0,0,0,0.7); z-index: 100000; align-items: center; justify-content: center; padding: 20px; }
         .price-popup-box { background: white; width: 100%; max-width: 400px; border-radius: 24px; padding: 24px; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.2); animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         @keyframes popIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
         .popup-title { font-size: 22px; font-weight: 800; color: #0f172a; margin-bottom: 8px; }
         .popup-barcode { font-size: 14px; color: #64748b; margin-bottom: 20px; font-family: monospace; }
-        .popup-price-big { font-size: 48px; font-weight: 900; color: #16a34a; background: #f0fdf4; padding: 15px; border-radius: 16px; border: 2px solid #16a34a; margin-bottom: 20px; display: inline-block; width: 100%; }
+        .popup-price-big { font-size: 48px; font-weight: 900; color: #16a34a; background: #f0fdf4; padding: 15px; border-radius: 16px; border: 2px solid #16a34a; margin-bottom: 20px; display: inline-block; width: 100%; direction: ltr; }
         .popup-close-btn { background: #0f172a; color: white; border: none; width: 100%; padding: 14px; border-radius: 12px; font-size: 16px; font-weight: bold; cursor: pointer; }
 
-        /* ترويسة وعناصر ورقة أسعار اليوم المخصصة للموظفين */
-        .dagens-item-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #e2e8f0; }
-        .dagens-item-name { font-weight: 700; font-size: 15px; }
+        /* أسعار اليوم */
+        .dagens-item-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #e2e8f0; direction: ltr; }
+        .dagens-item-name { font-weight: 700; font-size: 15px; text-align: left; }
         .dagens-item-price { font-weight: 800; color: #16a34a; font-size: 16px; }
 
-        /* 🖨️ وضعية الطباعة الاحترافية النظيفة تماماً وبدون علامات */
+        /* وضعية الطباعة الاحترافية */
         @media print {
             @page { size: A4; margin: 12mm; }
             body { background: white; padding: 0; color: #000; font-size: 11pt; }
@@ -120,7 +120,6 @@
             .brand-signature { font-size: 14pt; text-align: center; color: #000 !important; }
             .subtitle { font-size: 12pt; text-align: center; margin-bottom: 20px; }
             
-            /* 🚫 إخفاء كافة البيانات الحساسة تماماً في كشف الموظفين */
             body.print-mode-ansatte .print-only-info, 
             body.print-mode-ansatte .prod-meta,
             body.print-mode-ansatte .prod-img,
@@ -145,7 +144,7 @@
 
     <div class="brand-title">DagligvarePris</div>
     <div class="brand-signature">By Mr intl</div>
-    <div class="subtitle" id="appSub">BestillingApp System</div>
+    <div class="subtitle" id="appSub">SmartGrocer System</div>
 
     <div id="scanner-container">
         <button class="close-scan-btn" onclick="stopScanner()">X</button>
@@ -184,7 +183,7 @@
                 <div class="form-group" id="grpVaregruppe">
                     <label id="lblVaregruppe">Varegruppe</label>
                     <div class="input-with-btn">
-                        <select id="prodVaregruppe"></select>
+                        <select id="prodVaregruppe" style="direction: ltr !important; text-align: left !important;"></select>
                         <button class="add-grp-btn" onclick="addNewVaregruppeManual()">+</button>
                     </div>
                 </div>
@@ -210,7 +209,7 @@
             <div class="col">
                 <div class="form-group" id="grpMargin">
                     <label id="lblMargin">Margin</label>
-                    <select id="prodMargin" onchange="runCalculations(true)">
+                    <select id="prodMargin" onchange="runCalculations(true)" style="direction: ltr !important; text-align: left !important;">
                         <option value="1.3">1.3</option><option value="1.4">1.4</option>
                         <option value="1.5" selected>1.5</option><option value="1.6">1.6</option>
                         <option value="1.7">1.7</option><option value="1.8">1.8</option><option value="1.9">1.9</option>
@@ -220,7 +219,7 @@
             <div class="col">
                 <div class="form-group" id="grpMva">
                     <label id="lblMva">MVA</label>
-                    <select id="prodMva" onchange="runCalculations(true)">
+                    <select id="prodMva" onchange="runCalculations(true)" style="direction: ltr !important; text-align: left !important;">
                         <option value="0.25">25%</option>
                         <option value="0.15" selected>15%</option>
                         <option value="0">0%</option>
@@ -322,7 +321,7 @@
         </div>
         <div class="form-group" id="grpFakItems">
             <label id="lblFakItems">Produkt valgt for bekreftelse</label>
-            <select id="fakItemSelect" onchange="syncFakturaFieldsFromSelect()">
+            <select id="fakItemSelect" onchange="syncFakturaFieldsFromSelect()" style="direction: ltr !important; text-align: left !important;">
                 <option value="">-- Velg --</option>
             </select>
         </div>
@@ -388,7 +387,7 @@
             lblFakSupplier: "Leverandørnavn", lblFakNum: "Fakturanummer", lblFakDate: "Dato", lblFakItems: "Mottatt produkt",
             lblFakRecQty: "Mottatt antall (Kasser/Stk)", lblFakActualCost: "Faktisk innkjøpspris (Total)",
             btnNewInvoice: "Bekreft og legg til i faktura",
-            btnScan: "Scan 📷", promptGroup: "Skriv inn navnet på den nye varegruppen:", alertEmpty: "Vennligst fyll ut alle felter!",
+            btnScan: "Scan 📷", promptGroup: "Skriv inn navnet på den نئے varegruppen:", alertEmpty: "Vennligst fyll ut alle felter!",
             alertFileEmpty: "Filen er tom!", alertSuccess: "Vellykket! Importert {count} produkter.", confirmDelete: "Slette?",
             thProd: "Produkt", thCost: "Kost", thIncome: "Inntekt/Verdi", thProfit: "Gevinst", btnDelFak: "Slett",
             lblOrderBtn: "+ Ordre", lblInvoiceBtn: "📄 Faktura +", lblEditBtn: "Edit", lblDeleteBtn: "X",
@@ -449,6 +448,7 @@
     function applyLanguageStrings() {
         const l = currentLang;
         
+        // الحفاظ على اتجاه العرض والقوائم من اليسار لليمين للنص النرويجي بشكل احترافي
         if (l === 'ar') {
             document.body.setAttribute('dir', 'rtl');
             document.getElementById('searchCatalogBar').style.textAlign = "right";
@@ -560,14 +560,8 @@
             finalPrice = exMva * (1 + mva);
             document.getElementById('resFinalPriceInput').value = finalPrice.toFixed(2);
         } else {
+            // تفعيل ميزة التعديل اليدوي على السعر النهائي وحساب الربح الفعلي دون كسر الكود
             finalPrice = parseFloat(document.getElementById('resFinalPriceInput').value) || 0;
-            if(unitCost > 0) {
-                const manualExMva = finalPrice / (1 + mva);
-                const calculatedMargin = (manualExMva / unitCost).toFixed(1);
-                if(['1.3','1.4','1.5','1.6','1.7','1.8','1.9'].includes(calculatedMargin)) {
-                    document.getElementById('prodMargin').value = calculatedMargin;
-                }
-            }
         }
 
         const calculatedExMva = finalPrice / (1 + mva);
@@ -626,7 +620,6 @@
         }
     }
 
-    /* 5. تعديل ذكي ومصلح بالكامل لحفظ وتحديث الحقول دون تكرار */
     function saveProductToCatalog() {
         const name = document.getElementById('prodName').value.trim();
         if(!name) return;
@@ -661,7 +654,7 @@
 
         localStorage.setItem('mr_v7_catalog', JSON.stringify(catalog));
         
-        // تفريغ الحقول فورا بعد الإضافة أو التحديث
+        // تفريغ المدخلات فوراً لتسهيل العمل السريع
         document.getElementById('prodName').value = '';
         document.getElementById('prodBarcode').value = '';
         document.getElementById('prodCost').value = '';
@@ -670,6 +663,7 @@
         document.getElementById('prodLinkUrl').value = '';
         document.getElementById('prodSupplier').value = '';
         document.getElementById('prodSupplierUrl').value = '';
+        document.getElementById('resFinalPriceInput').value = '0.00';
         
         applyLanguageStrings();
     }
@@ -750,7 +744,6 @@
         });
     }
 
-    /* 2. الدالة الذكية لنقل اسم وسعر المنتج فورا لأسعار اليوم بنقرة زر */
     function addDirectToDagens(name, price) {
         dagensList.push({ id: Date.now(), name: name, price: parseFloat(price) });
         localStorage.setItem('mr_v7_dagens', JSON.stringify(dagensList));
@@ -886,7 +879,7 @@
     }
 
     function sendOrderViaWhatsApp() {
-        let text = "*Varebestilling:*\n\n";
+        let text = "*Bestilling:*\n\n";
         orderList.forEach((o, i) => { text += `${i+1}. ${o.name} (${o.supplier}) -> *${o.antall}*\n`; });
         window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
     }
