@@ -535,7 +535,6 @@
         document.getElementById('pricePopup').style.display = 'none';
     }
 
-    // تفعيل التحديث التلقائي للقائمة المنسدلة
     function updateVaregruppeDropdown() {
         const select = document.getElementById('prodVaregruppe');
         if (!select) return;
@@ -632,7 +631,7 @@
         }
     }
 
-    /* 4. حل مشكلة تعديل المنتج وحفظ التغييرات */
+    /* إصلاح مشكلة حفظ وتعديل الروابط والصور */
     function saveProductToCatalog() {
         const name = document.getElementById('prodName').value.trim();
         if(!name) return;
@@ -642,11 +641,12 @@
         const prodLinkStr = document.getElementById('prodLinkUrl').value.trim();
         const supUrlStr = document.getElementById('prodSupplierUrl').value.trim();
 
-        let existingImg = '';
-        if (editId) {
+        let finalImg = imgUrlStr;
+        // إذا كان حقل رابط الصورة فارغاً أثناء التعديل، نبحث عن الصورة المحفوظة مسبقاً لمنع حذفها
+        if (!finalImg && editId) {
             const oldProd = catalog.find(p => String(p.id) === String(editId));
             if (oldProd && oldProd.img) {
-                existingImg = oldProd.img;
+                finalImg = oldProd.img;
             }
         }
 
@@ -659,7 +659,7 @@
             qty: parseInt(document.getElementById('prodQty').value) || 1,
             margin: parseFloat(document.getElementById('prodMargin').value) || 1.5,
             mva: parseFloat(document.getElementById('prodMva').value) || 0,
-            img: imgUrlStr ? imgUrlStr : existingImg, 
+            img: finalImg, 
             link: prodLinkStr,
             supplier: document.getElementById('prodSupplier').value.trim() || "Afro kjøp as",
             supplierUrl: supUrlStr,
@@ -667,16 +667,15 @@
         };
 
         if(editId) {
-            // تحديث مصفوفة المنتجات بالكامل بناء على الرقم الفريد
             catalog = catalog.map(p => String(p.id) === String(pData.id) ? pData : p);
-            document.getElementById('editId').value = ""; // تفريغ الـ ID للعودة للوضع الطبيعي
         } else {
             catalog.unshift(pData);
         }
 
         localStorage.setItem('mr_v7_catalog', JSON.stringify(catalog));
         
-        // تفريغ كافة المدخلات وإعادتها للافتراضي
+        // تفريغ المدخلات وإعادة تعيين حقل التعديل المخفي لضمان نجاح الإضافات القادمة
+        document.getElementById('editId').value = "";
         document.getElementById('prodName').value = '';
         document.getElementById('prodBarcode').value = '';
         document.getElementById('prodCost').value = '';
@@ -695,7 +694,6 @@
         renderOrderList();
     }
 
-    /* 1. حل مشكلة عدم ظهور الصورة */
     function renderCatalogList() {
         const container = document.getElementById('catalogContainer');
         if (!container) return;
@@ -726,7 +724,6 @@
                 const card = document.createElement('div');
                 card.className = 'product-card';
                 
-                // التحقق من الرابط: إذا لم يكن هناك رابط صورة صحيح، يتم وضع أيقونة كرتونية بديلة مباشرة لمنع ظهور المربع الأبيض وعلامة الاستفهام
                 let imgHtml = '';
                 if(p.img && p.img.trim().length > 5 && (p.img.startsWith('http://') || p.img.startsWith('https://') || p.img.startsWith('data:image'))) {
                     imgHtml = `<img src="${p.img.trim()}" class="prod-img" onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\'prod-img\' style=\'display:flex;align-items:center;justify-content:center;font-size:18px;\'>📦</div>';">`;
@@ -954,47 +951,6 @@
         document.getElementById('fakActualCost').value = '';
         document.getElementById('fakItemSelect').value = '';
         renderFakturaRecords();
-    }
-
-    function renderFakturaRecords() {
-        const container = document.getElementById('fakturaRecordsContainer');
-        if (!container) return;
-        container.innerHTML = '';
-        const l = currentLang;
-
-        if(fakturaList.length === 0) return;
-
-        fakturaList.forEach(f => {
-            const div = document.createElement('div');
-            div.className = 'faktura-card';
-            div.innerHTML = `
-                <div class="faktura-header">
-                    <span>${words[l].textLeverandoer}: ${f.supplier}</span>
-                    <span style="color:#7c3aed;">Fak# ${f.number}</span>
-                </div>
-                <div style="font-size:11px; color:#64748b; margin-bottom:6px;">Dato: ${f.date}</div>
-                <table class="faktura-table">
-                    <thead>
-                        <tr>
-                            <th>${words[l].thProd}</th>
-                            <th>${words[l].thCost}</th>
-                            <th>${words[l].thIncome}</th>
-                            <th>${words[l].thProfit}</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>${f.prodName}</td>
-                            <td>${f.totalCost.toFixed(2)} kr</td>
-                            <td>${(f.totalCost + f.totalProfit).toFixed(2)} kr</td>
-                            <td style="color:#16a34a; font-weight:bold;">+${f.totalProfit.toFixed(2)} kr</td>
-                        </tr>
-                    </tbody>
-                </table>
-                <button class="action-btn btn-del" style="margin-top:8px; padding:4px 8px; max-width:none;" onclick="fakturaList=fakturaList.filter(item=>item.id!==${f.id});localStorage.setItem('mr_v7_faktura', JSON.stringify(fakturaList));renderFakturaRecords();">${words[l].btnDelFak}</button>
-            `;
-            container.appendChild(div);
-        });
     }
 
     function deleteFromCatalog(id) {
