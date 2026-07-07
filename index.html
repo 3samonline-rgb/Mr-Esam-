@@ -23,11 +23,10 @@
         .btn-print-kunder { background: #7c3aed; }
         .btn-print-ansatte { background: #db2777; }
         
-        /* الهوية واللمسة الشخصية الجديدة */
+        /* الهوية واللمسة الشخصية المعتمدة */
         .brand-title { font-size: 24px; font-weight: 900; text-align: center; margin: 0; color: #0f172a; letter-spacing: -0.5px; line-height: 1.2; }
         .brand-subtitle { font-size: 14px; font-weight: 700; text-align: center; margin: 2px 0; color: #475569; }
-        .brand-signature { font-size: 12px; font-weight: 800; color: #10b981; text-align: center; margin: 0 0 4px 0; text-transform: uppercase; letter-spacing: 1px; }
-        .subtitle { font-size: 11px; font-weight: 600; color: #64748b; text-align: center; margin-bottom: 16px; }
+        .brand-signature { font-size: 12px; font-weight: 800; color: #10b981; text-align: center; margin: 0 0 16px 0; text-transform: uppercase; letter-spacing: 1px; }
         
         .page-section { display: none; }
         .page-section.active { display: block; }
@@ -67,14 +66,14 @@
         .prod-meta { font-size: 11px; color: #64748b; margin-top: 2px; text-align: left !important; }
         .prod-price-tag { text-align: right !important; font-weight: 800; font-size: 16px; color: #16a34a; white-space: nowrap; margin-left: auto; direction: ltr !important; cursor: pointer; }
         
-        /* إجبار أزرار الإجراءات على صف واحد ومنع الالتفاف */
+        /* أزرار الإجراءات */
         .prod-actions-row { display: flex; gap: 3px; width: 100%; border-top: 1px solid #f1f5f9; padding-top: 8px; direction: ltr !important; flex-wrap: nowrap !important; justify-content: space-between; }
         .action-btn { flex: 1; border: none; padding: 7px 2px; border-radius: 6px; font-size: 9px; font-weight: bold; cursor: pointer; color: white; text-align: center; white-space: nowrap; min-width: 0; }
         .btn-order { background: #0284c7; }
         .btn-add-fak { background: #475569; }
         .btn-edit { background: #ea580c; }
         .btn-dag { background: #7c3aed; }
-        .btn-del { background: #ef4444; flex: 0 0 28px; font-size: 10px; } /* حجم ثابت لزر الحذف لإعطاء مساحة للبقية */
+        .btn-del { background: #ef4444; flex: 0 0 28px; font-size: 10px; }
         
         .order-qty-input { width: 50px; padding: 2px; font-size: 12px; text-align: center; border: 1px solid #cbd5e1; border-radius: 4px; display: inline-block; margin-left: 4px; direction: ltr !important; }
         .reorder-sticky-bar { background: #fffbeb; border-top: 2px solid #fef3c7; padding: 12px; margin-top: 15px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; direction: ltr; }
@@ -110,24 +109,39 @@
         .dagens-item-name { font-weight: 700; font-size: 15px; text-align: left; }
         .dagens-item-price { font-weight: 800; color: #16a34a; font-size: 16px; }
 
-        /* وضعية الطباعة */
+        /* مراجعة شاملة وتحسين كامل لورقة الطباعة للمالك والموظفين */
         @media print {
-            @page { size: A4; margin: 12mm; }
-            body { background: white; padding: 0 !important; color: #000; font-size: 11pt; }
+            @page { size: A4; margin: 10mm; }
+            body { background: white; padding: 0 !important; color: #000; font-size: 11pt; direction: ltr !important; }
             .app-container { box-shadow: none; max-width: 100%; width: 100%; padding: 0; }
+            
+            /* إخفاء كافة العناصر غير القابلة للطباعة */
             .top-actions, .nav-tabs, .form-group, .calc-box, .btn-main, .bottom-control-bar, 
             .prod-actions-row, .reorder-sticky-bar, .scan-btn, .add-grp-btn, .price-popup-overlay,
-            .prod-meta a, .prod-meta span { display: none !important; }
-            .group-header-title { background: #f1f5f9 !important; color: #000 !important; border: 1px solid #000; page-break-after: avoid; }
-            .product-card { border: none; border-bottom: 1px solid #000 !important; padding: 10px 0; page-break-inside: avoid; display: flex !important; justify-content: space-between; align-items: center; direction: ltr !important; }
-            .prod-price-tag { color: #000 !important; font-size: 14pt; font-weight: bold; }
-            .brand-title { font-size: 22pt; text-align: center; }
-            .brand-subtitle { font-size: 14pt; text-align: center; }
-            .brand-signature { font-size: 12pt; text-align: center; color: #000 !important; }
-            .subtitle { font-size: 11pt; text-align: center; margin-bottom: 20px; }
-            body.print-mode-ansatte .print-only-info, body.print-mode-ansatte .prod-meta, body.print-mode-ansatte .prod-img, body.print-mode-ansatte .action-btn, body.print-mode-ansatte .prod-actions-row { display: none !important; }
-            body.print-mode-ansatte .prod-title { font-size: 16pt; font-weight: bold; color: #000 !important; }
-            body.print-mode-ansatte .prod-price-tag { font-size: 18pt; font-weight: 900; color: #000 !important; }
+            .prod-meta a, .prod-meta span, input, select, button { display: none !important; }
+            
+            .group-header-title { background: #f1f5f9 !important; color: #000 !important; border: 1px solid #000; padding: 6px; margin-top: 15px; font-size: 14pt; page-break-after: avoid; display: block !important; text-align: left !important; }
+            
+            /* كارت المنتج في الطباعة */
+            .product-card { border: none !important; border-bottom: 1px solid #ccc !important; padding: 8px 0 !important; margin: 0 !important; display: flex !important; flex-direction: row !important; justify-content: space-between !important; align-items: center !important; page-break-inside: avoid; direction: ltr !important; }
+            .prod-main-row { display: flex !important; flex-direction: row !important; justify-content: space-between !important; align-items: center !important; width: 100% !important; direction: ltr !important; }
+            
+            /* ترويسة الطباعة للمالك */
+            .brand-title { font-size: 24pt; text-align: center; font-weight: bold; display: block !important; }
+            .brand-subtitle { font-size: 14pt; text-align: center; display: block !important; }
+            .brand-signature { font-size: 12pt; text-align: center; color: #000 !important; display: block !important; }
+            
+            /* تنسيق عرض أسعار الموظفين النظيف والواضح جداً للـ Labels */
+            body.print-mode-ansatte .prod-meta, 
+            body.print-mode-ansatte .prod-img, 
+            body.print-mode-ansatte .print-only-info { display: none !important; }
+            body.print-mode-ansatte .prod-title { font-size: 18pt !important; font-weight: bold !important; color: #000 !important; text-align: left !important; }
+            body.print-mode-ansatte .prod-price-tag { font-size: 22pt !important; font-weight: 900 !important; color: #000 !important; text-align: right !important; }
+            
+            /* وضعية طباعة المالك لإظهار الباركود والتكلفة */
+            body.print-mode-kunder .print-only-info { display: block !important; font-size: 10pt; color: #333; margin-top: 2px; }
+            body.print-mode-kunder .prod-title { font-size: 14pt !important; font-weight: bold !important; }
+            body.print-mode-kunder .prod-price-tag { font-size: 16pt !important; font-weight: bold !important; }
         }
     </style>
 </head>
@@ -143,11 +157,9 @@
         <button class="btn-print-ansatte" onclick="triggerPrint('ansatte')" id="lblPrintAnsatteBtn">Ansatte 🖨️</button>
     </div>
 
-    <!-- التسمية والترويسة الجديدة بالكامل -->
     <div class="brand-title">Afro kjøp as</div>
     <div class="brand-subtitle">Bestilling og ordre system</div>
     <div class="brand-signature">By Mr intl</div>
-    <div class="subtitle" id="appSub">SmartGrocer System</div>
 
     <div id="scanner-container">
         <button class="close-scan-btn" onclick="stopScanner()">X</button>
@@ -377,7 +389,6 @@
 
     const words = {
         no: {
-            appSub: "SmartGrocer System",
             lblImportBtn: "Import CSV", lblExportBtn: "Eksporter", lblPrintKunderBtn: "Prisliste 🖨️", lblPrintAnsatteBtn: "Ansatte 🖨️",
             varelisteTab: "Vareliste", ordrelisteTab: "Ordreliste", fakturaTab: "Fakturaliste",
             prodName: "Produktnavn", barcode: "Strekkode", varegruppe: "Varegruppe", cost: "Innkjøpspris (Total)",
@@ -396,7 +407,6 @@
             selectPlh: "-- Velg produkt --", textLeverandoer: "Leverandør", textGruppe: "Gruppe", textAntall: "Antall:"
         },
         ar: {
-            appSub: "نظام إدارة المتجر الذكي",
             lblImportBtn: "استيراد ملف CSV", lblExportBtn: "تصدير البيانات", lblPrintKunderBtn: "قائمة الأسعار 🖨️", lblPrintAnsatteBtn: "كشف الموظفين 🖨️",
             varelisteTab: "قائمة المنتجات", ordrelisteTab: "قائمة الطلبيات", fakturaTab: "تأكيد الفواتير",
             prodName: "اسم المنتج", barcode: "الباركود", varegruppe: "المجموعة التموينية", cost: "سعر الشراء الإجمالي",
@@ -459,7 +469,6 @@
             document.querySelectorAll('.form-group').forEach(el => el.style.textAlign = 'left');
         }
 
-        document.getElementById('appSub').innerText = words[l].appSub;
         document.getElementById('lblImportBtn').innerText = words[l].lblImportBtn;
         document.getElementById('lblExportBtn').innerText = words[l].lblExportBtn;
         document.getElementById('lblPrintKunderBtn').innerText = words[l].lblPrintKunderBtn;
@@ -526,9 +535,11 @@
         document.getElementById('pricePopup').style.display = 'none';
     }
 
+    // تفعيل التحديث التلقائي للقائمة المنسدلة
     function updateVaregruppeDropdown() {
         const select = document.getElementById('prodVaregruppe');
         if (!select) return;
+        const savedVal = select.value;
         select.innerHTML = '';
         varegrupper.forEach(g => {
             const opt = document.createElement('option');
@@ -536,6 +547,7 @@
             opt.innerText = g;
             select.appendChild(opt);
         });
+        if(savedVal) select.value = savedVal;
     }
 
     function addNewVaregruppeManual() {
@@ -620,6 +632,7 @@
         }
     }
 
+    /* 4. حل مشكلة تعديل المنتج وحفظ التغييرات */
     function saveProductToCatalog() {
         const name = document.getElementById('prodName').value.trim();
         if(!name) return;
@@ -629,7 +642,6 @@
         const prodLinkStr = document.getElementById('prodLinkUrl').value.trim();
         const supUrlStr = document.getElementById('prodSupplierUrl').value.trim();
 
-        // إصلاح دقيق لمشكلة استعادة وحفظ الصورة القديمة ومطابقتها كـ سلاسل نصية String دقيقة
         let existingImg = '';
         if (editId) {
             const oldProd = catalog.find(p => String(p.id) === String(editId));
@@ -655,15 +667,16 @@
         };
 
         if(editId) {
+            // تحديث مصفوفة المنتجات بالكامل بناء على الرقم الفريد
             catalog = catalog.map(p => String(p.id) === String(pData.id) ? pData : p);
-            document.getElementById('editId').value = "";
+            document.getElementById('editId').value = ""; // تفريغ الـ ID للعودة للوضع الطبيعي
         } else {
             catalog.unshift(pData);
         }
 
         localStorage.setItem('mr_v7_catalog', JSON.stringify(catalog));
         
-        // تفريغ المدخلات بأمان بعد الحفظ والعودة للوضع الطبيعي
+        // تفريغ كافة المدخلات وإعادتها للافتراضي
         document.getElementById('prodName').value = '';
         document.getElementById('prodBarcode').value = '';
         document.getElementById('prodCost').value = '';
@@ -682,6 +695,7 @@
         renderOrderList();
     }
 
+    /* 1. حل مشكلة عدم ظهور الصورة */
     function renderCatalogList() {
         const container = document.getElementById('catalogContainer');
         if (!container) return;
@@ -712,9 +726,10 @@
                 const card = document.createElement('div');
                 card.className = 'product-card';
                 
+                // التحقق من الرابط: إذا لم يكن هناك رابط صورة صحيح، يتم وضع أيقونة كرتونية بديلة مباشرة لمنع ظهور المربع الأبيض وعلامة الاستفهام
                 let imgHtml = '';
-                if(p.img && p.img.length > 5) {
-                    imgHtml = `<img src="${p.img}" class="prod-img" onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\'prod-img\' style=\'display:flex;align-items:center;justify-content:center;font-size:18px;\'>📦</div>';">`;
+                if(p.img && p.img.trim().length > 5 && (p.img.startsWith('http://') || p.img.startsWith('https://') || p.img.startsWith('data:image'))) {
+                    imgHtml = `<img src="${p.img.trim()}" class="prod-img" onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\'prod-img\' style=\'display:flex;align-items:center;justify-content:center;font-size:18px;\'>📦</div>';">`;
                 } else {
                     imgHtml = `<div class="prod-img" style="display:flex;align-items:center;justify-content:center;font-size:18px;">📦</div>`;
                 }
@@ -737,7 +752,6 @@
                         </div>
                         <div class="prod-price-tag" onclick="showPricePopup('${p.name.replace(/'/g, "\\'")}', '${p.barcode || ''}', ${p.finalPrice || 0})">${(p.finalPrice || 0).toFixed(2)} kr</div>
                     </div>
-                    <!-- الأزرار مصفوفة هنا على سطر واحد تماماً متناسق ومحمي -->
                     <div class="prod-actions-row">
                         <button class="action-btn btn-order" onclick="addToOrderList(${p.id})">${words[l].lblOrderBtn}</button>
                         <button class="action-btn btn-add-fak" onclick="autoSendToFakturaForm(${p.id})">${words[l].lblInvoiceBtn}</button>
