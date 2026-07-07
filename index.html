@@ -2,16 +2,28 @@
 <html lang="no">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>SmartButikk BY MR INTL</title>
+    <!-- مكتبة QuaggaJS لتشغيل كاميرا الباركود مباشرة من الهاتف --<!DOCTYPE html>
+<html lang="no">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>SmartButikk BY MR INTL</title>
+    <!-- مكتبة QuaggaJS لتشغيل كاميرا الباركود مباشرة من الهاتف -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/quagga/0.12.1/quagga.min.js"></script>
     <style>
-        /* التنسيق الأساسي المعتاد لتطبيقك */
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             background-color: #f5f7fb;
             margin: 0;
             padding: 15px;
-            direction: ltr; /* من اليسار لليمين للنرويجية */
+            direction: ltr;
+        }
+        
+        /* دعم الاتجاه العربي عند التبديل */
+        body.rtl {
+            direction: rtl;
         }
         
         .header {
@@ -31,7 +43,24 @@
             letter-spacing: 1px;
         }
 
-        /* شريط التبويب العلوي الأصلي (Tabs) */
+        /* أزرار التحكم باللغة والأدوات في الأعلى */
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .top-btn {
+            padding: 6px 12px;
+            border: 1px solid #cbd5e1;
+            background: white;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            color: #334155;
+        }
+
         .tabs {
             display: flex;
             justify-content: space-between;
@@ -58,7 +87,6 @@
             box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
 
-        /* الكروت والخانات الاصلية للتطبيق */
         .card {
             background: white;
             border-radius: 16px;
@@ -86,7 +114,7 @@
             border: 1px solid #cbd5e1;
             border-radius: 8px;
             box-sizing: border-box;
-            font-size: 16px; /* يمنع الزووم المزعج في الآيفون */
+            font-size: 16px;
             background-color: white;
         }
         
@@ -101,7 +129,6 @@
             white-space: nowrap;
         }
 
-        /* لوحة الأكشن السريعة أسفل المنتج */
         .action-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -122,7 +149,6 @@
         .btn-today { background: #f59e0b; color: white; }
         .btn-invoice { background: #8b5cf6; color: white; }
 
-        /* قائمة المنتجات المضافة */
         .product-item {
             display: flex;
             justify-content: space-between;
@@ -131,9 +157,34 @@
             border-bottom: 1px solid #e2e8f0;
         }
 
-        /* 🖨️ كود إخفاء أزرار الحذف والـ X عند الطباعة تماماً */
+        .status-badge {
+            font-size: 11px;
+            padding: 2px 6px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            font-weight: bold;
+            margin-left: 5px;
+        }
+
+        /* نافذة الكاميرا الحية للآيفون */
+        #scanner-container {
+            display: none;
+            width: 100%;
+            height: 250px;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 15px;
+            position: relative;
+            background: #000;
+        }
+        #scanner-container video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
         @media print {
-            .no-print, .slett-btn, .delete-x, button, .tabs, .action-grid, .scan-btn, [onclick*="setProduktForRedigering"] {
+            .no-print, .slett-btn, .delete-x, button, .tabs, .action-grid, .scan-btn, .top-bar, #scanner-container {
                 display: none !important;
             }
             body { background: white; padding: 0; }
@@ -143,158 +194,270 @@
 </head>
 <body>
 
-    <!-- الاسم النرويجي المحدث مع بصمتك الاحترافية -->
+    <!-- شريط الأدوات العلوي واللغة -->
+    <div class="top-bar no-print">
+        <button class="top-btn" onclick="toggleLanguage()" id="langBtn">🇳🇴 / 🇦🇷 Language</button>
+        <div>
+            <button class="top-btn" onclick="eksporterData()" id="btnExport">Eksporter CSV</button>
+            <button class="top-btn" onclick="document.getElementById('importFile').click()" id="btnImport">Importer CSV</button>
+            <input type="file" id="importFile" accept=".csv" style="display:none;" onchange="importerData(event)">
+        </div>
+    </div>
+
     <div class="header">
         <h1>SmartButikk</h1>
         <div class="brand">BY MR INTL</div>
-        <p style="color: #64748b; margin: 5px 0; font-size: 12px;">SmartButikk System</p>
+        <p style="color: #64748b; margin: 5px 0; font-size: 12px;" id="subHeader">SmartButikk System</p>
     </div>
 
-    <!-- شريط التبويب الأصلي بالكامل -->
     <div class="tabs no-print">
-        <button class="tab-btn active" onclick="switchTab('vareliste')">Vareliste</button>
-        <button class="tab-btn" onclick="switchTab('dagens')">Dagens Priser 🥦</button>
-        <button class="tab-btn" onclick="switchTab('ordre')">Ordreliste</button>
-        <button class="tab-btn" onclick="switchTab('faktura')">Fakturaliste</button>
+        <button class="tab-btn active" id="btn-vareliste" onclick="switchTab('vareliste')">Vareliste</button>
+        <button class="tab-btn" id="btn-dagens" onclick="switchTab('dagens')">Dagens Priser 🥦</button>
+        <button class="tab-btn" id="btn-ordre" onclick="switchTab('ordre')">Ordreliste</button>
+        <button class="tab-btn" id="btn-faktura" onclick="switchTab('faktura')">Fakturaliste</button>
     </div>
 
-    <!-- القسم الرئيسي: إدارة المنتجات -->
+    <!-- حاوية كاميرا الباركود الذكية -->
+    <div id="scanner-container" class="no-print">
+        <button onclick="stopScanner()" style="position:absolute; right:10px; top:10px; z-index:10; background:#ef4444; color:white; border:none; padding:5px 10px; border-radius:6px; font-weight:bold;">X</button>
+    </div>
+
+    <!-- القسم الأول: إدارة المنتجات -->
     <div id="varelisteSeksjon" class="tab-content">
         <div class="card">
             <div class="input-group">
-                <label>Produktnavn</label>
+                <label id="lblStrekkode">Strekkode / EAN</label>
                 <div class="input-row">
-                    <input type="text" id="prodNavn" class="input-field" placeholder="Skriv produktnavn...">
-                    <button class="scan-btn">Scan 📷</button>
+                    <input type="text" id="prodBarcode" class="input-field" placeholder="Scan eller skriv strekkode...">
+                    <button class="scan-btn no-print" onclick="startScanner()">Scan 📷</button>
                 </div>
             </div>
 
-            <!-- المجموعات تظهر هنا بشكل مستقل وبدون أي مشاكل -->
             <div class="input-group">
-                <label>Varegruppe</label>
+                <label id="lblNavn">Produktnavn</label>
+                <input type="text" id="prodNavn" class="input-field" placeholder="Skriv produktnavn...">
+            </div>
+
+            <div class="input-group">
+                <label id="lblGruppe">Varegruppe</label>
                 <select id="prodGruppe" class="input-field">
-                    <option value="Tørrvarer">Tørrvarer</option>
-                    <option value="Drikke">Drikke</option>
-                    <option value="Kosmetikk">Kosmetikk</option>
-                    <option value="Ferskvarer">Ferskvarer</option>
-                    <option value="Grønnsaker">Grønnsaker</option>
-                    <option value="Krydder">Krydder</option>
-                    <option value="Kjølevarer">Kjølevarer</option>
+                    <option value="Frukt og grønt">Frukt og grønt 🥦</option>
+                    <option value="Kjølevarer">Kjølevarer 🧀</option>
+                    <option value="Tørrvarer">Tørrvarer 🌾</option>
+                    <option value="Drikke">Drikke 🥤</option>
+                    <option value="Frysevarer">Frysevarer ❄️</option>
                     <option value="Andre">Andre</option>
                 </select>
             </div>
 
             <div class="input-group">
-                <label>Innkjøpspris (Total)</label>
-                <input type="number" step="any" id="innPris" class="input-field" inputmode="decimal" placeholder="0.00">
+                <label id="lblInnkjøp">Innkjøpspris (kr)</label>
+                <input type="number" step="any" id="innPris" class="input-field" inputmode="decimal" placeholder="0.00" oninput="kalkulerPriser()">
             </div>
 
             <div class="input-group">
-                <label>Margin</label>
-                <input type="number" step="any" id="prodMargin" class="input-field" inputmode="decimal" value="1.5">
+                <label id="lblMargin">Margin / Faktor</label>
+                <input type="number" step="any" id="prodMargin" class="input-field" inputmode="decimal" value="1.5" oninput="kalkulerPriser()">
             </div>
 
-            <!-- لوحة تحكم لتسجيل، تعديل، وحفظ وإرسال المنتجات سرياً -->
+            <div class="input-group">
+                <label id="lblUtsalg">Utsalgspris (kr) - <span style="font-size:12px; color:#64748b;" id="lblManual">Kan overstyres manuelt</span></label>
+                <input type="number" step="any" id="utPris" class="input-field" inputmode="decimal" placeholder="0.00" oninput="kalkulerFraUtsalg()">
+            </div>
+
+            <!-- الحسابات الذكية التلقائية للأرباح والضرائب -->
+            <div style="background:#f8fafc; padding:10px; border-radius:8px; margin-bottom:12px; font-size:13px; font-weight:bold; color:#334155;" id="beregningBoks">
+                Netto fortjeneste: <span id="nettoProfit" style="color:#10b981;">0.00</span> kr | Mva (25%): <span id="mvaVerdi">0.00</span> kr
+            </div>
+
             <div class="action-grid no-print">
-                <button class="action-btn btn-save" onclick="lagreProdukt()">Lagre</button>
-                <button class="action-btn btn-edit" onclick="startRedigering()">Endre</button>
-                <button class="action-btn btn-today" onclick="hurtigDagensPris()">+ Dagens Pris</button>
-                <button class="action-btn btn-invoice" onclick="hurtigFaktura()">+ Faktura</button>
+                <button class="action-btn btn-save" onclick="lagreProdukt()" id="btnLagre">Lagre</button>
+                <button class="action-btn btn-edit" onclick="triggerManueltRediger()" id="btnEndre">Endre</button>
+                <button class="action-btn btn-today" onclick="hurtigDagensPris()" id="btnDagensHurtig">+ Dagens Pris</button>
+                <button class="action-btn btn-invoice" onclick="hurtigFaktura()" id="btnFakturaHurtig">+ Faktura</button>
+            </div>
+            
+            <div id="cancel-box" class="no-print" style="margin-top: 10px; display: none;">
+                <button class="action-btn" style="background: #64748b; color: white; width: 100%;" onclick="avbrytRedigering()" id="btnAvbryt">Avbryt endring</button>
             </div>
         </div>
 
-        <!-- عرض قائمة المنتجات الحالية المضافة -->
         <div class="card">
-            <h3>Registrerte Produkter</h3>
-            <div id="visningsListe">
-                <!-- المنتجات المضافة تظهر هنا وبجانبها زر تعديل وحذف (يختفي عند الطباعة) -->
-            </div>
+            <h3 id="lblRegistrerteTitle">Registrerte Produkter</h3>
+            <div id="visningsListe"></div>
         </div>
     </div>
 
-    <!-- قسم أسعار اليوم المطور -->
+    <!-- القسم الثاني: أسعار اليوم -->
     <div id="dagensSeksjon" class="tab-content" style="display:none;">
         <div class="card">
-            <h3>Dagens Priser 🥦</h3>
-            
-            <!-- اختيار منتج مخزن مسبقاً من القائمة المنسدلة مباشرة بدلاً من الكتابة -->
+            <h3 id="lblDagensTitle">Dagens Priser 🥦</h3>
             <div class="input-group">
-                <label>Velg Produkt fra liste</label>
-                <select id="dagensProdValg" class="input-field">
-                    <!-- يتم تعبئتها تلقائياً عبر الجافاسكريبت -->
-                </select>
+                <label id="lblVelgProd">Velg Produkt fra liste</label>
+                <select id="dagensProdValg" class="input-field" onchange="synkDagensPrisInp()"></select>
             </div>
-
             <div class="input-group">
-                <label>Dagens Pris (kr)</label>
+                <label id="lblDagensPrisInput">Dagens Pris (kr)</label>
                 <input type="number" step="any" id="dagensPrisInp" class="input-field" inputmode="decimal" placeholder="0.00">
             </div>
-            
-            <button class="action-btn btn-save no-print" style="width:100%" onclick="leggTilIDagensListe()">Legg til i priser</button>
+            <button class="action-btn btn-save no-print" style="width:100%" onclick="leggTilIDagensListe()" id="btnLeggTilDagens">Legg til i priser</button>
         </div>
+        <div class="card">
+            <h3 id="lblAktivDagensTitle">Aktiv Dagens Prisliste</h3>
+            <div id="dagensVisningsListe"></div>
+        </div>
+    </div>
+
+    <!-- الأقسام الإضافية للترتيب المعتاد -->
+    <div id="ordreSeksjon" class="tab-content" style="display:none;">
+        <div class="card"><h3>Ordreliste</h3><p>Ingen aktive ordrer.</p></div>
+    </div>
+    <div id="fakturaSeksjon" class="tab-content" style="display:none;">
+        <div class="card"><h3>Fakturaliste</h3><p>Ingen utestående fakturaer.</p></div>
     </div>
 
     <script>
-        // مصفوفة البيانات الأساسية
         let produkter = JSON.parse(localStorage.getItem('produkter')) || [];
+        let dagensPriser = JSON.parse(localStorage.getItem('dagensPriser')) || [];
         let valgtIndex = null;
+        let currentLang = 'no';
 
-        // التبديل بين التبويبات الأصلية للتطبيق
+        const i18n = {
+            no: {
+                subHeader: "SmartButikk System",
+                lblStrekkode: "Strekkode / EAN",
+                lblNavn: "Produktnavn",
+                lblGruppe: "Varegruppe",
+                lblInnkjøp: "Innkjøpspris (kr)",
+                lblMargin: "Margin / Faktor",
+                lblUtsalg: "Utsalgspris (kr)",
+                lblManual: "Kan overstyres manuelt",
+                btnLagre: "Lagre",
+                btnEndre: "Endre",
+                btnAvbryt: "Avbryt endring",
+                lblRegistrerteTitle: "Registrerte Produkter",
+                lblDagensTitle: "Dagens Priser 🥦",
+                lblVelgProd: "Velg Produkt fra liste",
+                lblDagensPrisInput: "Dagens Pris (kr)",
+                btnLeggTilDagens: "Legg til i priser",
+                lblAktivDagensTitle: "Aktiv Dagens Prisliste",
+                netto: "Netto fortjeneste",
+                mvaTxt: "Mva"
+            },
+            ar: {
+                subHeader: "نظام سمارت بوتيك الذكي",
+                lblStrekkode: "الباركود / رمز المنتج",
+                lblNavn: "اسم المنتج",
+                lblGruppe: "مجموعة المنتج",
+                lblInnkjøp: "سعر الشراء (kr)",
+                lblMargin: "هامش الربح / العامل",
+                lblUtsalg: "سعر البيع (kr)",
+                lblManual: "يمكن تعديله يدوياً بكامل الحرية",
+                btnLagre: "حفظ المنتج",
+                btnEndre: "تعديل",
+                btnAvbryt: "إلغاء التعديل",
+                lblRegistrerteTitle: "المنتجات المسجلة في النظام",
+                lblDagensTitle: "أسعار اليوم 🥦",
+                lblVelgProd: "اختر المنتج من القائمة",
+                lblDagensPrisInput: "سعر اليوم الحقيقي (kr)",
+                btnLeggTilDagens: "إضافة إلى قائمة الأسعار",
+                lblAktivDagensTitle: "قائمة أسعار اليوم النشطة",
+                netto: "صافي الربح",
+                mvaTxt: "الضريبة"
+            }
+        };
+
+        function toggleLanguage() {
+            currentLang = currentLang === 'no' ? 'ar' : 'no';
+            document.body.classList.toggle('rtl', currentLang === 'ar');
+            
+            const trans = i18n[currentLang];
+            document.getElementById('subHeader').innerText = trans.subHeader;
+            document.getElementById('lblStrekkode').innerText = trans.lblStrekkode;
+            document.getElementById('lblNavn').innerText = trans.lblNavn;
+            document.getElementById('lblGruppe').innerText = trans.lblGruppe;
+            document.getElementById('lblInnkjøp').innerText = trans.lblInnkjøp;
+            document.getElementById('lblMargin').innerText = trans.lblMargin;
+            document.getElementById('lblUtsalg').innerHTML = `${trans.lblUtsalg} - <span style="font-size:12px; color:#64748b;">${trans.lblManual}</span>`;
+            document.getElementById('btnLagre').innerText = trans.btnLagre;
+            document.getElementById('btnEndre').innerText = trans.btnEndre;
+            document.getElementById('btnAvbryt').innerText = trans.btnAvbryt;
+            document.getElementById('lblRegistrerteTitle').innerText = trans.lblRegistrerteTitle;
+            document.getElementById('lblDagensTitle').innerText = trans.lblDagensTitle;
+            document.getElementById('lblVelgProd').innerText = trans.lblVelgProd;
+            document.getElementById('lblDagensPrisInput').innerText = trans.lblDagensPrisInput;
+            document.getElementById('btnLeggTilDagens').innerText = trans.btnLeggTilDagens;
+            document.getElementById('lblAktivDagensTitle').innerText = trans.lblAktivDagensTitle;
+            
+            kalkulerPriser();
+            visProdukter();
+        }
+
+        function kalkulerPriser() {
+            const inn = parseFloat(document.getElementById('innPris').value) || 0;
+            const margin = parseFloat(document.getElementById('prodMargin').value) || 1;
+            
+            const utsalg = inn * margin;
+            document.getElementById('utPris').value = utsalg.toFixed(2);
+            
+            oppdaterProfitOgMva(inn, utsalg);
+        }
+
+        function kalkulerFraUtsalg() {
+            const inn = parseFloat(document.getElementById('innPris').value) || 0;
+            const utsalg = parseFloat(document.getElementById('utPris').value) || 0;
+            
+            if(inn > 0) {
+                document.getElementById('prodMargin').value = (utsalg / inn).toFixed(2);
+            }
+            oppdaterProfitOgMva(inn, utsalg);
+        }
+
+        function oppdaterProfitOgMva(inn, utsalg) {
+            const trans = i18n[currentLang];
+            const mva = utsalg * 0.25; 
+            const profit = utsalg - inn - mva;
+            
+            document.getElementById('beregningBoks').innerHTML = `
+                ${trans.netto}: <span style="color:#10b981;">${profit.toFixed(2)}</span> kr | ${trans.mvaTxt} (25%): <span>${mva.toFixed(2)}</span> kr
+            `;
+        }
+
         function switchTab(tabName) {
-            // إخفاء جميع الأقسام أولاً
-            document.getElementById('varelisteSeksjon').style.display = 'none';
-            document.getElementById('dagensSeksjon').style.display = 'none';
-            
-            // إزالة اللون النشط من الأزرار
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            
+            document.querySelectorAll('.tab-content').forEach(c => c.style.display = 'none');
+            document.getElementById('btn-' + tabName).classList.add('active');
+
             if(tabName === 'vareliste') {
                 document.getElementById('varelisteSeksjon').style.display = 'block';
             } else if(tabName === 'dagens') {
                 document.getElementById('dagensSeksjon').style.display = 'block';
                 oppdaterDagensDropdown();
+                visDagensPriser();
+            } else {
+                document.getElementById(tabName + 'Seksjon').style.display = 'block';
             }
-            
-            // تفعيل التبويب المختار حالياً
-            event.currentTarget.classList.add('active');
         }
 
-        // تحديث القائمة المنسدلة لأسعار اليوم تلقائياً من المنتجات المخزنة
-        function oppdaterDagensDropdown() {
-            const dropdown = document.getElementById('dagensProdValg');
-            dropdown.innerHTML = '';
-            if(produkter.length === 0) {
-                dropdown.innerHTML = '<option>Ingen produkter registrert</option>';
-                return;
-            }
-            produkter.forEach(p => {
-                let opt = document.createElement('option');
-                opt.value = p.navn;
-                opt.textContent = p.navn;
-                dropdown.appendChild(opt);
-            });
-        }
-
-        // دالة حفظ وإضافة منتج جديد وحل مشكلة التعديل السابقة
         function lagreProdukt() {
-            const navn = document.getElementById('prodNavn').value;
+            const barcode = document.getElementById('prodBarcode').value.trim();
+            const navn = document.getElementById('prodNavn').value.trim();
             const gruppe = document.getElementById('prodGruppe').value;
             const pris = document.getElementById('innPris').value;
             const margin = document.getElementById('prodMargin').value;
+            const utsalg = document.getElementById('utPris').value;
 
-            if(!navn) return alert('Skriv produktnavn først!');
+            if(!navn) return alert(currentLang === 'no' ? 'Skriv produktnavn først!' : 'يرجى كتابة اسم المنتج أولاً!');
 
-            const prodObj = { navn, gruppe, pris, margin };
+            const prodObj = { barcode, navn, gruppe, pris, margin, utsalg };
 
             if(valgtIndex !== null) {
-                // حفظ التعديل على منتج موجود (إصلاح مشكلة التحرير بنجاح)
                 produkter[valgtIndex] = prodObj;
                 valgtIndex = null;
-                alert('Produktet er oppdatert!');
+                alert(currentLang === 'no' ? 'Produktet ble oppdatert!' : 'تم تحديث المنتج بنجاح!');
             } else {
-                // إضافة جديد
                 produkter.push(prodObj);
-                alert('Produktet er lagret!');
+                alert(currentLang === 'no' ? 'Produktet ble lagret!' : 'تم حفظ المنتج بنجاح!');
             }
 
             localStorage.setItem('produkter', JSON.stringify(produkter));
@@ -302,35 +465,54 @@
             visProdukter();
         }
 
-        // تفعيل وضع التعديل عند اختيار منتج
         function setProduktForRedigering(index) {
             valgtIndex = index;
             const p = produkter[index];
+            document.getElementById('prodBarcode').value = p.barcode || '';
             document.getElementById('prodNavn').value = p.navn;
             document.getElementById('prodGruppe').value = p.gruppe;
             document.getElementById('innPris').value = p.pris;
             document.getElementById('prodMargin').value = p.margin;
+            document.getElementById('utPris').value = p.utsalg || '';
+            
+            document.getElementById('cancel-box').style.display = 'block';
+            kalkulerFraUtsalg();
+            window.scrollTo({top: 0, behavior: 'smooth'});
         }
 
-        // دالة تشغيل التعديل عند الضغط على زر Endre في القائمة الرئيسية للتحذير أو التوجيه
-        function startRedigering() {
-            if(valgtIndex === null) {
-                alert('Trykk på "تعديل" ved siden av produktet i listen nedenfor først.');
-            } else {
-                lagreProdukt();
-            }
+        function avbrytRedigering() {
+            valgtIndex = null;
+            tømSkjema();
+        }
+
+        function tømSkjema() {
+            document.getElementById('prodBarcode').value = '';
+            document.getElementById('prodNavn').value = '';
+            document.getElementById('innPris').value = '';
+            document.getElementById('prodMargin').value = '1.5';
+            document.getElementById('utPris').value = '';
+            document.getElementById('cancel-box').style.display = 'none';
+            kalkulerPriser();
         }
 
         function visProdukter() {
             const liste = document.getElementById('visningsListe');
             liste.innerHTML = '';
+            if(produkter.length === 0) {
+                liste.innerHTML = `<p style="text-align:center; color:#64748b;">${currentLang === 'no' ? 'Ingen produkter registrert.' : 'لا توجد منتجات مسجلة حالياً.'}</p>`;
+                return;
+            }
             produkter.forEach((p, idx) => {
+                let uPris = parseFloat(p.utsalg) || (parseFloat(p.pris) * parseFloat(p.margin)) || 0;
                 liste.innerHTML += `
                     <div class="product-item">
-                        <div><strong>${p.navn}</strong> - ${p.gruppe} (${p.pris} kr)</div>
+                        <div>
+                            <strong>${p.navn}</strong> <span class="status-badge">${p.gruppe}</span>
+                            <br><small style="color:#64748b;">EAN: ${p.barcode || '---'} | Utsalg: ${uPris.toFixed(2)} kr</small>
+                        </div>
                         <div class="no-print">
-                            <button onclick="setProduktForRedigering(${idx})" style="background:#3b82f6; color:white; border:none; padding:5px 10px; border-radius:4px; font-weight:bold; cursor:pointer;">تعديل</button>
-                            <button class="slett-btn" onclick="slettProdukt(${idx})" style="background:#ef4444; color:white; border:none; padding:5px 10px; border-radius:4px; margin-left:5px; font-weight:bold; cursor:pointer;">Slett</button>
+                            <button onclick="setProduktForRedigering(${idx})" style="background:#3b82f6; color:white; border:none; padding:6px 12px; border-radius:6px; font-weight:bold; cursor:pointer;">${currentLang === 'no' ? 'Endre' : 'تعديل'}</button>
+                            <button class="slett-btn" onclick="slettProdukt(${idx})" style="background:#ef4444; color:white; border:none; padding:6px 12px; border-radius:6px; font-weight:bold; cursor:pointer; margin-left:5px;">${currentLang === 'no' ? 'Slett' : 'حذف'}</button>
                         </div>
                     </div>
                 `;
@@ -338,44 +520,812 @@
         }
 
         function slettProdukt(idx) {
-            if(confirm('Vil du slette dette produktet?')) {
+            if(confirm(currentLang === 'no' ? 'Vil du slette?' : 'هل تريد الحذف؟')) {
                 produkter.splice(idx, 1);
                 localStorage.setItem('produkter', JSON.stringify(produkter));
                 visProdukter();
-                if(valgtIndex === idx) valgtIndex = null;
             }
         }
 
-        function tømSkjema() {
-            document.getElementById('prodNavn').value = '';
-            document.getElementById('innPris').value = '';
-            valgtIndex = null;
-        }
-
-        // أزرار الاختصارات السريعة لأسعار اليوم والفواتير
-        function hurtigDagensPris() {
-            const navn = document.getElementById('prodNavn').value;
-            if(!navn) return alert('Velg eller skriv et produkt først!');
+        // منظومة مسح الباركود بالكاميرا (Quagga)
+        function startScanner() {
+            const container = document.getElementById('scanner-container');
+            container.style.display = 'block';
             
-            // إيجاد التبويب يدوياً للانتقال الآمن
-            document.getElementById('varelisteSeksjon').style.display = 'none';
-            document.getElementById('dagensSeksjon').style.display = 'block';
-            
-            document.querySelectorAll('.tab-btn').forEach(b => {
-                if(b.textContent.includes('Dagens Priser')) b.classList.add('active');
-                else b.classList.remove('active');
+            Quagga.init({
+                inputStream: {
+                    name: "Live",
+                    type: "InputStream",
+                    target: container,
+                    constraints: { facingMode: "environment" }
+                },
+                decoder: { readers: ["code_128_reader", "ean_reader", "ean_8_reader", "upc_reader"] }
+            }, function(err) {
+                if (err) { alert("Kamerafeil: " + err); return; }
+                Quagga.start();
             });
-            
-            oppdaterDagensDropdown();
-            document.getElementById('dagensProdValg').value = navn;
+
+            Quagga.onDetected(function(data) {
+                const code = data.codeResult.code;
+                document.getElementById('prodBarcode').value = code;
+                stopScanner();
+                
+                // البحث الذكي التلقائي فور المسح
+                let match = produkter.findIndex(p => p.barcode === code);
+                if(match !== -1) setProduktForRedigering(match);
+            });
         }
 
-        function hurtigFaktura() {
-            alert('Lagt til i Fakturaliste!');
+        function stopScanner() {
+            Quagga.stop();
+            document.getElementById('scanner-container').style.display = 'none';
         }
+
+        // استيراد وتصدير ملفات البيانات لسهولة العمل
+        function eksporterData() {
+            let csv = "Barcode,Navn,Gruppe,Innkjøpspris,Margin,Utsalgspris\n";
+            produkter.forEach(p => {
+                csv += `"${p.barcode || ''}","${p.navn}","${p.gruppe}","${p.pris}","${p.margin}","${p.utsalg || ''}"\n`;
+            });
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.setAttribute("download", "SmartButikk_Produkter.csv");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function importerData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const lines = e.target.result.split("\n");
+                for (let i = 1; i < lines.length; i++) {
+                    if (!lines[i].trim()) continue;
+                    const col = lines[i].split(",");
+                    if(col.length >= 3) {
+                        produkter.push({
+                            barcode: col[0].replace(/"/g, ""),
+                            navn: col[1].replace(/"/g, ""),
+                            gruppe: col[2].replace(/"/g, ""),
+                            pris: col[3] ? col[3].replace(/"/g, "") : "0",
+                            margin: col[4] ? col[4].replace(/"/g, "") : "1.5",
+                            utsalg: col[5] ? col[5].replace(/"/g, "") : "0"
+                        });
+                    }
+                }
+                localStorage.setItem('produkter', JSON.stringify(produkter));
+                visProdukter();
+                alert('CSV Importert!');
+            };
+            reader.readAsText(file);
+        }
+
+        // دوال أسعار اليوم النشطة
+        function oppdaterDagensDropdown() {
+            const dropdown = document.getElementById('dagensProdValg');
+            dropdown.innerHTML = '';
+            if(produkter.length === 0) return;
+            produkter.forEach((p, index) => {
+                let opt = document.createElement('option');
+                opt.value = index;
+                opt.textContent = p.navn;
+                dropdown.appendChild(opt);
+            });
+            synkDagensPrisInp();
+        }
+
+        function synkDagensPrisInp() {
+            const idx = document.getElementById('dagensProdValg').value;
+            if(produkter[idx]) {
+                document.getElementById('dagensPrisInp').value = produkter[idx].utsalg || "0.00";
+            }
+        }
+
+        function leggTilIDagensListe() {
+            const idx = document.getElementById('dagensProdValg').value;
+            if(!produkter[idx]) return;
+            const p = produkter[idx];
+            const dPris = document.getElementById('dagensPrisInp').value;
+            dagensPriser.push({ navn: p.navn, gruppe: p.gruppe, pris: dPris });
+            localStorage.setItem('dagensPriser', JSON.stringify(dagensPriser));
+            visDagensPriser();
+        }
+
+        function visDagensPriser() {
+            const liste = document.getElementById('dagensVisningsListe');
+            liste.innerHTML = '';
+            dagensPriser.forEach((dp, idx) => {
+                liste.innerHTML += `
+                    <div class="product-item">
+                        <div><strong>${dp.navn}</strong> <span class="status-badge">${dp.gruppe}</span></div>
+                        <div>
+                            <span style="font-weight:bold; color:#ef4444; margin-right:15px;">${dp.pris} kr</span>
+                            <span class="delete-x no-print" onclick="slettDagensItem(${idx})" style="color:#ef4444; font-weight:bold; cursor:pointer; padding:5px;">×</span>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function slettDagensItem(idx) {
+            dagensPriser.splice(idx, 1);
+            localStorage.setItem('dagensPriser', JSON.stringify(dagensPriser));
+            visDagensPriser();
+        }
+
+        function triggerManueltRediger() {
+            alert(currentLang === 'no' ? 'Trykk på Endre-knappen ved siden av produktet i listen.' : 'اضغط على زر التعديل الأزرق بجانب المنتج في القائمة بالأسفل.');
+        }
+
+        function hurtigDagensPris() { switchTab('dagens'); }
+        function hurtigFaktura() { alert('Lagt til i Fakturaliste!'); }
 
         window.onload = function() {
             visProdukter();
+            kalkulerPriser();
+        };
+    </script>
+</body>
+</html>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/quagga/0.12.1/quagga.min.js"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: #f5f7fb;
+            margin: 0;
+            padding: 15px;
+            direction: ltr;
+        }
+        
+        /* دعم الاتجاه العربي عند التبديل */
+        body.rtl {
+            direction: rtl;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 15px;
+        }
+        .header h1 {
+            color: #0f172a;
+            margin: 0;
+            font-size: 28px;
+            font-weight: 800;
+        }
+        .brand {
+            color: #10b981;
+            font-size: 14px;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        /* أزرار التحكم باللغة والأدوات في الأعلى */
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .top-btn {
+            padding: 6px 12px;
+            border: 1px solid #cbd5e1;
+            background: white;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            color: #334155;
+        }
+
+        .tabs {
+            display: flex;
+            justify-content: space-between;
+            background: #e2e8f0;
+            padding: 5px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+        .tab-btn {
+            flex: 1;
+            padding: 10px 5px;
+            text-align: center;
+            background: none;
+            border: none;
+            font-weight: bold;
+            font-size: 12px;
+            color: #64748b;
+            cursor: pointer;
+        }
+        .tab-btn.active {
+            background: white;
+            color: #0f172a;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .card {
+            background: white;
+            border-radius: 16px;
+            padding: 15px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+            margin-bottom: 15px;
+        }
+        .input-group {
+            margin-bottom: 12px;
+        }
+        .input-row {
+            display: flex;
+            gap: 10px;
+        }
+        label {
+            display: block;
+            font-weight: 700;
+            color: #334155;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+        .input-field {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-size: 16px;
+            background-color: white;
+        }
+        
+        .scan-btn {
+            background: #0284c7;
+            color: white;
+            border: none;
+            padding: 0 15px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        .action-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        .action-btn {
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 14px;
+            cursor: pointer;
+            text-align: center;
+        }
+        .btn-save { background: #10b981; color: white; }
+        .btn-edit { background: #3b82f6; color: white; }
+        .btn-today { background: #f59e0b; color: white; }
+        .btn-invoice { background: #8b5cf6; color: white; }
+
+        .product-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .status-badge {
+            font-size: 11px;
+            padding: 2px 6px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            font-weight: bold;
+            margin-left: 5px;
+        }
+
+        /* نافذة الكاميرا الحية للآيفون */
+        #scanner-container {
+            display: none;
+            width: 100%;
+            height: 250px;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 15px;
+            position: relative;
+            background: #000;
+        }
+        #scanner-container video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        @media print {
+            .no-print, .slett-btn, .delete-x, button, .tabs, .action-grid, .scan-btn, .top-bar, #scanner-container {
+                display: none !important;
+            }
+            body { background: white; padding: 0; }
+            .card { box-shadow: none; border: none; padding: 0; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- شريط الأدوات العلوي واللغة -->
+    <div class="top-bar no-print">
+        <button class="top-btn" onclick="toggleLanguage()" id="langBtn">🇳🇴 / 🇦🇷 Language</button>
+        <div>
+            <button class="top-btn" onclick="eksporterData()" id="btnExport">Eksporter CSV</button>
+            <button class="top-btn" onclick="document.getElementById('importFile').click()" id="btnImport">Importer CSV</button>
+            <input type="file" id="importFile" accept=".csv" style="display:none;" onchange="importerData(event)">
+        </div>
+    </div>
+
+    <div class="header">
+        <h1>SmartButikk</h1>
+        <div class="brand">BY MR INTL</div>
+        <p style="color: #64748b; margin: 5px 0; font-size: 12px;" id="subHeader">SmartButikk System</p>
+    </div>
+
+    <div class="tabs no-print">
+        <button class="tab-btn active" id="btn-vareliste" onclick="switchTab('vareliste')">Vareliste</button>
+        <button class="tab-btn" id="btn-dagens" onclick="switchTab('dagens')">Dagens Priser 🥦</button>
+        <button class="tab-btn" id="btn-ordre" onclick="switchTab('ordre')">Ordreliste</button>
+        <button class="tab-btn" id="btn-faktura" onclick="switchTab('faktura')">Fakturaliste</button>
+    </div>
+
+    <!-- حاوية كاميرا الباركود الذكية -->
+    <div id="scanner-container" class="no-print">
+        <button onclick="stopScanner()" style="position:absolute; right:10px; top:10px; z-index:10; background:#ef4444; color:white; border:none; padding:5px 10px; border-radius:6px; font-weight:bold;">X</button>
+    </div>
+
+    <!-- القسم الأول: إدارة المنتجات -->
+    <div id="varelisteSeksjon" class="tab-content">
+        <div class="card">
+            <div class="input-group">
+                <label id="lblStrekkode">Strekkode / EAN</label>
+                <div class="input-row">
+                    <input type="text" id="prodBarcode" class="input-field" placeholder="Scan eller skriv strekkode...">
+                    <button class="scan-btn no-print" onclick="startScanner()">Scan 📷</button>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label id="lblNavn">Produktnavn</label>
+                <input type="text" id="prodNavn" class="input-field" placeholder="Skriv produktnavn...">
+            </div>
+
+            <div class="input-group">
+                <label id="lblGruppe">Varegruppe</label>
+                <select id="prodGruppe" class="input-field">
+                    <option value="Frukt og grønt">Frukt og grønt 🥦</option>
+                    <option value="Kjølevarer">Kjølevarer 🧀</option>
+                    <option value="Tørrvarer">Tørrvarer 🌾</option>
+                    <option value="Drikke">Drikke 🥤</option>
+                    <option value="Frysevarer">Frysevarer ❄️</option>
+                    <option value="Andre">Andre</option>
+                </select>
+            </div>
+
+            <div class="input-group">
+                <label id="lblInnkjøp">Innkjøpspris (kr)</label>
+                <input type="number" step="any" id="innPris" class="input-field" inputmode="decimal" placeholder="0.00" oninput="kalkulerPriser()">
+            </div>
+
+            <div class="input-group">
+                <label id="lblMargin">Margin / Faktor</label>
+                <input type="number" step="any" id="prodMargin" class="input-field" inputmode="decimal" value="1.5" oninput="kalkulerPriser()">
+            </div>
+
+            <div class="input-group">
+                <label id="lblUtsalg">Utsalgspris (kr) - <span style="font-size:12px; color:#64748b;" id="lblManual">Kan overstyres manuelt</span></label>
+                <input type="number" step="any" id="utPris" class="input-field" inputmode="decimal" placeholder="0.00" oninput="kalkulerFraUtsalg()">
+            </div>
+
+            <!-- الحسابات الذكية التلقائية للأرباح والضرائب -->
+            <div style="background:#f8fafc; padding:10px; border-radius:8px; margin-bottom:12px; font-size:13px; font-weight:bold; color:#334155;" id="beregningBoks">
+                Netto fortjeneste: <span id="nettoProfit" style="color:#10b981;">0.00</span> kr | Mva (25%): <span id="mvaVerdi">0.00</span> kr
+            </div>
+
+            <div class="action-grid no-print">
+                <button class="action-btn btn-save" onclick="lagreProdukt()" id="btnLagre">Lagre</button>
+                <button class="action-btn btn-edit" onclick="triggerManueltRediger()" id="btnEndre">Endre</button>
+                <button class="action-btn btn-today" onclick="hurtigDagensPris()" id="btnDagensHurtig">+ Dagens Pris</button>
+                <button class="action-btn btn-invoice" onclick="hurtigFaktura()" id="btnFakturaHurtig">+ Faktura</button>
+            </div>
+            
+            <div id="cancel-box" class="no-print" style="margin-top: 10px; display: none;">
+                <button class="action-btn" style="background: #64748b; color: white; width: 100%;" onclick="avbrytRedigering()" id="btnAvbryt">Avbryt endring</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3 id="lblRegistrerteTitle">Registrerte Produkter</h3>
+            <div id="visningsListe"></div>
+        </div>
+    </div>
+
+    <!-- القسم الثاني: أسعار اليوم -->
+    <div id="dagensSeksjon" class="tab-content" style="display:none;">
+        <div class="card">
+            <h3 id="lblDagensTitle">Dagens Priser 🥦</h3>
+            <div class="input-group">
+                <label id="lblVelgProd">Velg Produkt fra liste</label>
+                <select id="dagensProdValg" class="input-field" onchange="synkDagensPrisInp()"></select>
+            </div>
+            <div class="input-group">
+                <label id="lblDagensPrisInput">Dagens Pris (kr)</label>
+                <input type="number" step="any" id="dagensPrisInp" class="input-field" inputmode="decimal" placeholder="0.00">
+            </div>
+            <button class="action-btn btn-save no-print" style="width:100%" onclick="leggTilIDagensListe()" id="btnLeggTilDagens">Legg til i priser</button>
+        </div>
+        <div class="card">
+            <h3 id="lblAktivDagensTitle">Aktiv Dagens Prisliste</h3>
+            <div id="dagensVisningsListe"></div>
+        </div>
+    </div>
+
+    <!-- الأقسام الإضافية للترتيب المعتاد -->
+    <div id="ordreSeksjon" class="tab-content" style="display:none;">
+        <div class="card"><h3>Ordreliste</h3><p>Ingen aktive ordrer.</p></div>
+    </div>
+    <div id="fakturaSeksjon" class="tab-content" style="display:none;">
+        <div class="card"><h3>Fakturaliste</h3><p>Ingen utestående fakturaer.</p></div>
+    </div>
+
+    <script>
+        let produkter = JSON.parse(localStorage.getItem('produkter')) || [];
+        let dagensPriser = JSON.parse(localStorage.getItem('dagensPriser')) || [];
+        let valgtIndex = null;
+        let currentLang = 'no';
+
+        const i18n = {
+            no: {
+                subHeader: "SmartButikk System",
+                lblStrekkode: "Strekkode / EAN",
+                lblNavn: "Produktnavn",
+                lblGruppe: "Varegruppe",
+                lblInnkjøp: "Innkjøpspris (kr)",
+                lblMargin: "Margin / Faktor",
+                lblUtsalg: "Utsalgspris (kr)",
+                lblManual: "Kan overstyres manuelt",
+                btnLagre: "Lagre",
+                btnEndre: "Endre",
+                btnAvbryt: "Avbryt endring",
+                lblRegistrerteTitle: "Registrerte Produkter",
+                lblDagensTitle: "Dagens Priser 🥦",
+                lblVelgProd: "Velg Produkt fra liste",
+                lblDagensPrisInput: "Dagens Pris (kr)",
+                btnLeggTilDagens: "Legg til i priser",
+                lblAktivDagensTitle: "Aktiv Dagens Prisliste",
+                netto: "Netto fortjeneste",
+                mvaTxt: "Mva"
+            },
+            ar: {
+                subHeader: "نظام سمارت بوتيك الذكي",
+                lblStrekkode: "الباركود / رمز المنتج",
+                lblNavn: "اسم المنتج",
+                lblGruppe: "مجموعة المنتج",
+                lblInnkjøp: "سعر الشراء (kr)",
+                lblMargin: "هامش الربح / العامل",
+                lblUtsalg: "سعر البيع (kr)",
+                lblManual: "يمكن تعديله يدوياً بكامل الحرية",
+                btnLagre: "حفظ المنتج",
+                btnEndre: "تعديل",
+                btnAvbryt: "إلغاء التعديل",
+                lblRegistrerteTitle: "المنتجات المسجلة في النظام",
+                lblDagensTitle: "أسعار اليوم 🥦",
+                lblVelgProd: "اختر المنتج من القائمة",
+                lblDagensPrisInput: "سعر اليوم الحقيقي (kr)",
+                btnLeggTilDagens: "إضافة إلى قائمة الأسعار",
+                lblAktivDagensTitle: "قائمة أسعار اليوم النشطة",
+                netto: "صافي الربح",
+                mvaTxt: "الضريبة"
+            }
+        };
+
+        function toggleLanguage() {
+            currentLang = currentLang === 'no' ? 'ar' : 'no';
+            document.body.classList.toggle('rtl', currentLang === 'ar');
+            
+            const trans = i18n[currentLang];
+            document.getElementById('subHeader').innerText = trans.subHeader;
+            document.getElementById('lblStrekkode').innerText = trans.lblStrekkode;
+            document.getElementById('lblNavn').innerText = trans.lblNavn;
+            document.getElementById('lblGruppe').innerText = trans.lblGruppe;
+            document.getElementById('lblInnkjøp').innerText = trans.lblInnkjøp;
+            document.getElementById('lblMargin').innerText = trans.lblMargin;
+            document.getElementById('lblUtsalg').innerHTML = `${trans.lblUtsalg} - <span style="font-size:12px; color:#64748b;">${trans.lblManual}</span>`;
+            document.getElementById('btnLagre').innerText = trans.btnLagre;
+            document.getElementById('btnEndre').innerText = trans.btnEndre;
+            document.getElementById('btnAvbryt').innerText = trans.btnAvbryt;
+            document.getElementById('lblRegistrerteTitle').innerText = trans.lblRegistrerteTitle;
+            document.getElementById('lblDagensTitle').innerText = trans.lblDagensTitle;
+            document.getElementById('lblVelgProd').innerText = trans.lblVelgProd;
+            document.getElementById('lblDagensPrisInput').innerText = trans.lblDagensPrisInput;
+            document.getElementById('btnLeggTilDagens').innerText = trans.btnLeggTilDagens;
+            document.getElementById('lblAktivDagensTitle').innerText = trans.lblAktivDagensTitle;
+            
+            kalkulerPriser();
+            visProdukter();
+        }
+
+        function kalkulerPriser() {
+            const inn = parseFloat(document.getElementById('innPris').value) || 0;
+            const margin = parseFloat(document.getElementById('prodMargin').value) || 1;
+            
+            const utsalg = inn * margin;
+            document.getElementById('utPris').value = utsalg.toFixed(2);
+            
+            oppdaterProfitOgMva(inn, utsalg);
+        }
+
+        function kalkulerFraUtsalg() {
+            const inn = parseFloat(document.getElementById('innPris').value) || 0;
+            const utsalg = parseFloat(document.getElementById('utPris').value) || 0;
+            
+            if(inn > 0) {
+                document.getElementById('prodMargin').value = (utsalg / inn).toFixed(2);
+            }
+            oppdaterProfitOgMva(inn, utsalg);
+        }
+
+        function oppdaterProfitOgMva(inn, utsalg) {
+            const trans = i18n[currentLang];
+            const mva = utsalg * 0.25; 
+            const profit = utsalg - inn - mva;
+            
+            document.getElementById('beregningBoks').innerHTML = `
+                ${trans.netto}: <span style="color:#10b981;">${profit.toFixed(2)}</span> kr | ${trans.mvaTxt} (25%): <span>${mva.toFixed(2)}</span> kr
+            `;
+        }
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.style.display = 'none');
+            document.getElementById('btn-' + tabName).classList.add('active');
+
+            if(tabName === 'vareliste') {
+                document.getElementById('varelisteSeksjon').style.display = 'block';
+            } else if(tabName === 'dagens') {
+                document.getElementById('dagensSeksjon').style.display = 'block';
+                oppdaterDagensDropdown();
+                visDagensPriser();
+            } else {
+                document.getElementById(tabName + 'Seksjon').style.display = 'block';
+            }
+        }
+
+        function lagreProdukt() {
+            const barcode = document.getElementById('prodBarcode').value.trim();
+            const navn = document.getElementById('prodNavn').value.trim();
+            const gruppe = document.getElementById('prodGruppe').value;
+            const pris = document.getElementById('innPris').value;
+            const margin = document.getElementById('prodMargin').value;
+            const utsalg = document.getElementById('utPris').value;
+
+            if(!navn) return alert(currentLang === 'no' ? 'Skriv produktnavn først!' : 'يرجى كتابة اسم المنتج أولاً!');
+
+            const prodObj = { barcode, navn, gruppe, pris, margin, utsalg };
+
+            if(valgtIndex !== null) {
+                produkter[valgtIndex] = prodObj;
+                valgtIndex = null;
+                alert(currentLang === 'no' ? 'Produktet ble oppdatert!' : 'تم تحديث المنتج بنجاح!');
+            } else {
+                produkter.push(prodObj);
+                alert(currentLang === 'no' ? 'Produktet ble lagret!' : 'تم حفظ المنتج بنجاح!');
+            }
+
+            localStorage.setItem('produkter', JSON.stringify(produkter));
+            tømSkjema();
+            visProdukter();
+        }
+
+        function setProduktForRedigering(index) {
+            valgtIndex = index;
+            const p = produkter[index];
+            document.getElementById('prodBarcode').value = p.barcode || '';
+            document.getElementById('prodNavn').value = p.navn;
+            document.getElementById('prodGruppe').value = p.gruppe;
+            document.getElementById('innPris').value = p.pris;
+            document.getElementById('prodMargin').value = p.margin;
+            document.getElementById('utPris').value = p.utsalg || '';
+            
+            document.getElementById('cancel-box').style.display = 'block';
+            kalkulerFraUtsalg();
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        }
+
+        function avbrytRedigering() {
+            valgtIndex = null;
+            tømSkjema();
+        }
+
+        function tømSkjema() {
+            document.getElementById('prodBarcode').value = '';
+            document.getElementById('prodNavn').value = '';
+            document.getElementById('innPris').value = '';
+            document.getElementById('prodMargin').value = '1.5';
+            document.getElementById('utPris').value = '';
+            document.getElementById('cancel-box').style.display = 'none';
+            kalkulerPriser();
+        }
+
+        function visProdukter() {
+            const liste = document.getElementById('visningsListe');
+            liste.innerHTML = '';
+            if(produkter.length === 0) {
+                liste.innerHTML = `<p style="text-align:center; color:#64748b;">${currentLang === 'no' ? 'Ingen produkter registrert.' : 'لا توجد منتجات مسجلة حالياً.'}</p>`;
+                return;
+            }
+            produkter.forEach((p, idx) => {
+                let uPris = parseFloat(p.utsalg) || (parseFloat(p.pris) * parseFloat(p.margin)) || 0;
+                liste.innerHTML += `
+                    <div class="product-item">
+                        <div>
+                            <strong>${p.navn}</strong> <span class="status-badge">${p.gruppe}</span>
+                            <br><small style="color:#64748b;">EAN: ${p.barcode || '---'} | Utsalg: ${uPris.toFixed(2)} kr</small>
+                        </div>
+                        <div class="no-print">
+                            <button onclick="setProduktForRedigering(${idx})" style="background:#3b82f6; color:white; border:none; padding:6px 12px; border-radius:6px; font-weight:bold; cursor:pointer;">${currentLang === 'no' ? 'Endre' : 'تعديل'}</button>
+                            <button class="slett-btn" onclick="slettProdukt(${idx})" style="background:#ef4444; color:white; border:none; padding:6px 12px; border-radius:6px; font-weight:bold; cursor:pointer; margin-left:5px;">${currentLang === 'no' ? 'Slett' : 'حذف'}</button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function slettProdukt(idx) {
+            if(confirm(currentLang === 'no' ? 'Vil du slette?' : 'هل تريد الحذف؟')) {
+                produkter.splice(idx, 1);
+                localStorage.setItem('produkter', JSON.stringify(produkter));
+                visProdukter();
+            }
+        }
+
+        // منظومة مسح الباركود بالكاميرا (Quagga)
+        function startScanner() {
+            const container = document.getElementById('scanner-container');
+            container.style.display = 'block';
+            
+            Quagga.init({
+                inputStream: {
+                    name: "Live",
+                    type: "InputStream",
+                    target: container,
+                    constraints: { facingMode: "environment" }
+                },
+                decoder: { readers: ["code_128_reader", "ean_reader", "ean_8_reader", "upc_reader"] }
+            }, function(err) {
+                if (err) { alert("Kamerafeil: " + err); return; }
+                Quagga.start();
+            });
+
+            Quagga.onDetected(function(data) {
+                const code = data.codeResult.code;
+                document.getElementById('prodBarcode').value = code;
+                stopScanner();
+                
+                // البحث الذكي التلقائي فور المسح
+                let match = produkter.findIndex(p => p.barcode === code);
+                if(match !== -1) setProduktForRedigering(match);
+            });
+        }
+
+        function stopScanner() {
+            Quagga.stop();
+            document.getElementById('scanner-container').style.display = 'none';
+        }
+
+        // استيراد وتصدير ملفات البيانات لسهولة العمل
+        function eksporterData() {
+            let csv = "Barcode,Navn,Gruppe,Innkjøpspris,Margin,Utsalgspris\n";
+            produkter.forEach(p => {
+                csv += `"${p.barcode || ''}","${p.navn}","${p.gruppe}","${p.pris}","${p.margin}","${p.utsalg || ''}"\n`;
+            });
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.setAttribute("download", "SmartButikk_Produkter.csv");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function importerData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const lines = e.target.result.split("\n");
+                for (let i = 1; i < lines.length; i++) {
+                    if (!lines[i].trim()) continue;
+                    const col = lines[i].split(",");
+                    if(col.length >= 3) {
+                        produkter.push({
+                            barcode: col[0].replace(/"/g, ""),
+                            navn: col[1].replace(/"/g, ""),
+                            gruppe: col[2].replace(/"/g, ""),
+                            pris: col[3] ? col[3].replace(/"/g, "") : "0",
+                            margin: col[4] ? col[4].replace(/"/g, "") : "1.5",
+                            utsalg: col[5] ? col[5].replace(/"/g, "") : "0"
+                        });
+                    }
+                }
+                localStorage.setItem('produkter', JSON.stringify(produkter));
+                visProdukter();
+                alert('CSV Importert!');
+            };
+            reader.readAsText(file);
+        }
+
+        // دوال أسعار اليوم النشطة
+        function oppdaterDagensDropdown() {
+            const dropdown = document.getElementById('dagensProdValg');
+            dropdown.innerHTML = '';
+            if(produkter.length === 0) return;
+            produkter.forEach((p, index) => {
+                let opt = document.createElement('option');
+                opt.value = index;
+                opt.textContent = p.navn;
+                dropdown.appendChild(opt);
+            });
+            synkDagensPrisInp();
+        }
+
+        function synkDagensPrisInp() {
+            const idx = document.getElementById('dagensProdValg').value;
+            if(produkter[idx]) {
+                document.getElementById('dagensPrisInp').value = produkter[idx].utsalg || "0.00";
+            }
+        }
+
+        function leggTilIDagensListe() {
+            const idx = document.getElementById('dagensProdValg').value;
+            if(!produkter[idx]) return;
+            const p = produkter[idx];
+            const dPris = document.getElementById('dagensPrisInp').value;
+            dagensPriser.push({ navn: p.navn, gruppe: p.gruppe, pris: dPris });
+            localStorage.setItem('dagensPriser', JSON.stringify(dagensPriser));
+            visDagensPriser();
+        }
+
+        function visDagensPriser() {
+            const liste = document.getElementById('dagensVisningsListe');
+            liste.innerHTML = '';
+            dagensPriser.forEach((dp, idx) => {
+                liste.innerHTML += `
+                    <div class="product-item">
+                        <div><strong>${dp.navn}</strong> <span class="status-badge">${dp.gruppe}</span></div>
+                        <div>
+                            <span style="font-weight:bold; color:#ef4444; margin-right:15px;">${dp.pris} kr</span>
+                            <span class="delete-x no-print" onclick="slettDagensItem(${idx})" style="color:#ef4444; font-weight:bold; cursor:pointer; padding:5px;">×</span>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function slettDagensItem(idx) {
+            dagensPriser.splice(idx, 1);
+            localStorage.setItem('dagensPriser', JSON.stringify(dagensPriser));
+            visDagensPriser();
+        }
+
+        function triggerManueltRediger() {
+            alert(currentLang === 'no' ? 'Trykk på Endre-knappen ved siden av produktet i listen.' : 'اضغط على زر التعديل الأزرق بجانب المنتج في القائمة بالأسفل.');
+        }
+
+        function hurtigDagensPris() { switchTab('dagens'); }
+        function hurtigFaktura() { alert('Lagt til i Fakturaliste!'); }
+
+        window.onload = function() {
+            visProdukter();
+            kalkulerPriser();
         };
     </script>
 </body>
