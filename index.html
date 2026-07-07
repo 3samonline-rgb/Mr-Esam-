@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SmartGrocer - By Mr intl</title>
+    <title>DagligvarePris - By Mr intl</title>
     <script src="https://unpkg.com/html5-qrcode"></script>
     <style>
         * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
@@ -66,11 +66,12 @@
         .prod-meta { font-size: 11px; color: #64748b; margin-top: 2px; text-align: left !important; }
         .prod-price-tag { text-align: right !important; font-weight: 800; font-size: 16px; color: #16a34a; white-space: nowrap; margin-left: auto; direction: ltr !important; cursor: pointer; }
         
-        .prod-actions-row { display: flex; gap: 4px; width: 100%; border-top: 1px solid #f1f5f9; padding-top: 8px; direction: ltr !important; }
-        .action-btn { flex: 1; border: none; padding: 8px 4px; border-radius: 6px; font-size: 10px; font-weight: bold; cursor: pointer; color: white; text-align: center; white-space: nowrap; }
+        .prod-actions-row { display: flex; gap: 4px; width: 100%; border-top: 1px solid #f1f5f9; padding-top: 8px; direction: ltr !important; flex-wrap: wrap; }
+        .action-btn { flex: 1; min-width: 65px; border: none; padding: 8px 4px; border-radius: 6px; font-size: 10px; font-weight: bold; cursor: pointer; color: white; text-align: center; white-space: nowrap; }
         .btn-order { background: #0284c7; }
         .btn-add-fak { background: #475569; }
         .btn-edit { background: #ea580c; }
+        .btn-dag { background: #7c3aed; }
         .btn-del { background: #ef4444; max-width: 35px; }
         
         .order-qty-input { width: 50px; padding: 2px; font-size: 12px; text-align: center; border: 1px solid #cbd5e1; border-radius: 4px; display: inline-block; margin-left: 4px; direction: ltr !important; }
@@ -107,7 +108,7 @@
         .dagens-item-name { font-weight: 700; font-size: 15px; }
         .dagens-item-price { font-weight: 800; color: #16a34a; font-size: 16px; }
 
-        /* وضعيّة الطباعة الاحترافية */
+        /* 🖨️ وضعية الطباعة الاحترافية النظيفة تماماً وبدون علامات */
         @media print {
             @page { size: A4; margin: 12mm; }
             body { background: white; padding: 0; color: #000; font-size: 11pt; }
@@ -119,12 +120,14 @@
             .brand-signature { font-size: 14pt; text-align: center; color: #000 !important; }
             .subtitle { font-size: 12pt; text-align: center; margin-bottom: 20px; }
             
-            /* إخفاء كافة بيانات الشراء والتكلفة للموظفين */
+            /* 🚫 إخفاء كافة البيانات الحساسة تماماً في كشف الموظفين */
             body.print-mode-ansatte .print-only-info, 
             body.print-mode-ansatte .prod-meta,
-            body.print-mode-ansatte .prod-img { display: none !important; }
-            body.print-mode-ansatte .prod-title { font-size: 16pt; font-weight: bold; }
-            body.print-mode-ansatte .prod-price-tag { font-size: 18pt; font-weight: 900; }
+            body.print-mode-ansatte .prod-img,
+            body.print-mode-ansatte .action-btn,
+            body.print-mode-ansatte .prod-actions-row { display: none !important; }
+            body.print-mode-ansatte .prod-title { font-size: 16pt; font-weight: bold; color: #000 !important; }
+            body.print-mode-ansatte .prod-price-tag { font-size: 18pt; font-weight: 900; color: #000 !important; }
         }
     </style>
 </head>
@@ -140,7 +143,7 @@
         <button class="btn-print-ansatte" onclick="triggerPrint('ansatte')" id="lblPrintAnsatteBtn">Ansatte 🖨️</button>
     </div>
 
-    <div class="brand-title">SmartGrocer</div>
+    <div class="brand-title">DagligvarePris</div>
     <div class="brand-signature">By Mr intl</div>
     <div class="subtitle" id="appSub">BestillingApp System</div>
 
@@ -306,7 +309,7 @@
         <div class="row">
             <div class="col">
                 <div class="form-group" id="grpFakNum">
-                    <label id="lblFakNum">Faktورانمبر</label>
+                    <label id="lblFakNum">Fakturanummer</label>
                     <input type="text" id="fakNumber" placeholder="Fak #">
                 </div>
             </div>
@@ -389,6 +392,7 @@
             alertFileEmpty: "Filen er tom!", alertSuccess: "Vellykket! Importert {count} produkter.", confirmDelete: "Slette?",
             thProd: "Produkt", thCost: "Kost", thIncome: "Inntekt/Verdi", thProfit: "Gevinst", btnDelFak: "Slett",
             lblOrderBtn: "+ Ordre", lblInvoiceBtn: "📄 Faktura +", lblEditBtn: "Edit", lblDeleteBtn: "X",
+            lblDagensBtn: "+ Dagens",
             selectPlh: "-- Velg produkt --", textLeverandoer: "Leverandør", textGruppe: "Gruppe", textAntall: "Antall:"
         },
         ar: {
@@ -407,6 +411,7 @@
             alertFileEmpty: "الملف فارغ تماماً!", alertSuccess: "تم بنجاح! استيراد {count} منتج إلى النظام.", confirmDelete: "هل أنت متأكد من الحذف؟",
             thProd: "المنتج", thCost: "التكلفة الإجمالية", thIncome: "القيمة الإجمالية للبيع", thProfit: "صافي الربح", btnDelFak: "حذف الفاتورة",
             lblOrderBtn: "الطلبية +", lblInvoiceBtn: "📄 الفاتورة +", lblEditBtn: "تعديل", lblDeleteBtn: "X",
+            lblDagensBtn: "+ أسعار اليوم",
             selectPlh: "-- اختر المنتج --", textLeverandoer: "المورد", textGruppe: "المجموعة", textAntall: "الكمية:"
         }
     };
@@ -541,7 +546,6 @@
         }
     }
 
-    /* 📌 منطومة الحسابات الذكية المطورة لتدعم التعديل اليدوي الكامل وسعر القطعة وصافي الأرباح المباشرة */
     function runCalculations(autoFinal = true) {
         const cost = parseFloat(document.getElementById('prodCost').value) || 0;
         const qty = parseFloat(document.getElementById('prodQty').value) || 1;
@@ -557,10 +561,8 @@
             document.getElementById('resFinalPriceInput').value = finalPrice.toFixed(2);
         } else {
             finalPrice = parseFloat(document.getElementById('resFinalPriceInput').value) || 0;
-            // إذا قام المستخدم بالتعديل يدوياً، نعيد حساب الهامش الفعلي للتأكيد
             if(unitCost > 0) {
                 const manualExMva = finalPrice / (1 + mva);
-                // تحديث قيمة حقل الاختيار بشكل ذكي لأقرب كسر عشري إذا لزم الأمر
                 const calculatedMargin = (manualExMva / unitCost).toFixed(1);
                 if(['1.3','1.4','1.5','1.6','1.7','1.8','1.9'].includes(calculatedMargin)) {
                     document.getElementById('prodMargin').value = calculatedMargin;
@@ -608,7 +610,6 @@
                     if(match) {
                         loadToForm(match.id);
                     } else {
-                        // كود ذكي: إذا تم مسح باركود غير موجود، يتم نقله تلقائياً لحقل الباركود لإضافته كمنتج جديد فوراً لتوفير الوقت
                         document.getElementById('prodBarcode').value = decodedText;
                     }
                 }
@@ -625,6 +626,7 @@
         }
     }
 
+    /* 5. تعديل ذكي ومصلح بالكامل لحفظ وتحديث الحقول دون تكرار */
     function saveProductToCatalog() {
         const name = document.getElementById('prodName').value.trim();
         if(!name) return;
@@ -659,6 +661,7 @@
 
         localStorage.setItem('mr_v7_catalog', JSON.stringify(catalog));
         
+        // تفريغ الحقول فورا بعد الإضافة أو التحديث
         document.getElementById('prodName').value = '';
         document.getElementById('prodBarcode').value = '';
         document.getElementById('prodCost').value = '';
@@ -738,6 +741,7 @@
                         <button class="action-btn btn-order" onclick="addToOrderList(${p.id})">${words[l].lblOrderBtn}</button>
                         <button class="action-btn btn-add-fak" onclick="autoSendToFakturaForm(${p.id})">${words[l].lblInvoiceBtn}</button>
                         <button class="action-btn btn-edit" onclick="loadToForm(${p.id})">${words[l].lblEditBtn}</button>
+                        <button class="action-btn btn-dag" onclick="addDirectToDagens('${p.name.replace(/'/g, "\\'")}', ${p.finalPrice || 0})">${words[l].lblDagensBtn}</button>
                         <button class="action-btn btn-del" onclick="deleteFromCatalog(${p.id})">${words[l].lblDeleteBtn}</button>
                     </div>
                 `;
@@ -746,7 +750,14 @@
         });
     }
 
-    /* 📌 تحرير فوري متكامل بنسبة 100% يجلب كافة تفاصيل الحقول الـ 8 لتعديلها بأمان وسرعة */
+    /* 2. الدالة الذكية لنقل اسم وسعر المنتج فورا لأسعار اليوم بنقرة زر */
+    function addDirectToDagens(name, price) {
+        dagensList.push({ id: Date.now(), name: name, price: parseFloat(price) });
+        localStorage.setItem('mr_v7_dagens', JSON.stringify(dagensList));
+        alert(currentLang === 'no' ? 'Lagt til i Dagens Priser!' : 'تمت الإضافة إلى أسعار اليوم بنجاح!');
+        renderDagensPrices();
+    }
+
     function loadToForm(id) {
         const p = catalog.find(item => item.id === id);
         if(!p) return;
