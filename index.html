@@ -192,13 +192,13 @@
             <div class="col" style="flex: 1.5;">
                 <div class="form-group" id="grpCost">
                     <label id="lblCost">Innkjøpspris (Total)</label>
-                    <input type="number" step="any" id="prodCost" placeholder="0.00" oninput="runCalculations()">
+                    <input type="number" step="any" id="prodCost" placeholder="0.00" oninput="runCalculations(true)">
                 </div>
             </div>
             <div class="col">
                 <div class="form-group" id="grpQty">
                     <label id="lblQty">Antall i eske</label>
-                    <input type="number" id="prodQty" value="1" oninput="runCalculations()">
+                    <input type="number" id="prodQty" value="1" oninput="runCalculations(true)">
                 </div>
             </div>
         </div>
@@ -207,7 +207,7 @@
             <div class="col">
                 <div class="form-group" id="grpMargin">
                     <label id="lblMargin">Margin</label>
-                    <select id="prodMargin" onchange="runCalculations()">
+                    <select id="prodMargin" onchange="runCalculations(true)">
                         <option value="1.3">1.3</option><option value="1.4">1.4</option>
                         <option value="1.5" selected>1.5</option><option value="1.6">1.6</option>
                         <option value="1.7">1.7</option><option value="1.8">1.8</option><option value="1.9">1.9</option>
@@ -217,7 +217,7 @@
             <div class="col">
                 <div class="form-group" id="grpMva">
                     <label id="lblMva">MVA</label>
-                    <select id="prodMva" onchange="runCalculations()">
+                    <select id="prodMva" onchange="runCalculations(true)">
                         <option value="0.25">25%</option>
                         <option value="0.15" selected>15%</option>
                         <option value="0">0%</option>
@@ -306,7 +306,7 @@
         <div class="row">
             <div class="col">
                 <div class="form-group" id="grpFakNum">
-                    <label id="lblFakNum">Fakturanummer</label>
+                    <label id="lblFakNum">Faktورانمبر</label>
                     <input type="text" id="fakNumber" placeholder="Fak #">
                 </div>
             </div>
@@ -541,6 +541,7 @@
         }
     }
 
+    /* 📌 منطومة الحسابات الذكية المطورة لتدعم التعديل اليدوي الكامل وسعر القطعة وصافي الأرباح المباشرة */
     function runCalculations(autoFinal = true) {
         const cost = parseFloat(document.getElementById('prodCost').value) || 0;
         const qty = parseFloat(document.getElementById('prodQty').value) || 1;
@@ -556,13 +557,22 @@
             document.getElementById('resFinalPriceInput').value = finalPrice.toFixed(2);
         } else {
             finalPrice = parseFloat(document.getElementById('resFinalPriceInput').value) || 0;
+            // إذا قام المستخدم بالتعديل يدوياً، نعيد حساب الهامش الفعلي للتأكيد
+            if(unitCost > 0) {
+                const manualExMva = finalPrice / (1 + mva);
+                // تحديث قيمة حقل الاختيار بشكل ذكي لأقرب كسر عشري إذا لزم الأمر
+                const calculatedMargin = (manualExMva / unitCost).toFixed(1);
+                if(['1.3','1.4','1.5','1.6','1.7','1.8','1.9'].includes(calculatedMargin)) {
+                    document.getElementById('prodMargin').value = calculatedMargin;
+                }
+            }
         }
 
         const calculatedExMva = finalPrice / (1 + mva);
         const profit = calculatedExMva - unitCost;
 
         document.getElementById('resUnitCost').innerText = unitCost.toFixed(2) + " kr";
-        document.getElementById('resExMva').innerText = exMva.toFixed(2) + " kr";
+        document.getElementById('resExMva').innerText = calculatedExMva.toFixed(2) + " kr";
         document.getElementById('resProfit').innerText = profit.toFixed(2) + " kr";
     }
 
@@ -595,7 +605,12 @@
                 } else {
                     document.getElementById(activeScanTarget).value = decodedText;
                     let match = catalog.find(p => p.barcode === decodedText);
-                    if(match) loadToForm(match.id);
+                    if(match) {
+                        loadToForm(match.id);
+                    } else {
+                        // كود ذكي: إذا تم مسح باركود غير موجود، يتم نقله تلقائياً لحقل الباركود لإضافته كمنتج جديد فوراً لتوفير الوقت
+                        document.getElementById('prodBarcode').value = decodedText;
+                    }
                 }
             },
             (err) => {}
@@ -669,7 +684,7 @@
         const l = currentLang;
 
         const filteredProducts = catalog.filter(p => {
-            if (!query) return true; // تظهر جميع المنتجات فوراً عند بدء التشغيل دون الحاجة للبحث
+            if (!query) return true;
             return p.name.toLowerCase().includes(query) || 
                    (p.barcode && p.barcode.includes(query)) ||
                    (p.supplier && p.supplier.toLowerCase().includes(query));
@@ -677,15 +692,12 @@
         
         let activeGroups = [...new Set(filteredProducts.map(p => p.varegruppe))];
 
-        // في حال عدم وجود فلتر، نعرض كافة مجموعات المتجر الأساسية لضمان عدم اختفائها
         if(activeGroups.length === 0 && !query) {
             activeGroups = varegrupper;
         }
 
         activeGroups.forEach(grp => {
             let groupProducts = filteredProducts.filter(p => p.varegruppe === grp);
-            
-            // لا نعرض المجموعات الفارغة إلا إذا كنا في وضع بدء التشغيل (بدون استعلام بحث) ليبقى المظهر نظيفاً
             if(groupProducts.length === 0 && query) return;
 
             const header = document.createElement('div');
@@ -734,7 +746,7 @@
         });
     }
 
-    // إصلاح دالة التعديل بالكامل لجلب كافة الحقول دون استثناء
+    /* 📌 تحرير فوري متكامل بنسبة 100% يجلب كافة تفاصيل الحقول الـ 8 لتعديلها بأمان وسرعة */
     function loadToForm(id) {
         const p = catalog.find(item => item.id === id);
         if(!p) return;
@@ -759,7 +771,6 @@
         document.getElementById('btnSave').innerText = words[l].updateBtn;
     }
 
-    /* 🥦 دوال خاصية أسعار اليوم والطباعة للموظفين */
     function addDagensPriceItem() {
         const name = document.getElementById('dagName').value.trim();
         const price = parseFloat(document.getElementById('dagPrice').value) || 0;
@@ -1069,7 +1080,6 @@
         dl.remove();
     }
 
-    // لتشغيل عرض المنتجات والمجموعات تلقائياً عند فتح الصفحة فوراً
     applyLanguageStrings();
 </script>
 
