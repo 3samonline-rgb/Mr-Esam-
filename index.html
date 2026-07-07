@@ -108,13 +108,19 @@
         .dagens-item-name { font-weight: 700; font-size: 15px; text-align: left; }
         .dagens-item-price { font-weight: 800; color: #16a34a; font-size: 16px; }
 
-        /* وضعية الطباعة الاحترافية */
+        /* وضعية الطباعة الاحترافية والتحسين الشامل */
         @media print {
             @page { size: A4; margin: 12mm; }
-            body { background: white; padding: 0; color: #000; font-size: 11pt; }
+            body { background: white; padding: 0 !important; color: #000; font-size: 11pt; }
             .app-container { box-shadow: none; max-width: 100%; width: 100%; padding: 0; }
-            .top-actions, .nav-tabs, .form-group, .calc-box, .btn-main, .bottom-control-bar, .prod-actions-row, .reorder-sticky-bar, .scan-btn, .add-grp-btn, .price-popup-overlay { display: none !important; }
-            .product-card { border: none; border-bottom: 1px solid #ddd; padding: 10px 0; page-break-inside: avoid; display: flex !important; justify-content: space-between; align-items: center; direction: ltr !important; }
+            
+            /* إخفاء تام للعناصر والرموز غير الضرورية أثناء الطباعة */
+            .top-actions, .nav-tabs, .form-group, .calc-box, .btn-main, .bottom-control-bar, 
+            .prod-actions-row, .reorder-sticky-bar, .scan-btn, .add-grp-btn, .price-popup-overlay,
+            .prod-meta a, .prod-meta span { display: none !important; }
+            
+            .group-header-title { background: #f1f5f9 !important; color: #000 !important; border: 1px solid #000; page-break-after: avoid; }
+            .product-card { border: none; border-bottom: 1px solid #000 !important; padding: 10px 0; page-break-inside: avoid; display: flex !important; justify-content: space-between; align-items: center; direction: ltr !important; }
             .prod-price-tag { color: #000 !important; font-size: 14pt; font-weight: bold; }
             .brand-title { font-size: 26pt; text-align: center; }
             .brand-signature { font-size: 14pt; text-align: center; color: #000 !important; }
@@ -320,7 +326,7 @@
             </div>
         </div>
         <div class="form-group" id="grpFakItems">
-            <label id="lblFakItems">Produkt valgt for bekreftelse</label>
+            <label id="lblFakItems">Produkt valgt for bekreفتة</label>
             <select id="fakItemSelect" onchange="syncFakturaFieldsFromSelect()" style="direction: ltr !important; text-align: left !important;">
                 <option value="">-- Velg --</option>
             </select>
@@ -387,7 +393,7 @@
             lblFakSupplier: "Leverandørnavn", lblFakNum: "Fakturanummer", lblFakDate: "Dato", lblFakItems: "Mottatt produkt",
             lblFakRecQty: "Mottatt antall (Kasser/Stk)", lblFakActualCost: "Faktisk innkjøpspris (Total)",
             btnNewInvoice: "Bekreft og legg til i faktura",
-            btnScan: "Scan 📷", promptGroup: "Skriv inn navnet på den نئے varegruppen:", alertEmpty: "Vennligst fyll ut alle felter!",
+            btnScan: "Scan 📷", promptGroup: "Skriv inn navnet på den nye varegruppen:", alertEmpty: "Vennligst fyll ut alle felter!",
             alertFileEmpty: "Filen er tom!", alertSuccess: "Vellykket! Importert {count} produkter.", confirmDelete: "Slette?",
             thProd: "Produkt", thCost: "Kost", thIncome: "Inntekt/Verdi", thProfit: "Gevinst", btnDelFak: "Slett",
             lblOrderBtn: "+ Ordre", lblInvoiceBtn: "📄 Faktura +", lblEditBtn: "Edit", lblDeleteBtn: "X",
@@ -448,7 +454,6 @@
     function applyLanguageStrings() {
         const l = currentLang;
         
-        // الحفاظ على اتجاه العرض والقوائم من اليسار لليمين للنص النرويجي بشكل احترافي
         if (l === 'ar') {
             document.body.setAttribute('dir', 'rtl');
             document.getElementById('searchCatalogBar').style.textAlign = "right";
@@ -528,6 +533,7 @@
 
     function updateVaregruppeDropdown() {
         const select = document.getElementById('prodVaregruppe');
+        if (!select) return;
         select.innerHTML = '';
         varegrupper.forEach(g => {
             const opt = document.createElement('option');
@@ -560,7 +566,6 @@
             finalPrice = exMva * (1 + mva);
             document.getElementById('resFinalPriceInput').value = finalPrice.toFixed(2);
         } else {
-            // تفعيل ميزة التعديل اليدوي على السعر النهائي وحساب الربح الفعلي دون كسر الكود
             finalPrice = parseFloat(document.getElementById('resFinalPriceInput').value) || 0;
         }
 
@@ -629,6 +634,15 @@
         const prodLinkStr = document.getElementById('prodLinkUrl').value.trim();
         const supUrlStr = document.getElementById('prodSupplierUrl').value.trim();
 
+        // جلب المنتج القديم للتحقق من وجود صورة مخزنة مسبقاً لمنع اختفائها
+        let existingImg = '';
+        if (editId) {
+            const oldProd = catalog.find(p => p.id === parseInt(editId));
+            if (oldProd && oldProd.img) {
+                existingImg = oldProd.img;
+            }
+        }
+
         const pData = {
             id: editId ? parseInt(editId) : Date.now(),
             name: name,
@@ -638,7 +652,7 @@
             qty: parseInt(document.getElementById('prodQty').value) || 1,
             margin: parseFloat(document.getElementById('prodMargin').value) || 1.5,
             mva: parseFloat(document.getElementById('prodMva').value) || 0,
-            img: imgUrlStr, 
+            img: imgUrlStr ? imgUrlStr : existingImg, // الاحتفاظ بالصورة القديمة إذا لم يتم إدخال رابط جديد
             link: prodLinkStr,
             supplier: document.getElementById('prodSupplier').value.trim() || "Afro kjøp as",
             supplierUrl: supUrlStr,
@@ -654,7 +668,7 @@
 
         localStorage.setItem('mr_v7_catalog', JSON.stringify(catalog));
         
-        // تفريغ المدخلات فوراً لتسهيل العمل السريع
+        // تفريغ المدخلات بنجاح للمنتج التالي
         document.getElementById('prodName').value = '';
         document.getElementById('prodBarcode').value = '';
         document.getElementById('prodCost').value = '';
@@ -754,6 +768,8 @@
     function loadToForm(id) {
         const p = catalog.find(item => item.id === id);
         if(!p) return;
+        
+        // تعبئة البيانات أولاً وبشكل منفصل
         document.getElementById('editId').value = p.id;
         document.getElementById('prodName').value = p.name;
         document.getElementById('prodBarcode').value = p.barcode || '';
@@ -771,8 +787,8 @@
         window.scrollTo({top: 0, behavior: 'smooth'});
         runCalculations(false);
         
-        const l = currentLang;
-        document.getElementById('btnSave').innerText = words[l].updateBtn;
+        // تحديث نص زر الحفظ فقط دون إعادة تصفير الحقول
+        document.getElementById('btnSave').innerText = words[currentLang].updateBtn;
     }
 
     function addDagensPriceItem() {
