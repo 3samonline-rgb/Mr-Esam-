@@ -57,7 +57,7 @@
         /* ترويسة المجموعات التموينية */
         .group-header-title { background: #e2e8f0; padding: 8px 12px; margin: 16px 0 8px 0; font-weight: 800; font-size: 14px; color: #1e293b; border-radius: 6px; text-align: left; }
         
-        /* كارت المنتج الثابت اليسار */
+        /* كارت المنتج الثابت */
         .product-card { background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 12px; margin-bottom: 8px; display: flex; flex-direction: column; gap: 8px; direction: ltr !important; text-align: left !important; }
         .prod-main-row { display: flex; gap: 12px; align-items: center; width: 100%; direction: ltr !important; text-align: left !important; }
         .prod-img { width: 55px; height: 55px; border-radius: 8px; object-fit: cover; background: #f1f5f9; border: 1px solid #cbd5e1; flex-shrink: 0; display: block; }
@@ -109,39 +109,42 @@
         .dagens-item-name { font-weight: 700; font-size: 15px; text-align: left; }
         .dagens-item-price { font-weight: 800; color: #16a34a; font-size: 16px; }
 
-        /* مراجعة شاملة وتحسين كامل لورقة الطباعة للمالك والموظفين */
+        /* ==================== نظام الطباعة المطور بالكامل للمالك والموظفين ==================== */
         @media print {
             @page { size: A4; margin: 10mm; }
-            body { background: white; padding: 0 !important; color: #000; font-size: 11pt; direction: ltr !important; }
-            .app-container { box-shadow: none; max-width: 100%; width: 100%; padding: 0; }
+            body { background: white !important; padding: 0 !important; color: #000 !important; font-size: 12pt !important; direction: ltr !important; }
+            .app-container { box-shadow: none !important; max-width: 100% !important; width: 100% !important; padding: 0 !important; }
             
-            /* إخفاء كافة العناصر غير القابلة للطباعة */
+            /* إخفاء كافة عناصر التحكم غير المخصصة للطباعة الورقية */
             .top-actions, .nav-tabs, .form-group, .calc-box, .btn-main, .bottom-control-bar, 
             .prod-actions-row, .reorder-sticky-bar, .scan-btn, .add-grp-btn, .price-popup-overlay,
-            .prod-meta a, .prod-meta span, input, select, button { display: none !important; }
+            input, select, button { display: none !important; }
             
-            .group-header-title { background: #f1f5f9 !important; color: #000 !important; border: 1px solid #000; padding: 6px; margin-top: 15px; font-size: 14pt; page-break-after: avoid; display: block !important; text-align: left !important; }
+            .group-header-title { background: #f1f5f9 !important; color: #000 !important; border: 1px solid #000 !important; padding: 6px !important; margin-top: 15px !important; font-size: 14pt !important; page-break-after: avoid; display: block !important; text-align: left !important; }
             
-            /* كارت المنتج في الطباعة */
-            .product-card { border: none !important; border-bottom: 1px solid #ccc !important; padding: 8px 0 !important; margin: 0 !important; display: flex !important; flex-direction: row !important; justify-content: space-between !important; align-items: center !important; page-break-inside: avoid; direction: ltr !important; }
+            /* إعداد هيكل كارت المنتج في الطباعة */
+            .product-card { border: none !important; border-bottom: 1px solid #ccc !important; padding: 10px 0 !important; margin: 0 !important; display: flex !important; flex-direction: row !important; justify-content: space-between !important; align-items: center !important; page-break-inside: avoid !important; direction: ltr !important; }
             .prod-main-row { display: flex !important; flex-direction: row !important; justify-content: space-between !important; align-items: center !important; width: 100% !important; direction: ltr !important; }
+            .prod-info { display: block !important; text-align: left !important; }
+
+            /* وضع ترويسة المتجر الثابتة */
+            .brand-title { font-size: 24pt !important; font-weight: bold !important; text-align: center !important; display: block !important; }
+            .brand-subtitle { font-size: 14pt !important; text-align: center !important; display: block !important; }
+            .brand-signature { font-size: 11pt !important; text-align: center !important; display: block !important; }
             
-            /* ترويسة الطباعة للمالك */
-            .brand-title { font-size: 24pt; text-align: center; font-weight: bold; display: block !important; }
-            .brand-subtitle { font-size: 14pt; text-align: center; display: block !important; }
-            .brand-signature { font-size: 12pt; text-align: center; color: #000 !important; display: block !important; }
-            
-            /* تنسيق عرض أسعار الموظفين النظيف والواضح جداً للـ Labels */
+            /* [1] تنسيق وضعية الموظفين: إخفاء كل شيء عدا الاسم وسعر البيع النهائي بشكل ضخم */
             body.print-mode-ansatte .prod-meta, 
             body.print-mode-ansatte .prod-img, 
             body.print-mode-ansatte .print-only-info { display: none !important; }
             body.print-mode-ansatte .prod-title { font-size: 18pt !important; font-weight: bold !important; color: #000 !important; text-align: left !important; }
-            body.print-mode-ansatte .prod-price-tag { font-size: 22pt !important; font-weight: 900 !important; color: #000 !important; text-align: right !important; }
+            body.print-mode-ansatte .prod-price-tag { font-size: 22pt !important; font-weight: 900 !important; color: #000 !important; text-align: right !important; display: block !important; }
             
-            /* وضعية طباعة المالك لإظهار الباركود والتكلفة */
-            body.print-mode-kunder .print-only-info { display: block !important; font-size: 10pt; color: #333; margin-top: 2px; }
+            /* [2] تنسيق وضعية المالك: عرض التفاصيل السرية (التكلفة والباركود) */
+            body.print-mode-kunder .print-only-info { display: block !important; font-size: 10pt !important; color: #444 !important; margin-top: 4px !important; font-weight: bold !important; }
             body.print-mode-kunder .prod-title { font-size: 14pt !important; font-weight: bold !important; }
-            body.print-mode-kunder .prod-price-tag { font-size: 16pt !important; font-weight: bold !important; }
+            body.print-mode-kunder .prod-price-tag { font-size: 16pt !important; font-weight: bold !important; color: #16a34a !important; }
+            body.print-mode-kunder .prod-img { display: block !important; width: 45px !important; height: 45px !important; }
+            body.print-mode-kunder .prod-meta { display: block !important; font-size: 9pt !important; }
         }
     </style>
 </head>
@@ -174,6 +177,7 @@
     </div>
 
     <div id="sectionVareliste" class="page-section active">
+        <!-- حقل الأيدي المخفي المسؤول عن وضع التعديل -->
         <input type="hidden" id="editId" value="">
         
         <div class="form-group" id="grpProdName">
@@ -631,7 +635,7 @@
         }
     }
 
-    /* إصلاح مشكلة حفظ وتعديل الروابط والصور */
+    // ==================== المعالجة المحدثة بالكامل للتعديل والحفظ الشامل ====================
     function saveProductToCatalog() {
         const name = document.getElementById('prodName').value.trim();
         if(!name) return;
@@ -642,11 +646,16 @@
         const supUrlStr = document.getElementById('prodSupplierUrl').value.trim();
 
         let finalImg = imgUrlStr;
-        // إذا كان حقل رابط الصورة فارغاً أثناء التعديل، نبحث عن الصورة المحفوظة مسبقاً لمنع حذفها
-        if (!finalImg && editId) {
+        let finalLink = prodLinkStr;
+        let finalSupUrl = supUrlStr;
+
+        // في حالة التعديل وحفظ منتج قديم، نقوم بجلب الروابط والصور القديمة لمنع إسقاطها إذا لم يتم تعديل حقولها
+        if (editId) {
             const oldProd = catalog.find(p => String(p.id) === String(editId));
-            if (oldProd && oldProd.img) {
-                finalImg = oldProd.img;
+            if (oldProd) {
+                if (!finalImg && oldProd.img) finalImg = oldProd.img;
+                if (!finalLink && oldProd.link) finalLink = oldProd.link;
+                if (!finalSupUrl && oldProd.supplierUrl) finalSupUrl = oldProd.supplierUrl;
             }
         }
 
@@ -660,9 +669,9 @@
             margin: parseFloat(document.getElementById('prodMargin').value) || 1.5,
             mva: parseFloat(document.getElementById('prodMva').value) || 0,
             img: finalImg, 
-            link: prodLinkStr,
+            link: finalLink,
             supplier: document.getElementById('prodSupplier').value.trim() || "Afro kjøp as",
-            supplierUrl: supUrlStr,
+            supplierUrl: finalSupUrl,
             finalPrice: parseFloat(document.getElementById('resFinalPriceInput').value) || 0
         };
 
@@ -674,7 +683,7 @@
 
         localStorage.setItem('mr_v7_catalog', JSON.stringify(catalog));
         
-        // تفريغ المدخلات وإعادة تعيين حقل التعديل المخفي لضمان نجاح الإضافات القادمة
+        // تصفير ذكي شامل ومسح كامل لمعرّف التعديل من الـ DOM لمنع التداخل مستقبلاً
         document.getElementById('editId').value = "";
         document.getElementById('prodName').value = '';
         document.getElementById('prodBarcode').value = '';
@@ -743,8 +752,9 @@
                                 ${words[l].textLeverandoer}: <b>${p.supplier || 'Afro kjøp as'}</b> 
                                 ${linkVareHtml} ${linkSupHtml}
                             </div>
+                            <!-- سطر مخفي يظهر في طباعة المالك فقط ويختفي تلقائياً عند طباعة الموظفين -->
                             <div class="print-only-info">
-                                BC: ${p.barcode || '-'} | Innkjøp: ${(p.cost/p.qty).toFixed(2)} kr
+                                BC: ${p.barcode || '-'} | Innkjøp (enhet): ${(p.cost / p.qty).toFixed(2)} kr
                             </div>
                         </div>
                         <div class="prod-price-tag" onclick="showPricePopup('${p.name.replace(/'/g, "\\'")}', '${p.barcode || ''}', ${p.finalPrice || 0})">${(p.finalPrice || 0).toFixed(2)} kr</div>
